@@ -42,7 +42,7 @@ Este projeto está sendo desenvolvido de forma iterativa, aplicando metodologias
 Nesta fase atual (MVP para o TCC), o foco absoluto está na **consolidação das regras de negócio, modelagem relacional e segurança de permissões**. Por ser uma versão de validação de negócio, algumas decisões arquiteturais foram tomadas:
 
 *   **Autenticação:** Atualmente gerenciada pela estrutura padrão baseada em sessões do Spring Security. A implementação de tokens **JWT** (JSON Web Tokens) para uma abordagem puramente *stateless* está mapeada para o próximo ciclo de refatoração.
-*   **Banco de Dados:** A criação e atualização do esquema do banco estão sendo delegadas ao `spring.jpa.hibernate.ddl-auto` (geração automática). O versionamento de banco via **Migrations** (como Flyway ou Liquibase) será integrado na fase de preparação para o ambiente de produção.
+*   **Banco de Dados:** A criação e atualização do esquema do banco estão sendo delegadas ao `spring.jpa.hibernate.ddl-auto` (geração automática). O versionamento de banco via **Migrations** (como Flyway ou Liquibase) será integrado na fase de atualizações para o ambiente de pós formação seguindo o cronograma de melhorias e atualizações com o cliente.
 *   **Validações:** As regras estão sendo tratadas explicitamente nas classes de `Service` (Domain Logic), sem o uso extensivo de dependências extras de `Annotations` de validação na camada de DTOs neste primeiro momento.
 
 Essa abordagem garante que a lógica fundamental do sistema esteja robusta e testável antes de adicionar complexidade de infraestrutura.
