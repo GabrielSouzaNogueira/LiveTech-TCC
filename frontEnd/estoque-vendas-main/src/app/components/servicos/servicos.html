@@ -1,0 +1,92 @@
+<div class="cadastro-servico-container">
+
+    <div>
+
+        <!-- Botões para mudar as abas -->
+        <div class="navegacao-abas">
+
+            <button
+                type="button"
+                class="btn-aba"
+                [class.aba-ativa]="abaAtiva === 'cadastrar'"
+                (click)="alternarAba('cadastrar')">
+
+                Cadastrar Serviço
+
+            </button>
+
+            <button
+                type="button"
+                class="btn-aba"
+                [class.aba-ativa]="abaAtiva === 'atualizar'"
+                (click)="alternarAba('atualizar')">
+
+                Atualizar Serviço
+
+            </button>
+
+        </div>
+
+        <!-- ABA DE CADASTRO -->
+        @if (abaAtiva === 'cadastrar') {
+
+            <h2>Cadastro de Serviço</h2>
+
+            <p>
+                Preencha todos os campos com * para cadastrar o Serviço!
+            </p>
+
+            <form
+                class="form-group"
+                #form="ngForm"
+                (ngSubmit)="executarCadastroServicos()">
+
+                <!-- Descrição -->
+                <label for="descServico">
+                    * Descrição do Serviço:
+                </label>
+
+                <input
+                    type="text"
+                    id="descServico"
+                    name="descServico"
+                    [(ngModel)]="descServicoDigitado"
+                    placeholder="Digite a descrição do serviço"
+                    required>
+
+                <!-- Preço -->
+                <label for="precoServico">
+                    * Preço do Serviço:
+                </label>
+
+                <input
+                    type="text"
+                    id="precoServico"
+                    name="precoServico"
+                    [(ngModel)]="precoServicoDigitado"
+                    placeholder="Digite o preço do serviço"
+                    required>
+
+                <!-- Botão -->
+                <button
+                    type="submit"
+                    [disabled]="form.invalid || carregando">
+
+                    {{ carregando ? 'Cadastrando...' : 'Cadastrar' }}
+
+                </button>
+
+            </form>
+
+        }
+
+        <!-- ABA DE ATUALIZAÇÃO -->
+        @if (abaAtiva === 'atualizar') {
+
+            <app-gerenciador-servicos></app-gerenciador-servicos>
+
+        }
+
+    </div>
+
+</div>

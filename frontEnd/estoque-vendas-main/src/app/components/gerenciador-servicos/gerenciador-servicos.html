@@ -1,0 +1,113 @@
+<div>
+
+  <div>
+<h2>Gerenciador de Serviços</h2>
+
+<p>Clique em um serviço da lista abaixo para editar os dados</p>
+
+<form (submit)="executarGerenciadorServicos()">
+
+  <div class="form-group">
+
+    <label>Descrição do Serviço:</label>
+
+    <input
+      type="text"
+      [(ngModel)]="descServicoSelecionado"
+      name="descServico"
+      placeholder="Descrição do serviço"
+      required>
+
+  </div>
+
+  <div class="form-group">
+
+    <label>Preço do Serviço:</label>
+
+    <input
+      type="text"
+      [(ngModel)]="precoServicoSelecionado"
+      name="precoServico"
+      placeholder="Preço do serviço"
+      required>
+
+  </div>
+
+  <button
+    type="submit"
+    [disabled]="carregando || !podeSalvar">
+
+    {{ carregando ? 'Atualizando...' : 'Salvar Alterações' }}
+
+  </button>
+
+</form>
+
+  </div>
+
+  <div>
+
+<h3>Serviços Cadastrados</h3>
+
+<table>
+
+  <thead>
+
+    <tr>
+
+      <th>Descrição</th>
+
+      <th>Preço</th>
+
+      <th>Status</th>
+
+      <th class="coluna-acao">Ação</th>
+
+    </tr>
+
+  </thead>
+
+  <tbody>
+
+    <!-- Percorre a lista de serviços -->
+
+    <tr
+      *ngFor="let servico of ListarServicos"
+      (click)="selecionarServicos(servico)"
+      [class.linha-selecionada]="servico.servicosId === servicosIdSelecionado">
+
+      <td>
+        {{ servico.descServico }}
+      </td>
+
+      <td>
+        {{ servico.precoServico }}
+      </td>
+
+      <td>
+        {{ servico.status }}
+      </td>
+
+      <td class="celila-acao">
+
+        <button
+          type="button"
+          class="btn-inativar"
+          [disabled]="isInativando(servico)"
+          (click)="inativarServicos(servico, $event)">
+
+          {{ isInativando(servico) ? 'Inativando...' : 'Inativar' }}
+
+        </button>
+
+      </td>
+
+    </tr>
+
+  </tbody>
+
+</table>
+
+  </div>
+
+</div>

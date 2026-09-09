@@ -1,0 +1,72 @@
+<div class="cadastro-cliente-container">
+    <div>
+
+        <div class="navegacao-abas">
+            <button 
+                type="button" 
+                class="btn-aba" 
+                [class.aba-ativa]="abaAtiva === 'cadastrar'" 
+                (click)="alternarAba('cadastrar')">
+                Cadastrar Usuario
+            </button>
+
+            <button 
+                type="button" 
+                class="btn-aba" 
+                [class.aba-ativa]="abaAtiva === 'atualizar'" 
+                (click)="alternarAba('atualizar')">
+                Atualizar Usuario
+            </button>
+        </div>
+
+        @if (abaAtiva === 'cadastrar') {
+            <h2>Cadastro de Cliente</h2>
+
+            <p>Preencha todos os campos com * para cadastrar o cliente!</p>
+
+            <form class="form-group" #form="ngForm" (ngSubmit)="executarCadastroCliente()">
+                <label for="username">* Nome do cliente: </label>
+                <input 
+                type="text"
+                name="username"
+                id="username"
+                [(ngModel)]="nomeDigitado"
+                placeholder="Digite o nome do cliente"
+                required>  
+
+                <label for="sobrenome">Sobrenome do cliente: </label>
+                <input 
+                type="text"
+                name="sobrenome"
+                id="sobrenome"
+                [(ngModel)]="sobrenomeDigitado"
+                placeholder="Digite o sobrenome do cliente">
+
+                <label for="email">Email: </label>
+                <input 
+                type="text"
+                name="email"
+                id="email"
+                [(ngModel)]="emailDigitado"
+                placeholder="Digite o email do cliente">
+
+                <label for="telefone">Telefone: </label>
+                <input 
+                type="text"
+                name="telefone"
+                [(ngModel)]="telefoneDigitado"
+                placeholder="(62) 90000-0000"
+                mask="(00) 00000-0000">
+
+                <button type="submit" [disabled]="form.invalid || carregando">
+                    {{carregando ? 'Entrando...' : 'Cadastrar'}}
+                </button>  
+            </form>
+        }
+                <!-- exibe a tela de atualizar -->
+        @if (abaAtiva === 'atualizar') {
+            <!-- chamamos diretamente o componente de -->
+             <app-gerenciador-cliente></app-gerenciador-cliente>
+        }
+    </div>
+</div>

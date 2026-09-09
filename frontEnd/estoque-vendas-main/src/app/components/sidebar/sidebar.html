@@ -19,6 +19,12 @@
         </a>
       </li>
       <li>
+        <a routerLink="/cadastro-cliente" routerLinkActive="link-ativo" class="nav-item">
+          <span class="icone">👤</span>
+          <span class="texto-link" *ngIf="!estaRecolhida">Cadastro de cliente</span>
+        </a>
+      </li>
+      <li>
         <a routerLink="/cadastro-usuario" routerLinkActive="link-ativo" class="nav-item">
           <span class="icone">👥</span>
           <span class="texto-link" *ngIf="!estaRecolhida">Cadastro de usuários</span>
@@ -36,6 +42,12 @@
           <span class="icone">📈</span> 
           <span class="texto-link" *ngIf="!estaRecolhida">Movimentação</span>
         </a>
+       </li>
+       <li>
+          <a routerLink="/servicos" routerLinkActive="link-ativo" class="nav-item">
+            <span class="icone">⚙️​</span>
+            <span class="text-link" *ngIf="!estaRecolhida">Serviços</span>
+          </a>
        </li>
        <li>
         <a routerLink="/forma-pagamento" routerLinkActive="link-ativo" class="nav-item">

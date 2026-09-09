@@ -1,0 +1,67 @@
+
+<div>
+    <div>
+        <h2>Gerenciador de Clientes</h2>
+        <p>Clique em um cliente da lista abaixo para editar os dados</p>
+
+        <form (submit)="executarGerenciadorCliente()">
+
+        <div class="form-group">
+            <label>Nome:</label>
+            <input type="text" [(ngModel)]="nomeDigitado" name="nome" placeholder="Nome do cliente" required>
+        </div>
+
+        <div class="form-group">
+            <label>Sobrenome</label>
+            <input type="text" [(ngModel)]="sobrenomeDigitado" name="sobrenome" placeholder="Sobre Nome do cliente">
+        </div>
+        
+        <div class="form-group">
+            <label>E-mail:</label>
+            <input type="email" [(ngModel)]="emailDigitado" name="email" placeholder="E-mail">
+        </div>
+
+        <div class="form-group">
+            <label>Telefone:</label>
+            <input type="text" [(ngModel)]="telefoneDigitado" name="telefone" placeholder="Telefone" mask="(00) 00000-0000">
+        </div>
+
+        <button type="submit" [disabled]="carregando || !podeSalvar">
+            {{ carregando ? 'Atualizando...' : 'Salvar Alterações' }}
+        </button>
+        </form>
+    </div>
+
+    <div>
+        <h3>Clientes Cadastrados</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>SobreNome</th>
+                    <th>E-mail</th>
+                    <th>Telefone</th>
+                    <th class="coluna-acao">Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of listarClientes"
+                (click)="selecionarCliente(user)"
+                [class.linha-selecionada]="user.id === idDigitado">
+                    <td>{{ user.nome }}</td>
+                    <td>{{ user.sobrenome }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.telefone }}</td>
+                    <td class="celila-acao">
+                        <button type="button" 
+                                class="btn-inativar" 
+                                (click)="inativarCliente(user, $event)">
+                            Inativar
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

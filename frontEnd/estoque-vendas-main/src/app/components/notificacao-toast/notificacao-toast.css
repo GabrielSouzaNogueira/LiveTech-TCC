@@ -3,16 +3,26 @@
   top: 1.25rem;
   right: 1.25rem;
   z-index: 9999;
+
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
+  gap: 1rem;
+
+  padding: 1.25rem 1.5rem;
+  border-radius: 10px;
+
+  font-size: 1.1rem;
   font-weight: 600;
+
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
   animation: entrada 0.25s ease-out;
-  max-width: 360px;
+
+  max-width: 500px;
+  min-width: 350px;
+
+  /* Faz mensagens grandes quebrarem corretamente */
+  line-height: 1.5;
 }
 
 .toast-sucesso {
@@ -30,11 +40,14 @@
 .toast-fechar {
   background: transparent;
   border: none;
-  font-size: 1.1rem;
+
+  font-size: 1.5rem;
   line-height: 1;
+
   cursor: pointer;
   color: inherit;
   opacity: 0.6;
+
   margin-left: auto;
   padding: 0;
 }
@@ -48,6 +61,7 @@
     transform: translateY(-10px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;

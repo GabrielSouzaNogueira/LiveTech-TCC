@@ -1,0 +1,147 @@
+/* Container principal */
+.cadastro-cliente-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    background-color: white;
+    font-family: inherit;
+    padding: 1.5rem 1rem;
+    box-sizing: border-box;
+}
+
+/* Caixa principal */
+.cadastro-cliente-container > div {
+    width: 100%;
+    max-width: 850px;
+    background: white;
+    border-radius: 8px;
+    padding: 1.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    box-sizing: border-box;
+}
+
+/* Título */
+.cadastro-cliente-container h2 {
+    text-align: center;
+    margin-bottom: 0.25rem;
+    color: #1e293b;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Texto */
+.cadastro-cliente-container p {
+    text-align: center;
+    margin-bottom: 1.25rem;
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+/* Formulário */
+.cadastro-cliente-container .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Labels */
+.cadastro-cliente-container .form-group label {
+    margin-top: 0.85rem;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.85rem;
+}
+
+/* Inputs */
+.cadastro-cliente-container .form-group input,
+.cadastro-cliente-container .form-group select {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.9rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Focus dos inputs */
+.cadastro-cliente-container .form-group input:focus,
+.cadastro-cliente-container .form-group select:focus {
+    outline: none;
+    border-color: #8BCF8B;
+    box-shadow: 0 0 5px rgba(139, 207, 139, 0.6);
+}
+
+/* Placeholder */
+.cadastro-cliente-container .form-group input::placeholder {
+    color: #94a3b8;
+}
+
+/* Botão de cadastro */
+.cadastro-cliente-container button {
+    width: 100%;
+    margin-top: 1.25rem;
+    padding: 0.55rem 1.2rem;
+    background: #8BCF8B;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+/* Hover do botão */
+.cadastro-cliente-container button:hover {
+    background: #72c172;
+}
+
+/* Clique no botão */
+.cadastro-cliente-container button:active {
+    transform: scale(0.98);
+}
+
+/* Botão desabilitado */
+.cadastro-cliente-container button:disabled {
+    background: #c2e7c2;
+    cursor: not-allowed;
+}
+
+/* Abas */
+.cadastro-cliente-container .navegacao-abas {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 0.75rem;
+}
+
+/* Botões das abas */
+.cadastro-cliente-container .btn-aba {
+    flex: 1;
+    padding: 0.55rem 0.75rem;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: 0.2s;
+    margin-top: 0;
+}
+
+/* Hover das abas */
+.cadastro-cliente-container .btn-aba:hover {
+    background: #e2f5e2;
+    border-color: #8BCF8B;
+}
+
+/* Aba ativa */
+.cadastro-cliente-container .aba-ativa {
+    background: #8BCF8B !important;
+    color: white !important;
+    border-color: #8BCF8B !important;
+}

@@ -7,8 +7,8 @@
     <form (submit)="executarGerenciadorProduto()">
 
       <div class="form-group">
-        <label>Nome:</label>
-        <input type="text" [(ngModel)]="nomeDigitado" name="nome" placeholder="Nome do produto" required>
+        <label>Descrição:</label>
+        <input type="text" [(ngModel)]="nomeDigitado" name="nome" placeholder="Descrição do produto" required>
       </div>
 
       <div class="form-group">
@@ -48,7 +48,7 @@
     <table>
       <thead>
         <tr>
-          <th>Nome</th>
+          <th>Descrição</th>
           <th>Marca</th>
           <th>Código de Barras</th>
           <th>Quantidade</th>

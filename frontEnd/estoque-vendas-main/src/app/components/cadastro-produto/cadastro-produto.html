@@ -25,13 +25,13 @@
             <p>Preencha todos os campos com * para cadastrar o Produto!</p>
 
             <form class="form-group" #form="ngForm" (ngSubmit)="executarCadastroProduto()">
-                <label for="username">* Nome do Produto: </label>
+                <label for="username">* Descrição do Produto: </label>
                 <input 
                 type="text"
                 id="username"
                 name="username"
                 [(ngModel)]="nomeDigitado"
-                placeholder="Digite o nome do Produto"
+                placeholder="Digite a descrição do Produto"
                 required>
 
                 <label for="marca">* Marca do produto: </label>

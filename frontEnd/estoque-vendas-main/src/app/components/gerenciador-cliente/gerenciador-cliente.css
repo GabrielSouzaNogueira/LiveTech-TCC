@@ -1,0 +1,194 @@
+/* Container principal */
+.cadastro-cliente-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    background-color: white;
+    font-family: inherit;
+    padding: 1.5rem 1rem;
+    box-sizing: border-box;
+}
+
+/* Caixa principal */
+.cadastro-cliente-container > div {
+    width: 100%;
+    max-width: 850px;
+    background: white;
+    border-radius: 8px;
+    padding: 1.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    box-sizing: border-box;
+}
+
+/* Título principal */
+.cadastro-cliente-container h2 {
+    text-align: center;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Texto explicativo */
+.cadastro-cliente-container p {
+    text-align: center;
+    color: #64748b;
+    margin-bottom: 1.25rem;
+    font-size: 0.95rem;
+}
+
+/* Organização do formulário */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Labels */
+.form-group label {
+    margin-top: 0.85rem;
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.85rem;
+}
+
+/* Campos de entrada */
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.9rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Campo selecionado */
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #8BCF8B;
+    box-shadow: 0 0 5px rgba(139, 207, 139, 0.6);
+}
+
+/* Placeholder */
+.form-group input::placeholder {
+    color: #94a3b8;
+}
+
+/* Botão Salvar */
+button {
+    width: 100%;
+    margin-top: 1.25rem;
+    padding: 0.55rem 1.2rem;
+    background-color: #8BCF8B;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+/* Hover do botão */
+button:hover {
+    background-color: #72c172;
+}
+
+/* Clique do botão */
+button:active {
+    transform: scale(0.98);
+}
+
+/* Botão desabilitado */
+button:disabled {
+    background-color: #c2e7c2;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Título da tabela */
+.cadastro-cliente-container h3 {
+    text-align: center;
+    color: #1e293b;
+    margin-top: 1.75rem;
+    margin-bottom: 1rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #e2e8f0;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+/* Tabela */
+table {
+    width: 100%;
+    margin-top: 1rem;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+/* Cabeçalho */
+thead {
+    background-color: #8BCF8B;
+    color: white;
+}
+
+/* Células */
+th,
+td {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+}
+
+/* Linhas da tabela */
+tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+/* Hover das linhas */
+tbody tr:hover {
+    background-color: #f5fff5;
+}
+
+/* Coluna de ação */
+.coluna-acao,
+.celila-acao {
+    text-align: center;
+}
+
+/* Botão Inativar */
+.btn-inativar {
+    width: auto;
+    background: transparent;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    padding: 0.3rem 0.65rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 0;
+}
+
+/* Hover do botão Inativar */
+.btn-inativar:hover {
+    background-color: #ef4444;
+    color: white;
+}
+
+/* Clique do botão Inativar */
+.btn-inativar:active {
+    transform: scale(0.98);
+}
+
+/* Destaque visual da linha selecionada */
+.linha-selecionada {
+    background-color: #e2f5e2 !important;
+}
