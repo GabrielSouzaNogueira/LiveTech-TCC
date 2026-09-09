@@ -21,6 +21,7 @@ public class Servicos {
     private BigDecimal precoServico;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private ServicosStatus status;
 
     public Servicos(){

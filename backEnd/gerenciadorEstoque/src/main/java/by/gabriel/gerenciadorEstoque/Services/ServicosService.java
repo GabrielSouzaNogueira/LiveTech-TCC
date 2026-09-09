@@ -45,7 +45,7 @@ public class ServicosService {
             throw new IllegalArgumentException("A descrição do serviço é obrigatória");
         }
 
-        if (dto.precoServico() == null || dto.precoServico().compareTo(BigDecimal.ZERO) < 0) {
+        if (dto.precoServico() == null || dto.precoServico().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("O preço do serviço é inválido");
         }
 

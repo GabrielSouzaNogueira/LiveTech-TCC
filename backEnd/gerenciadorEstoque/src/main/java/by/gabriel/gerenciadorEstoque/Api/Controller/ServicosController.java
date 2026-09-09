@@ -1,17 +1,19 @@
 package by.gabriel.gerenciadorEstoque.Api.Controller;
 
+import by.gabriel.gerenciadorEstoque.Api.DTO.Response.ResponseDTO;
 import by.gabriel.gerenciadorEstoque.Api.DTO.Servicos.ServicosDTO;
 import by.gabriel.gerenciadorEstoque.Api.DTO.Servicos.Consultas.ServicosSelectDTO;
-import by.gabriel.gerenciadorEstoque.Model.Servicos.Servicos;
 import by.gabriel.gerenciadorEstoque.Services.ServicosService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
 @RequestMapping("/servicos")
+@CrossOrigin(originPatterns = "*")
 public class ServicosController {
 
     private final ServicosService servicosService;
@@ -20,41 +22,59 @@ public class ServicosController {
         this.servicosService = servicosService;
     }
 
-    // --- LISTAGEM DE SERVIÇOS ---
+    // --- LISTAGEM DE SERVIÇOS (Mantido o original para não quebrar o Angular) ---
     @GetMapping("/listAll")
     public ResponseEntity<List<ServicosSelectDTO>> listarServicos() {
         List<ServicosSelectDTO> servicos = servicosService.listarServicosAtivos();
         return ResponseEntity.ok(servicos);
     }
 
-    // --- CADASTRO ---
+    // --- CADASTRO (Agora com ResponseDTO) ---
     @PostMapping("/cadastrar")
-    public ResponseEntity<Servicos> cadastrarServico(
+    public ResponseEntity<ResponseDTO> cadastrarServico(
             @RequestBody ServicosDTO dto,
             @RequestHeader("X-Usuario-Logado") String usuarioLogado) {
 
-        Servicos novoServico = servicosService.cadastrarServico(dto, usuarioLogado);
-        return ResponseEntity.status(HttpStatus.CREATED).body(novoServico);
+        servicosService.cadastrarServico(dto, usuarioLogado);
+
+        ResponseDTO response = new ResponseDTO(
+                true,
+                "Serviço cadastrado com sucesso!",
+                LocalDateTime.now().toString()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // --- ATUALIZAÇÃO ---
+    // --- ATUALIZAÇÃO (Agora com ResponseDTO) ---
     @PutMapping("/atualizar/{id}")
-    public ResponseEntity<Servicos> atualizarServico(
+    public ResponseEntity<ResponseDTO> atualizarServico(
             @PathVariable Long id,
             @RequestBody ServicosDTO dto,
             @RequestHeader("X-Usuario-Logado") String usuarioLogado) {
 
-        Servicos servicoAtualizado = servicosService.atualizarServico(id, dto, usuarioLogado);
-        return ResponseEntity.ok(servicoAtualizado);
+        servicosService.atualizarServico(id, dto, usuarioLogado);
+
+        ResponseDTO response = new ResponseDTO(
+                true,
+                "Serviço atualizado com sucesso!",
+                LocalDateTime.now().toString()
+        );
+        return ResponseEntity.ok(response);
     }
 
-    // --- DELEÇÃO LÓGICA ---
+    // --- DELEÇÃO LÓGICA (Agora com ResponseDTO) ---
     @DeleteMapping("/deletar/{id}")
-    public ResponseEntity<String> deletarServico(
+    public ResponseEntity<ResponseDTO> deletarServico(
             @PathVariable Long id,
             @RequestHeader("X-Usuario-Logado") String usuarioLogado) {
 
         servicosService.deletarServico(id, usuarioLogado);
-        return ResponseEntity.ok("Serviço inativado com sucesso!");
+
+        ResponseDTO response = new ResponseDTO(
+                true,
+                "Serviço inativado com sucesso!",
+                LocalDateTime.now().toString()
+        );
+        return ResponseEntity.ok(response);
     }
 }
