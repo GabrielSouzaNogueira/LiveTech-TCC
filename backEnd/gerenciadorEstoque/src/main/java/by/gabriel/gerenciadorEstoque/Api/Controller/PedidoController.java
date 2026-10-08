@@ -27,7 +27,7 @@ public class PedidoController {
     @PostMapping("/criar")
     public ResponseEntity<PedidoResponseDTO> criarPedidoAberta (@RequestBody PedidoDTO dto, @RequestHeader ("X-Usuario-Logado") String usuarioLogado) {
 
-        Pedido novoPedido = vendaService.criarVendaAberta(dto, usuarioLogado);
+        Pedido novoPedido = vendaService.criarPedidoAberta(dto, usuarioLogado);
 
         PedidoResponseDTO response = new PedidoResponseDTO(
                 novoPedido.getId(),
@@ -44,7 +44,7 @@ public class PedidoController {
     @PostMapping("/finalizar/{id}")
     public ResponseEntity<PedidoResponseDTO> finalizarPedido (@PathVariable Long id, @RequestBody List<PagPedidoDTO> pagDto, @RequestHeader ("X-Usuario-Logado") String usuarioLogado) {
 
-        Pedido pedidoFinalizado = vendaService.finalizarVenda(id, pagDto, usuarioLogado);
+        Pedido pedidoFinalizado = vendaService.finalizarPedido(id, pagDto, usuarioLogado);
 
         PedidoResponseDTO response = new PedidoResponseDTO(
                 pedidoFinalizado.getId(),
@@ -64,7 +64,7 @@ public class PedidoController {
             @RequestBody PedidoDTO dto,
             @RequestHeader("X-Usuario-Logado") String usuarioLogado) {
 
-        Pedido pedidoAtualizado = vendaService.atualizarVendaAberta(id, dto, usuarioLogado);
+        Pedido pedidoAtualizado = vendaService.atualizarPedidoAberta(id, dto, usuarioLogado);
 
         PedidoResponseDTO response = new PedidoResponseDTO(
                 pedidoAtualizado.getId(),
@@ -110,7 +110,7 @@ public class PedidoController {
     // --- LISTAR TODAS (Para a tabela do frontend) ---
     @GetMapping("/listAll")
     public ResponseEntity<List<PedidoListDTO>> listarVendas() {
-        List<PedidoListDTO> lista = vendaService.listarTodasAsVendas();
+        List<PedidoListDTO> lista = vendaService.listarTodosOsPedidos();
         return ResponseEntity.ok(lista);
     }
 
