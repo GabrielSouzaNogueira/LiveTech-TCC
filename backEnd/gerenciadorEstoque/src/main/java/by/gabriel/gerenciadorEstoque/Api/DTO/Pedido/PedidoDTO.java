@@ -7,6 +7,6 @@ public record PedidoDTO(
 
         Long clienteId, // <-- Agora recebemos o ID numérico do cliente
         BigDecimal desconto,
-        List<ItensPedidoDTO> itensVenda,
+        List<ItensPedidoDTO> itensPedido,
         List<PagPedidoDTO> pagVenda
 ) {}
