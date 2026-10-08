@@ -182,6 +182,10 @@ public class PedidoService {
         Usuario userLogado = userRepository.findByNomeIgnoreCase(usuarioLogado)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado: " + usuarioLogado));
 
+        if (userLogado.getUserCargo() != UserCargo.ADMINISTRADOR || userLogado.getUserCargo() != UserCargo.DEV || userLogado.getUserCargo() != UserCargo.GERENTE) {
+            throw new UserNotPermission("Usuario sem permissão para realizar esta ação");
+        }
+
         Pedido pedido = pedidoRepository.findById(vendaId)
                 .orElseThrow(() -> new PedidoNaoEncontrado("Pedido não encontrado"));
 
@@ -245,7 +249,6 @@ public class PedidoService {
     @Transactional
     public void cancelarPedidoAberto(Long vendaId, String usuarioLogado) {
 
-        // Valida usuário apenas para fins de auditoria/segurança da requisição
         userRepository.findByNomeIgnoreCase(usuarioLogado)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
 
@@ -262,7 +265,7 @@ public class PedidoService {
 
     // --- 3. DEVOLUÇÃO DE VENDA FINALIZADA (Estorno) ---
     @Transactional
-    public Pedido devolverPedidoinalizada(Long vendaId, String usuarioLogado) {
+    public Pedido devolverPedidoFinalizada(Long vendaId, String usuarioLogado) {
 
         Usuario userLogado = userRepository.findByNomeIgnoreCase(usuarioLogado)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
