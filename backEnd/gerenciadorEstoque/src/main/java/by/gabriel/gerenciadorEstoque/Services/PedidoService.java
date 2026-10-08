@@ -8,6 +8,13 @@ import java.util.List;
 import by.gabriel.gerenciadorEstoque.Api.DTO.Pedido.Consultas.PedidoListDTO;
 import by.gabriel.gerenciadorEstoque.Enum.Movimentacao.AcaoMovimentacao;
 import by.gabriel.gerenciadorEstoque.Enum.Movimentacao.TipoEntidade;
+import by.gabriel.gerenciadorEstoque.Enum.Usuario.UserCargo;
+import by.gabriel.gerenciadorEstoque.Enum.Usuario.UserStatus;
+import by.gabriel.gerenciadorEstoque.Exception.Cliente.ClienteNaoEncontrado;
+import by.gabriel.gerenciadorEstoque.Exception.FormaPag.FormPagNotExistException;
+import by.gabriel.gerenciadorEstoque.Exception.Pedido.*;
+import by.gabriel.gerenciadorEstoque.Exception.Produto.CostOrSellBellowZeroException;
+import by.gabriel.gerenciadorEstoque.Exception.Usuario.UserNotPermission;
 import by.gabriel.gerenciadorEstoque.Model.Cliente.Cliente;
 import by.gabriel.gerenciadorEstoque.Model.Movimentacao.Movimentacao;
 import by.gabriel.gerenciadorEstoque.Repository.Cliente.ClienteRepository;
@@ -50,12 +57,11 @@ public class PedidoService {
     }
 
     @Transactional
-    public Pedido criarVendaAberta(PedidoDTO vDto, String usuarioLogado) {
+    public Pedido criarPedidoAberta(PedidoDTO vDto, String usuarioLogado) {
 
         Usuario userLogado = userRepository.findByNomeIgnoreCase(usuarioLogado)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado: " + usuarioLogado));
 
-        // Busca o cliente pelo ID vindo do DTO
         Cliente cliente = clienteRepository.findById(vDto.clienteId())
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado com o ID: " + vDto.clienteId()));
 
@@ -69,9 +75,26 @@ public class PedidoService {
         BigDecimal valorTotalCalculado = BigDecimal.ZERO;
         List<ItensPedido> listaItens = new ArrayList<>();
 
-        for (var itemDto : vDto.itensVenda()) {
+        for (var itemDto : vDto.itensPedido()) {
+
             Produto produto = produtoRepository.findById(itemDto.produtoId())
                     .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+            if (itemDto.quantidade() <= 0) {
+                throw new QuantidadeMenorIgualZero("A Quantidade do produto não pode estar zerada!");
+            }
+
+            if (itemDto.quantidade() > produto.getQuantidade()) {
+                throw new QuantidadeMaiorEstoqueAtual("A quantidade do produto não pode ser maior que o estoque atual");
+            }
+
+            if (produto.getPrecoCusto().compareTo(BigDecimal.ZERO) == 0) {
+                throw new CostOrSellBellowZeroException("O preço de custo do produto está zerado, ajuste o cadastro do produto para continuar");
+            }
+
+            if (produto.getPrecoVenda().compareTo(BigDecimal.ZERO) == 0) {
+                throw new CostOrSellBellowZeroException("O preço de venda do produto está zerado, ajuste o cadastro do produto para continuar");
+            }
 
             ItensPedido itemVenda = new ItensPedido();
             itemVenda.setVenda(venda);
@@ -96,24 +119,23 @@ public class PedidoService {
     }
 
     @Transactional
-    public Pedido finalizarVenda(Long vendaId, List<PagPedidoDTO> pagamentosDto, String usuarioLogado) {
+    public Pedido finalizarPedido(Long vendaId, List<PagPedidoDTO> pagamentosDto, String usuarioLogado) {
 
         Usuario userLogado = userRepository.findByNomeIgnoreCase(usuarioLogado)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado: " + usuarioLogado));
 
         Pedido venda = pedidoRepository.findById(vendaId)
-                .orElseThrow(() -> new RuntimeException("Venda não encontrada"));
+                .orElseThrow(() -> new PedidoNaoEncontrado("Pedido não encontrada"));
 
         if (venda.getStatus() != PedidoStatus.ABERTA) {
-            throw new RuntimeException("Esta venda não está aberta para finalização.");
+            throw new PedidoComStatusInvalido("Este pedido não está ABERTO para finalização.");
         }
 
-        // Subtrai do Estoque
         for (var itemVenda : venda.getItensVenda()) {
             Produto produto = itemVenda.getProduto();
 
             if (produto.getQuantidade() < itemVenda.getQuantidade()) {
-                throw new RuntimeException("Estoque insuficiente para o produto: " + produto.getNome());
+                throw new QuantidadeMaiorEstoqueAtual("Estoque insuficiente para o produto: " + produto.getNome());
             }
 
             produto.setQuantidade(produto.getQuantidade() - itemVenda.getQuantidade());
@@ -131,7 +153,7 @@ public class PedidoService {
 
         for (var pagDto : pagamentosDto) {
             FormaPagto formapagto = formaPagtoRepository.findById(pagDto.formaPagId())
-                    .orElseThrow(() -> new RuntimeException("Forma de pagamento não encontrada"));
+                    .orElseThrow(() -> new FormPagNotExistException("Forma de pagamento não encontrada"));
 
             PagPedido pagVenda = new PagPedido();
             pagVenda.setVenda(venda);
@@ -143,7 +165,7 @@ public class PedidoService {
         }
 
         if (totalPago.compareTo(venda.getValorTotal()) < 0) {
-            throw new RuntimeException("O valor total pago é menor que o valor total da venda.");
+            throw new TotalPagoMenorQueValorDaVenda("O valor total pago é menor que o valor total do pedido.");
         }
 
         venda.setStatus(PedidoStatus.FINALIZADA);
@@ -155,34 +177,48 @@ public class PedidoService {
 
     // --- 1. ATUALIZAR VENDA ABERTA ---
     @Transactional
-    public Pedido atualizarVendaAberta(Long vendaId, PedidoDTO vDto, String usuarioLogado) {
+    public Pedido atualizarPedidoAberta(Long vendaId, PedidoDTO vDto, String usuarioLogado) {
 
         Usuario userLogado = userRepository.findByNomeIgnoreCase(usuarioLogado)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado: " + usuarioLogado));
 
         Pedido pedido = pedidoRepository.findById(vendaId)
-                .orElseThrow(() -> new RuntimeException("Venda não encontrada"));
+                .orElseThrow(() -> new PedidoNaoEncontrado("Pedido não encontrado"));
 
         if (pedido.getStatus() != PedidoStatus.ABERTA) {
-            throw new RuntimeException("Apenas vendas ABERTAS podem ser alteradas.");
+            throw new PedidoComStatusInvalido("Apenas pedidos ABERTOS podem ser alteradas.");
         }
 
         Cliente cliente = clienteRepository.findById(vDto.clienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado com o ID: " + vDto.clienteId()));
+                .orElseThrow(() -> new ClienteNaoEncontrado("Cliente não encontrado com o ID: " + vDto.clienteId()));
 
         pedido.setCliente(cliente);
         pedido.setDesconto(vDto.desconto() != null ? vDto.desconto() : BigDecimal.ZERO);
 
-        // Limpa os itens antigos (o orphanRemoval=true no Pedido vai deletar do banco)
         pedido.getItensVenda().clear();
 
         BigDecimal valorTotalCalculado = BigDecimal.ZERO;
 
-        // Verifica se a lista não é nula antes de tentar percorrê-la
-        if (vDto.itensVenda() != null) {
-            for (var itemDto : vDto.itensVenda()) {
+        if (vDto.itensPedido() != null) {
+            for (var itemDto : vDto.itensPedido()) {
                 Produto produto = produtoRepository.findById(itemDto.produtoId())
                         .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+                if (itemDto.quantidade() <= 0) {
+                    throw new QuantidadeMenorIgualZero("A Quantidade do produto não pode estar zerada!");
+                }
+
+                if (itemDto.quantidade() > produto.getQuantidade()) {
+                    throw new QuantidadeMaiorEstoqueAtual("A quantidade do produto não pode ser maior que o estoque atual");
+                }
+
+                if (produto.getPrecoCusto().compareTo(BigDecimal.ZERO) == 0) {
+                    throw new CostOrSellBellowZeroException("O preço de custo do produto está zerado, ajuste o cadastro do produto para continuar");
+                }
+
+                if (produto.getPrecoVenda().compareTo(BigDecimal.ZERO) == 0) {
+                    throw new CostOrSellBellowZeroException("O preço do pedido do produto está zerado, ajuste o cadastro do produto para continuar");
+                }
 
                 ItensPedido itemVenda = new ItensPedido();
                 itemVenda.setVenda(pedido);
@@ -214,13 +250,12 @@ public class PedidoService {
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
 
         Pedido pedido = pedidoRepository.findById(vendaId)
-                .orElseThrow(() -> new RuntimeException("Venda não encontrada"));
+                .orElseThrow(() -> new PedidoNaoEncontrado("pedido não encontrada"));
 
         if (pedido.getStatus() != PedidoStatus.ABERTA) {
-            throw new RuntimeException("Apenas vendas ABERTAS podem ser canceladas por desistência.");
+            throw new PedidoComStatusInvalido("Apenas pedidos ABERTAS podem ser canceladas por desistência.");
         }
 
-        // Cancelamento lógico. Como não deu baixa no estoque ainda, é só mudar o status!
         pedido.setStatus(PedidoStatus.CANCELADA);
         pedidoRepository.save(pedido);
     }
@@ -229,17 +264,20 @@ public class PedidoService {
     @Transactional
     public Pedido devolverPedidoinalizada(Long vendaId, String usuarioLogado) {
 
-        userRepository.findByNomeIgnoreCase(usuarioLogado)
+        Usuario userLogado = userRepository.findByNomeIgnoreCase(usuarioLogado)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
 
         Pedido pedido = pedidoRepository.findById(vendaId)
-                .orElseThrow(() -> new RuntimeException("Venda não encontrada"));
+                .orElseThrow(() -> new PedidoNaoEncontrado("Pedido não encontrada"));
 
-        if (pedido.getStatus() != PedidoStatus.FINALIZADA) {
-            throw new RuntimeException("Apenas vendas FINALIZADAS podem ser devolvidas.");
+        if (userLogado.getUserCargo() != UserCargo.ADMINISTRADOR || userLogado.getUserCargo() != UserCargo.DEV || userLogado.getUserCargo() != UserCargo.GERENTE) {
+            throw new UserNotPermission("Usuario sem permissão para realizar esta ação");
         }
 
-        // Devolve os itens para o estoque do Produto
+        if (pedido.getStatus() != PedidoStatus.FINALIZADA) {
+            throw new PedidoComStatusInvalido("Apenas vendas FINALIZADAS podem ser devolvidas.");
+        }
+
         for (ItensPedido item : pedido.getItensVenda()) {
             Produto produto = item.getProduto();
             produto.setQuantidade(produto.getQuantidade() + item.getQuantidade());
@@ -253,7 +291,7 @@ public class PedidoService {
     }
 
     // --- 6. LISTAR TODAS AS VENDAS (Resumo para a Tabela) ---
-    public List<PedidoListDTO> listarTodasAsVendas() {
+    public List<PedidoListDTO> listarTodosOsPedidos() {
 
         List<Pedido> vendas = pedidoRepository.findAll();
 
@@ -266,9 +304,8 @@ public class PedidoService {
         )).toList();
     }
 
-    // --- 7. BUSCAR VENDA POR ID (Detalhes completos para Editar) ---
     public Pedido buscarVendaPorId(Long id) {
         return pedidoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Venda não encontrada com o ID: " + id));
+                .orElseThrow(() -> new PedidoNaoEncontrado("Pedido não encontrada com o ID: " + id));
     }
 }
