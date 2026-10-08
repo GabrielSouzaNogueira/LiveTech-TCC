@@ -83,7 +83,7 @@ public class PedidoController {
             @PathVariable Long id,
             @RequestHeader("X-Usuario-Logado") String usuarioLogado) {
 
-        Pedido pedidoDevolvido = vendaService.devolverPedidoinalizada(id, usuarioLogado);
+        Pedido pedidoDevolvido = vendaService.devolverPedidoFinalizada(id, usuarioLogado);
 
         PedidoResponseDTO response = new PedidoResponseDTO(
                 pedidoDevolvido.getId(),
