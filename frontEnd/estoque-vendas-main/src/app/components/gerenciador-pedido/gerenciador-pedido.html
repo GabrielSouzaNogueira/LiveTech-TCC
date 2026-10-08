@@ -1,0 +1,54 @@
+<div>
+  <h3>Pedidos Lançados</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Cliente</th>
+        <th>Valor Total</th>
+        <th>Status</th>
+        <th>Data</th>
+        <th class="coluna-acao">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let pedido of listaPedidos">
+        <td>{{ pedido.id }}</td>
+        <td>{{ pedido.nomeCliente }}</td>
+        <td>{{ pedido.valorTotal | currency:'BRL' }}</td>
+        <td>
+          <span class="badge" [ngClass]="'badge-' + pedido.status.toLowerCase()">
+            {{ pedido.status }}
+          </span>
+        </td>
+        <td>{{ pedido.dataVenda | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td class="celula-acao">
+          <ng-container *ngIf="pedido.status === 'ABERTA'">
+            <button type="button" class="btn-acao btn-editar" (click)="editar(pedido)">Editar</button>
+            <button type="button" class="btn-acao btn-finalizar" (click)="abrirFinalizar(pedido)">Finalizar</button>
+            <button type="button" class="btn-acao btn-cancelar" (click)="cancelar(pedido)">Cancelar</button>
+          </ng-container>
+
+          <ng-container *ngIf="pedido.status === 'FINALIZADA'">
+            <button type="button" class="btn-acao btn-devolver" (click)="devolver(pedido)">Devolver</button>
+          </ng-container>
+
+          <span class="sem-acao" *ngIf="pedido.status === 'CANCELADA' || pedido.status === 'DEVOLVIDA'">—</span>
+        </td>
+      </tr>
+
+      <tr *ngIf="listaPedidos.length === 0 && !carregando">
+        <td colspan="6" class="sem-dados">Nenhum pedido lançado ainda.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<app-finalizar-pedido
+  *ngIf="pedidoSelecionadoParaFinalizar"
+  [pedidoId]="pedidoSelecionadoParaFinalizar!"
+  [valorTotal]="valorTotalParaFinalizar"
+  (finalizado)="aoFinalizar()"
+  (fechar)="fecharFinalizar()">
+</app-finalizar-pedido>

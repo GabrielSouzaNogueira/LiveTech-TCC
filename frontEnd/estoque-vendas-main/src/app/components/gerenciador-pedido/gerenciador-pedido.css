@@ -1,0 +1,122 @@
+h3 {
+    text-align: center;
+    color: #1e293b;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+thead {
+    background-color: #8BCF8B;
+    color: white;
+}
+
+th, td {
+    padding: 0.7rem 0.85rem;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+}
+
+tbody tr:hover {
+    background-color: #f5fff5;
+}
+
+.celula-acao {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: center;
+}
+
+.btn-acao {
+    padding: 0.3rem 0.65rem;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: transparent;
+    transition: all 0.2s;
+}
+
+.btn-editar {
+    border-color: #64748b;
+    color: #64748b;
+}
+.btn-editar:hover {
+    background: #64748b;
+    color: white;
+}
+
+.btn-finalizar {
+    border-color: #8BCF8B;
+    color: #166534;
+}
+.btn-finalizar:hover {
+    background: #8BCF8B;
+    color: white;
+}
+
+.btn-cancelar {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+.btn-cancelar:hover {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-devolver {
+    border-color: #f59e0b;
+    color: #b45309;
+}
+.btn-devolver:hover {
+    background: #f59e0b;
+    color: white;
+}
+
+.sem-acao {
+    color: #cbd5e1;
+}
+
+.sem-dados {
+    text-align: center;
+    color: #64748b;
+    padding: 1.5rem;
+}
+
+/* Badges de status */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.badge-aberta {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.badge-finalizada {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-cancelada {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-devolvida {
+    background: #fef3c7;
+    color: #92400e;
+}

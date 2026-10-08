@@ -17,7 +17,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 export class GerenciadorServicos implements OnInit{
   servicosIdSelecionado: string = '';
   descServicoSelecionado: string = '';
-  precoServicoSelecionado: string = '';
+  precoServicoSelecionado: number = 0;
   
   ListarServicos: ServicosDTO[] = [];
 
@@ -34,7 +34,7 @@ export class GerenciadorServicos implements OnInit{
     return (
       !!this.servicosIdSelecionado &&
       this.descServicoSelecionado.trim().length > 0 &&
-      this.precoServicoSelecionado.trim().length > 0
+      this.precoServicoSelecionado != null
     );
   }
   

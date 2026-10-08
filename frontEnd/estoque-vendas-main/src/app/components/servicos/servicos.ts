@@ -18,7 +18,7 @@ export class Servicos {
   abaAtiva: 'cadastrar' | 'atualizar' = 'cadastrar';
 
   descServicoDigitado: string = '';
-  precoServicoDigitado: string = '';
+  precoServicoDigitado: number = 0;
 
   carregando: boolean = false;
 
@@ -39,20 +39,11 @@ export class Servicos {
     const descricao = this.descServicoDigitado.trim();
     if (!descricao) return;
 
-    // Converte vírgula para ponto e transforma em número
-    let precoFormatado = this.precoServicoDigitado.replace(',', '.');
-    
-    // Validação extra opcional
-    if (isNaN(Number(precoFormatado))) {
-        this.authNotificacaoService.erro('Por favor, digite um preço válido.');
-        return;
-    }
-
     this.carregando = true;
     const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
 
     this.authServicosService
-      .cadastroServicos(descricao, precoFormatado, usuarioAtual)
+      .cadastroServicos(descricao, this.precoServicoDigitado, usuarioAtual)
       .subscribe({
           next: (resposta) => {
           this.carregando = false;

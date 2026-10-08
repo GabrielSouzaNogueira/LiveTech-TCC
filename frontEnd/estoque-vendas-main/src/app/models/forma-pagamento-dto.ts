@@ -4,6 +4,7 @@ export enum FormaPagStatus {
 }
 
 export interface SelectFormPag{
+  id: number;
   descricao: string;
   status: string;
 }

@@ -60,11 +60,13 @@
                 </label>
 
                 <input
-                    type="text"
+                    type="number"
                     id="precoServico"
                     name="precoServico"
                     [(ngModel)]="precoServicoDigitado"
-                    placeholder="Digite o preço do serviço"
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
                     required>
 
                 <!-- Botão -->

@@ -1,0 +1,99 @@
+<div class="pedido-container">
+  <div>
+    <div class="navegacao-abas">
+      <button
+        type="button"
+        class="btn-aba"
+        [class.aba-ativa]="abaAtiva === 'cadastrar'"
+        (click)="alternarAba('cadastrar')">
+        {{ pedidoIdEmEdicao ? 'Editando Pedido #' + pedidoIdEmEdicao : 'Novo Pedido' }}
+      </button>
+
+      <button
+        type="button"
+        class="btn-aba"
+        [class.aba-ativa]="abaAtiva === 'gerenciar'"
+        (click)="alternarAba('gerenciar')">
+        Pedidos Lançados
+      </button>
+    </div>
+
+    @if (abaAtiva === 'cadastrar') {
+      <h2>{{ pedidoIdEmEdicao ? 'Editar Pedido' : 'Novo Pedido' }}</h2>
+      <p>Selecione o cliente, adicione os produtos e salve o pedido.</p>
+
+      <div class="form-group">
+        <label>Cliente:</label>
+        <select [(ngModel)]="clienteIdSelecionado" name="cliente">
+          <option [ngValue]="null" disabled>Selecione um cliente</option>
+          <option *ngFor="let cliente of clientes" [ngValue]="cliente.id">
+            {{ cliente.nome }} {{ cliente.sobrenome }}
+          </option>
+        </select>
+      </div>
+
+      <div class="linha-adicionar-item">
+        <div class="form-group">
+          <label>Produto:</label>
+          <select [(ngModel)]="produtoIdParaAdicionar" name="produto">
+            <option [ngValue]="null" disabled>Selecione um produto</option>
+            <option *ngFor="let produto of produtos" [ngValue]="produto.prodId">
+              {{ produto.nome }} — {{ produto.precoVenda | currency:'BRL' }} (estoque: {{ produto.quantidade }})
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group form-group-qtd">
+          <label>Quantidade:</label>
+          <input type="number" [(ngModel)]="quantidadeParaAdicionar" name="quantidade" min="1">
+        </div>
+
+        <button type="button" class="btn-adicionar" (click)="adicionarItem()">+ Adicionar</button>
+      </div>
+
+      <table class="tabela-carrinho" *ngIf="itensCarrinho.length > 0">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Qtd</th>
+            <th>Preço Un.</th>
+            <th>Subtotal</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of itensCarrinho; let i = index">
+            <td>{{ item.nome }}</td>
+            <td>{{ item.quantidade }}</td>
+            <td>{{ item.precoVenda | currency:'BRL' }}</td>
+            <td>{{ item.subtotal | currency:'BRL' }}</td>
+            <td><button type="button" class="btn-remover-item" (click)="removerItem(i)">×</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="sem-itens" *ngIf="itensCarrinho.length === 0">Nenhum produto adicionado ainda.</p>
+
+      <div class="form-group">
+        <label>Desconto:</label>
+        <input type="number" [(ngModel)]="descontoDigitado" name="desconto" min="0" step="0.01">
+      </div>
+
+      <div class="resumo-total">
+        <span>Total do Pedido:</span>
+        <strong>{{ valorTotalCarrinho | currency:'BRL' }}</strong>
+      </div>
+
+      <div class="acoes-form">
+        <button type="button" class="btn-cancelar-edicao" *ngIf="pedidoIdEmEdicao" (click)="cancelarEdicao()">Cancelar Edição</button>
+        <button type="button" [disabled]="carregando || !podeSalvar" (click)="salvarPedido()">
+          {{ carregando ? 'Salvando...' : (pedidoIdEmEdicao ? 'Salvar Alterações' : 'Abrir Pedido') }}
+        </button>
+      </div>
+    }
+
+    @if (abaAtiva === 'gerenciar') {
+      <app-gerenciador-pedido (editarPedido)="carregarParaEdicao($event)"></app-gerenciador-pedido>
+    }
+  </div>
+</div>

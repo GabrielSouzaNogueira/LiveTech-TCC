@@ -1,0 +1,225 @@
+.pedido-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    background-color: white;
+    font-family: inherit;
+    padding: 1.5rem 1rem;
+    box-sizing: border-box;
+}
+
+.pedido-container > div {
+    width: 100%;
+    max-width: 900px;
+    background: white;
+    border-radius: 8px;
+    padding: 1.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+.pedido-container h2 {
+    text-align: center;
+    margin-bottom: 0.25rem;
+    color: #1e293b;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.pedido-container p {
+    text-align: center;
+    margin-bottom: 1.25rem;
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.85rem;
+}
+
+.form-group label {
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.85rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.9rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #8BCF8B;
+    box-shadow: 0 0 5px rgba(139, 207, 139, 0.6);
+}
+
+/* Linha de adicionar item ao carrinho */
+.linha-adicionar-item {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.linha-adicionar-item .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.form-group-qtd {
+    max-width: 110px;
+}
+
+.btn-adicionar {
+    padding: 0.55rem 1rem;
+    background: #8BCF8B;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.3s;
+}
+
+.btn-adicionar:hover {
+    background: #72c172;
+}
+
+/* Tabela do carrinho */
+.tabela-carrinho {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.tabela-carrinho thead {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.tabela-carrinho th,
+.tabela-carrinho td {
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: left;
+}
+
+.btn-remover-item {
+    background: transparent;
+    border: none;
+    color: #ef4444;
+    font-size: 1.1rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+
+.sem-itens {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+/* Resumo do total */
+.resumo-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 1rem;
+    background: #f5fff5;
+    border: 1px solid #8BCF8B;
+    border-radius: 6px;
+    font-size: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.resumo-total strong {
+    color: #166534;
+    font-size: 1.15rem;
+}
+
+/* Ações do form */
+.acoes-form {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.acoes-form button {
+    flex: 1;
+    padding: 0.55rem 1.2rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.acoes-form button:not(.btn-cancelar-edicao) {
+    background: #8BCF8B;
+    color: white;
+}
+
+.acoes-form button:not(.btn-cancelar-edicao):hover {
+    background: #72c172;
+}
+
+.acoes-form button:disabled {
+    background: #c2e7c2;
+    cursor: not-allowed;
+}
+
+.btn-cancelar-edicao {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+/* Abas */
+.navegacao-abas {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 0.75rem;
+}
+
+.btn-aba {
+    flex: 1;
+    padding: 0.55rem 0.75rem;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.btn-aba:hover {
+    background: #e2f5e2;
+    border-color: #8BCF8B;
+}
+
+.aba-ativa {
+    background: #8BCF8B !important;
+    color: white !important;
+    border-color: #8BCF8B !important;
+}

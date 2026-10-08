@@ -19,6 +19,12 @@
         </a>
       </li>
       <li>
+        <a routerLink="/pedido" routerLinkActive="link-ativo" class="nav-item">
+          <span class="icone">🧾</span>
+          <span class="texto-link" *ngIf="!estaRecolhida">Pedidos</span>
+        </a>
+      </li>
+      <li>
         <a routerLink="/cadastro-cliente" routerLinkActive="link-ativo" class="nav-item">
           <span class="icone">👤</span>
           <span class="texto-link" *ngIf="!estaRecolhida">Cadastro de cliente</span>

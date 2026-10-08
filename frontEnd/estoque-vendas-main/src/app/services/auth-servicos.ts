@@ -11,7 +11,7 @@ export class AuthServicos {
 
   constructor(private http: HttpClient) {}
 
-  cadastroServicos(descServico: string, precoServico: string, usuarioLogado: string): Observable<any> {
+  cadastroServicos(descServico: string, precoServico: number, usuarioLogado: string): Observable<any> {
     const dadosCadastroServicos = {
       descServico: descServico,
       precoServico: precoServico

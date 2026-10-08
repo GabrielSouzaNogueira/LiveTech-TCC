@@ -25,10 +25,12 @@
     <label>Preço do Serviço:</label>
 
     <input
-      type="text"
+      type="number"
       [(ngModel)]="precoServicoSelecionado"
       name="precoServico"
       placeholder="Preço do serviço"
+      step="0.01" 
+      min="0"
       required>
 
   </div>

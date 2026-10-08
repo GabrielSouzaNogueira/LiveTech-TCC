@@ -28,12 +28,12 @@
 
       <div class="form-group">
         <label>Preço de Custo:</label>
-        <input type="number" [(ngModel)]="precoCustoDigitado" name="precoCusto" placeholder="Preço de custo" step="0.01" required>
+        <input type="number" [(ngModel)]="precoCustoDigitado" name="precoCusto" placeholder="Preço de custo" step="0.01" min="0" required>
       </div>
 
       <div class="form-group">
         <label>Preço de Venda:</label>
-        <input type="number" [(ngModel)]="precoVendaDigitado" name="precoVenda" placeholder="Preço de venda" step="0.01" required>
+        <input type="number" [(ngModel)]="precoVendaDigitado" name="precoVenda" placeholder="Preço de venda" step="0.01" min="0" required>
       </div>
 
       <button type="submit" [disabled]="carregando || !podeSalvar">

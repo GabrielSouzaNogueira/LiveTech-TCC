@@ -9,6 +9,7 @@ import { FormaPagamento } from './components/forma-pagamento/forma-pagamento';
 import { authGuard } from './guards/auth-guard';
 import { CadastroCliente } from './components/cadastro-cliente/cadastro-cliente';
 import { Servicos } from './components/servicos/servicos';
+import { Pedido } from './components/pedido/pedido';
 
 //aqui criamos as rotas das paginas
 export const routes: Routes = [
@@ -20,6 +21,7 @@ export const routes: Routes = [
     {path: 'movimentacao', component: Movimentacao, canActivate: [authGuard]},
     {path: 'servicos', component: Servicos, canActivate: [authGuard]},
     {path: 'forma-pagamento', component: FormaPagamento, canActivate: [authGuard]},
+    {path: 'pedido', component: Pedido, canActivate: [authGuard]},
     // rota para caso o usuario digite algo que nao existe, ele cai no login de novo
     {path: '**', redirectTo: ''}
 ];

@@ -42,7 +42,7 @@ export class AuthGerenciadorServicos {
   atualizarServicos(
     servicosId: string,
     descServico: string,
-    precoServico: string,
+    precoServico: number,
     usuarioLogado: string
   ): Observable<any> {
 
