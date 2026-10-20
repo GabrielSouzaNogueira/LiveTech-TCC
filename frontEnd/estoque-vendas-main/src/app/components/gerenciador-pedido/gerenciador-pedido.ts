@@ -1,23 +1,33 @@
 import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AuthPedido } from '../../services/auth-pedido';
+import { AuthPedido } from '../../services/auth-pedido'; // Tiramos o PedidoStatus daqui
 import { AuthNotificacaoService } from '../../services/auth-notificacao';
-import { PedidoDetalheDTO, PedidoListDTO } from '../../models/pedido-dto';
+import { PedidoDetalheDTO, PedidoListDTO, PedidoStatus } from '../../models/pedido-dto'; // E colocamos ele aqui
 import { FinalizarPedido } from '../finalizar-pedido/finalizar-pedido';
-
 @Component({
   selector: 'app-gerenciador-pedido',
   templateUrl: './gerenciador-pedido.html',
   styleUrl: './gerenciador-pedido.css',
-  imports: [CommonModule, FinalizarPedido],
+  imports: [CommonModule, FormsModule, FinalizarPedido],
+  standalone: true
 })
 export class GerenciadorPedido implements OnInit {
   @Output() editarPedido = new EventEmitter<PedidoDetalheDTO>();
 
-  listaPedidos: PedidoListDTO[] = [];
+  listaPedidosGeral: PedidoListDTO[] = [];
+  listaPedidosFiltrada: PedidoListDTO[] = [];
   carregando: boolean = false;
 
+  filtroStatus: PedidoStatus | 'TODOS' = 'TODOS';
+  termoBuscaID: string = '';
+
+  // --- Controle do Modal de Detalhes ---
+  pedidoEmDetalhe: PedidoDetalheDTO | null = null;
+  modalDetalhesAberto: boolean = false;
+
+  // --- Controle da Finalização ---
   pedidoSelecionadoParaFinalizar: number | null = null;
   valorTotalParaFinalizar: number = 0;
 
@@ -35,34 +45,77 @@ export class GerenciadorPedido implements OnInit {
     this.carregando = true;
     this.authPedidoService.listarPedidos().subscribe({
       next: (dados: PedidoListDTO[]) => {
-        this.listaPedidos = dados;
+        this.listaPedidosGeral = dados;
+        this.aplicarFiltros();
         this.carregando = false;
         this.cdr.detectChanges();
       },
       error: (erro: any) => {
         console.error('Erro ao buscar pedidos', erro);
-        this.listaPedidos = [];
+        this.listaPedidosGeral = [];
+        this.aplicarFiltros();
         this.carregando = false;
         this.cdr.detectChanges();
       }
     });
   }
 
-  editar(pedido: PedidoListDTO): void {
+  aplicarFiltros(): void {
+    let lista = this.listaPedidosGeral;
+
+    if (this.filtroStatus !== 'TODOS') {
+      lista = lista.filter(p => p.status === this.filtroStatus);
+    }
+
+    if (this.termoBuscaID) {
+      lista = lista.filter(p => p.id.toString().includes(this.termoBuscaID));
+    }
+
+    this.listaPedidosFiltrada = lista;
+  }
+
+  abrirDetalhes(pedido: PedidoListDTO): void {
+    this.carregando = true;
     this.authPedidoService.buscarPedidoPorId(pedido.id).subscribe({
-      next: (detalhe: any) => {
-        this.editarPedido.emit(detalhe);
+      next: (detalhe: PedidoDetalheDTO) => {
+        this.pedidoEmDetalhe = detalhe;
+        this.modalDetalhesAberto = true;
+        this.carregando = false;
+        this.cdr.detectChanges();
       },
       error: (erro: HttpErrorResponse) => {
-        const mensagem = this.authNotificacaoService.extrairMensagemErro(erro, 'Não foi possível abrir esse pedido para edição.');
+        const mensagem = this.authNotificacaoService.extrairMensagemErro(erro, 'Não foi possível carregar os detalhes do pedido.');
         this.authNotificacaoService.erro(mensagem);
+        this.carregando = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
-  abrirFinalizar(pedido: PedidoListDTO): void {
-    this.pedidoSelecionadoParaFinalizar = pedido.id;
-    this.valorTotalParaFinalizar = pedido.valorTotal;
+  fecharDetalhes(): void {
+    this.modalDetalhesAberto = false;
+    this.pedidoEmDetalhe = null;
+  }
+
+  imprimirPedido(): void {
+      window.print();
+  }
+
+  // --- AÇÕES DENTRO DO MODAL ---
+
+  acaoEditar(): void {
+    if (this.pedidoEmDetalhe) {
+      this.editarPedido.emit(this.pedidoEmDetalhe);
+      this.fecharDetalhes();
+    }
+  }
+
+  acaoAbrirFinalizar(): void {
+    if (this.pedidoEmDetalhe) {
+      this.pedidoSelecionadoParaFinalizar = this.pedidoEmDetalhe.id;
+      this.valorTotalParaFinalizar = this.pedidoEmDetalhe.valorTotal;
+      this.fecharDetalhes();
+    }
   }
 
   fecharFinalizar(): void {
@@ -74,16 +127,17 @@ export class GerenciadorPedido implements OnInit {
     this.carregarListaPedidos();
   }
 
-  cancelar(pedido: PedidoListDTO): void {
-    const confirmacao = confirm(`Tem certeza que deseja cancelar o pedido #${pedido.id}?`);
-    if (!confirmacao) {
-      return;
-    }
+  acaoCancelar(): void {
+    if (!this.pedidoEmDetalhe) return;
+    
+    const confirmacao = confirm(`Tem certeza que deseja cancelar o pedido #${this.pedidoEmDetalhe.id}?`);
+    if (!confirmacao) return;
 
     const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
-    this.authPedidoService.cancelarPedido(pedido.id, usuarioAtual).subscribe({
+    this.authPedidoService.cancelarPedido(this.pedidoEmDetalhe.id, usuarioAtual).subscribe({
       next: (mensagemTexto: any) => {
         this.authNotificacaoService.sucesso(mensagemTexto || 'Pedido cancelado com sucesso!');
+        this.fecharDetalhes();
         this.carregarListaPedidos();
       },
       error: (erro: HttpErrorResponse) => {
@@ -93,16 +147,17 @@ export class GerenciadorPedido implements OnInit {
     });
   }
 
-  devolver(pedido: PedidoListDTO): void {
-    const confirmacao = confirm(`Confirma a devolução do pedido #${pedido.id}? O estoque dos produtos será restaurado.`);
-    if (!confirmacao) {
-      return;
-    }
+  acaoDevolver(): void {
+    if (!this.pedidoEmDetalhe) return;
+
+    const confirmacao = confirm(`Confirma a devolução do pedido #${this.pedidoEmDetalhe.id}? O estoque dos produtos será restaurado.`);
+    if (!confirmacao) return;
 
     const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
-    this.authPedidoService.devolverPedido(pedido.id, usuarioAtual).subscribe({
-      next: (resposta: { mensagem: any; }) => {
+    this.authPedidoService.devolverPedido(this.pedidoEmDetalhe.id, usuarioAtual).subscribe({
+      next: (resposta: any) => {
         this.authNotificacaoService.sucesso(resposta?.mensagem || 'Devolução concluída!');
+        this.fecharDetalhes();
         this.carregarListaPedidos();
       },
       error: (erro: HttpErrorResponse) => {

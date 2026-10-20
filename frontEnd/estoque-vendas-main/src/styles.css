@@ -3,3 +3,31 @@ body {
     margin: 0;
     padding: 0;         /* Garante que nenhum espaçamento interno crie rolagem */
 }
+
+/* =========================================
+   CONFIGURAÇÃO GLOBAL DE IMPRESSÃO
+   ========================================= */
+@media print {
+    /* 1. Esconde a barra lateral (ajuste o nome da tag/classe se necessário) */
+    app-sidebar, 
+    .sidebar, 
+    .menu-lateral {
+        display: none !important;
+    }
+
+    /* 2. Esconde as abas de navegação do componente pai */
+    .navegacao-abas {
+        display: none !important;
+    }
+
+    /* 3. Força a área principal a ocupar 100% da largura, ignorando o espaço do menu */
+    .content, 
+    main, 
+    .layout-principal,
+    app-pedido {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}

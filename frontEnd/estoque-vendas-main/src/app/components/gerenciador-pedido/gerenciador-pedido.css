@@ -1,10 +1,42 @@
-h3 {
-    text-align: center;
-    color: #1e293b;
-    margin-top: 0;
-    margin-bottom: 1rem;
-    font-size: 1.05rem;
-    font-weight: 700;
+.gestao-container {
+    width: 100%;
+}
+
+/* BARRA DE FILTROS */
+.barra-filtros {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.filtro-busca { flex: 2; }
+.filtro-status { flex: 1; }
+
+.barra-filtros input,
+.barra-filtros select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background-color: #f8fafc;
+    color: #334155;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.barra-filtros input:focus,
+.barra-filtros select:focus {
+    border-color: #8BCF8B;
+    background-color: #fff;
+}
+
+/* TABELA PRINCIPAL */
+.tabela-wrapper {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 table {
@@ -13,110 +45,320 @@ table {
     font-size: 0.9rem;
 }
 
-thead {
-    background-color: #8BCF8B;
-    color: white;
+thead { background-color: #f8fafc; }
+
+th {
+    padding: 1rem;
+    text-align: left;
+    color: #475569;
+    font-weight: 600;
+    border-bottom: 1px solid #e2e8f0;
+    text-transform: uppercase;
+    font-size: 0.8rem;
 }
 
-th, td {
-    padding: 0.7rem 0.85rem;
-    border: 1px solid #e2e8f0;
-    text-align: center;
+td {
+    padding: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+    vertical-align: middle;
 }
 
-tbody tr:hover {
-    background-color: #f5fff5;
+tbody tr:hover { background-color: #f0fdf4; }
+
+.fw-bold { font-weight: 600; }
+.text-muted { color: #64748b; }
+.texto-centro { text-align: center; }
+.texto-direita { text-align: right; }
+
+.btn-visualizar {
+    background: transparent;
+    border: 1px solid #8BCF8B;
+    color: #166534;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn-visualizar:hover { background: #8BCF8B; color: white; }
+
+.sem-dados { text-align: center; padding: 2.5rem; color: #94a3b8; }
+
+/* BADGES DE STATUS */
+.badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
 }
 
-.celula-acao {
+.badge-aberta { background: #dbeafe; color: #1e40af; }
+.badge-finalizada { background: #dcfce7; color: #166534; }
+.badge-cancelada { background: #fee2e2; color: #991b1b; }
+.badge-devolvida { background: #fef3c7; color: #92400e; }
+
+/* MODAL DE DETALHES */
+.overlay-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
+    align-items: center;
     justify-content: center;
+    z-index: 1000;
+}
+
+.modal-conteudo {
+    background: #fff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* =========================================
+   CABEÇALHO DO MODAL (Com Impressora e X)
+   ========================================= */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-header h3 { 
+    margin: 0; 
+    color: #0f172a; 
+    font-size: 1.25rem; 
+    margin-right: 1rem; 
+}
+
+.titulo-grupo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.acoes-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Espaço entre impressora e X */
+}
+
+.btn-imprimir {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.btn-imprimir:hover {
+    color: #166534;
+}
+
+.btn-fechar-modal {
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.btn-fechar-modal:hover { 
+    color: #ef4444; 
+}
+
+/* =========================================
+   CORPO DO MODAL (Informações do Pedido)
+   ========================================= */
+.modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.info-cliente-data {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #334155;
+}
+
+.info-cliente-data p { 
+    margin: 0; 
+}
+
+.modal-body h4 { 
+    margin: 0 0 1rem 0; 
+    color: #1e293b; 
+    font-size: 1rem; 
+}
+
+.tabela-itens-detalhe { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-bottom: 1.5rem; 
+}
+
+.tabela-itens-detalhe th { 
+    background: transparent; 
+    border-bottom: 2px solid #e2e8f0; 
+    padding: 0.5rem; 
+}
+
+.tabela-itens-detalhe td { 
+    border-bottom: 1px solid #f1f5f9; 
+    padding: 0.75rem 0.5rem; 
+    font-size: 0.9rem; 
+}
+
+.resumo-financeiro {
+    border-top: 2px solid #e2e8f0;
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+}
+
+.resumo-financeiro p { 
+    margin: 0.25rem 0; 
+    color: #64748b; 
+    font-size: 0.95rem; 
+    width: 250px; 
+    display: flex; 
+    justify-content: space-between;
+}
+
+.resumo-financeiro .total-destaque { 
+    color: #166534; 
+    font-size: 1.25rem; 
+    font-weight: 700; 
+}
+
+.pagamentos-info { 
+    background: #f0fdf4; 
+    padding: 1rem; 
+    border-radius: 8px; 
+    border: 1px dashed #8BCF8B;
+}
+
+.pagamentos-info ul { 
+    margin: 0; 
+    padding-left: 1.5rem; 
+    color: #334155; 
+    font-size: 0.9rem;
+}
+
+/* =========================================
+   RODAPÉ DO MODAL (Botões de Ação)
+   ========================================= */
+.modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    border-radius: 0 0 12px 12px;
+}
+
+.acoes-direita { 
+    display: flex; 
+    gap: 0.75rem; 
 }
 
 .btn-acao {
-    padding: 0.3rem 0.65rem;
-    border-radius: 4px;
-    font-size: 0.72rem;
-    font-weight: 700;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
     cursor: pointer;
-    border: 1px solid transparent;
-    background: transparent;
-    transition: all 0.2s;
+    border: none;
+    transition: 0.2s;
 }
 
-.btn-editar {
-    border-color: #64748b;
-    color: #64748b;
-}
-.btn-editar:hover {
-    background: #64748b;
-    color: white;
+/* =========================================
+   MÁGICA DE IMPRESSÃO (GERAR PDF LIMPO) 
+   ========================================= */
+@media print {
+    /* 1. Limpa margens padrão do navegador */
+    @page {
+        margin: 1cm;
+    }
+
+    /* 2. REMOVE COMPLETAMENTE a tabela, barras e fundos da impressão */
+    .gestao-container, 
+    app-finalizar-pedido {
+        display: none !important;
+    }
+
+    /* 3. Transforma o Modal em uma página comum (tira o efeito flutuante) */
+    .overlay-modal {
+        position: relative !important;
+        background: transparent !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    /* 4. Expande o cartão para ocupar 100% da folha sulfite */
+    .modal-conteudo {
+        position: relative !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        max-height: none !important; 
+        overflow: visible !important; 
+        color: #000 !important; /* Força tinta preta */
+    }
+
+    /* 5. Esconde os botões que não devem sair no papel */
+    .modal-footer, 
+    .acoes-header {
+        display: none !important;
+    }
+
+    /* Opcional: Remove o fundo cinza das caixinhas de informação para poupar tinta */
+    .info-cliente-data, .pagamentos-info {
+        background: transparent !important;
+        border: 1px solid #cbd5e1 !important;
+    }
 }
 
-.btn-finalizar {
-    border-color: #8BCF8B;
-    color: #166534;
-}
-.btn-finalizar:hover {
-    background: #8BCF8B;
-    color: white;
-}
+.btn-editar { background: #fff; color: #475569; border: 1px solid #cbd5e1; }
+.btn-editar:hover { background: #f1f5f9; color: #0f172a; }
 
-.btn-cancelar {
-    border-color: #ef4444;
-    color: #ef4444;
-}
-.btn-cancelar:hover {
-    background: #ef4444;
-    color: white;
-}
+.btn-finalizar { background: #8BCF8B; color: white; }
+.btn-finalizar:hover { background: #72c172; }
 
-.btn-devolver {
-    border-color: #f59e0b;
-    color: #b45309;
-}
-.btn-devolver:hover {
-    background: #f59e0b;
-    color: white;
-}
+.btn-cancelar { background: transparent; color: #ef4444; border: 1px solid #fca5a5; }
+.btn-cancelar:hover { background: #fef2f2; }
 
-.sem-acao {
-    color: #cbd5e1;
-}
+.btn-devolver { background: #f59e0b; color: white; width: 100%; }
+.btn-devolver:hover { background: #d97706; }
 
-.sem-dados {
-    text-align: center;
-    color: #64748b;
-    padding: 1.5rem;
-}
+.aviso-status { margin: 0; color: #94a3b8; font-size: 0.9rem; font-style: italic; text-align: center; width: 100%; }
 
-/* Badges de status */
-.badge {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.72rem;
-    font-weight: 700;
-}
 
-.badge-aberta {
-    background: #dbeafe;
-    color: #1e40af;
-}
-
-.badge-finalizada {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.badge-cancelada {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.badge-devolvida {
-    background: #fef3c7;
-    color: #92400e;
-}

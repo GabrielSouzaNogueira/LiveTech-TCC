@@ -32,16 +32,20 @@ export class Pedido implements OnInit {
   clientes: ClienteSelectDTO[] = [];
   produtos: SelectAllProdDTO[] = [];
 
+  // --- Controle da Busca de Cliente ---
+  termoBuscaCliente: string = '';
+  dropdownClienteAberto: boolean = false;
   clienteIdSelecionado: number | null = null;
+  
+  // --- Controle da Busca de Produto ---
+  termoBuscaProduto: string = '';
+  dropdownProdutoAberto: boolean = false;
+  produtoSelecionadoObj: SelectAllProdDTO | null = null;
+
   descontoDigitado: number = 0;
-
-  produtoIdParaAdicionar: number | null = null;
   quantidadeParaAdicionar: number = 1;
-
   itensCarrinho: ItemCarrinho[] = [];
-
   pedidoIdEmEdicao: number | null = null;
-
   carregando: boolean = false;
 
   constructor(
@@ -52,81 +56,96 @@ export class Pedido implements OnInit {
     private cdr: ChangeDetectorRef
   ) {}
 
-  /**
-   * Ciclo de vida do Angular: executado ao inicializar o componente.
-   * Carrega as listas iniciais de clientes e produtos.
-   */
   ngOnInit(): void {
     this.carregarClientes();
     this.carregarProdutos();
   }
 
-  /**
-   * Alterna a visualização entre as abas 'cadastrar' e 'gerenciar'.
-   */
   alternarAba(aba: 'cadastrar' | 'gerenciar'): void {
     this.abaAtiva = aba;
   }
 
-  /**
-   * Calcula o valor total do carrinho subtraindo o desconto digitado.
-   * Garante que o valor final não seja menor que zero.
-   */
   get valorTotalCarrinho(): number {
     const totalItens = this.itensCarrinho.reduce((soma, item) => soma + item.subtotal, 0);
     const total = totalItens - (this.descontoDigitado || 0);
     return total > 0 ? total : 0;
   }
 
-  /**
-   * Valida se o pedido pode ser salvo (exige cliente selecionado e ao menos um item no carrinho).
-   */
   get podeSalvar(): boolean {
     return this.clienteIdSelecionado !== null && this.itensCarrinho.length > 0;
   }
 
-  /**
-   * Busca a lista de clientes no serviço backend e atualiza o estado local.
-   */
   carregarClientes(): void {
     this.authGerenciadorClienteService.listarClientes().subscribe({
-      next: (dados) => {
-        this.clientes = dados;
-        this.cdr.detectChanges();
-      },
-      error: (erro) => console.error('Erro ao buscar clientes', erro)
+      next: (dados) => { this.clientes = dados; this.cdr.detectChanges(); },
+      error: (e) => console.error(e)
     });
   }
 
-  /**
-   * Busca a lista de produtos no serviço backend e atualiza o estado local.
-   */
   carregarProdutos(): void {
     this.authGerenciadorProdutoService.listarProdutos().subscribe({
-      next: (dados) => {
-        this.produtos = dados;
-        this.cdr.detectChanges();
-      },
-      error: (erro) => console.error('Erro ao buscar produtos', erro)
+      next: (dados) => { this.produtos = dados; this.cdr.detectChanges(); },
+      error: (e) => console.error(e)
     });
   }
 
-  /**
-   * Adiciona o produto selecionado ao carrinho de compras.
-   * Se o item já existir no carrinho, apenas incrementa a quantidade e recalcula o subtotal.
-   */
+  // === LÓGICA DE BUSCA E SELEÇÃO (AUTOCOMPLETE) ===
+
+  get clientesFiltrados(): ClienteSelectDTO[] {
+    if (!this.termoBuscaCliente) return this.clientes;
+    const termo = this.termoBuscaCliente.toLowerCase();
+    return this.clientes.filter(c => 
+      c.nome.toLowerCase().includes(termo) || c.sobrenome.toLowerCase().includes(termo)
+    );
+  }
+
+ selecionarCliente(cliente: ClienteSelectDTO): void {
+    // Usamos o Number() para forçar a conversão caso venha como string
+    // e o || null para caso venha undefined
+    this.clienteIdSelecionado = cliente.id ? Number(cliente.id) : null; 
+    this.termoBuscaCliente = `${cliente.nome} ${cliente.sobrenome}`;
+    this.dropdownClienteAberto = false;
+  }
+
+  limparCliente(): void {
+    this.clienteIdSelecionado = null;
+    this.termoBuscaCliente = '';
+  }
+
+  get produtosFiltrados(): SelectAllProdDTO[] {
+    if (!this.termoBuscaProduto) return this.produtos;
+    const termo = this.termoBuscaProduto.toLowerCase();
+    return this.produtos.filter(p => p.nome.toLowerCase().includes(termo));
+  }
+
+  selecionarProdutoBusca(produto: SelectAllProdDTO): void {
+    this.produtoSelecionadoObj = produto;
+    this.termoBuscaProduto = `${produto.nome} — R$ ${produto.precoVenda.toFixed(2)}`;
+    this.dropdownProdutoAberto = false;
+  }
+
+  limparProduto(): void {
+    this.produtoSelecionadoObj = null;
+    this.termoBuscaProduto = '';
+  }
+
+  fecharDropdowns(event: FocusEvent): void {
+    // Timeout para dar tempo do evento 'mousedown' das listas ser disparado antes de esconder
+    setTimeout(() => {
+      this.dropdownClienteAberto = false;
+      this.dropdownProdutoAberto = false;
+    }, 150);
+  }
+
+  // === LÓGICA DO CARRINHO ===
+
   adicionarItem(): void {
-    if (!this.produtoIdParaAdicionar || this.quantidadeParaAdicionar <= 0) {
+    if (!this.produtoSelecionadoObj || this.quantidadeParaAdicionar <= 0) {
       this.authNotificacaoService.erro('Selecione um produto e uma quantidade válida.');
       return;
     }
 
-    const produto = this.produtos.find(p => Number(p.prodId) === Number(this.produtoIdParaAdicionar));
-    if (!produto) {
-      return;
-    }
-
-    const produtoId = Number(produto.prodId);
+    const produtoId = Number(this.produtoSelecionadoObj.prodId);
     const itemExistente = this.itensCarrinho.find(i => i.produtoId === produtoId);
 
     if (itemExistente) {
@@ -135,31 +154,30 @@ export class Pedido implements OnInit {
     } else {
       this.itensCarrinho.push({
         produtoId: produtoId,
-        nome: produto.nome,
-        precoVenda: produto.precoVenda,
+        nome: this.produtoSelecionadoObj.nome,
+        precoVenda: this.produtoSelecionadoObj.precoVenda,
         quantidade: this.quantidadeParaAdicionar,
-        subtotal: produto.precoVenda * this.quantidadeParaAdicionar
+        subtotal: this.produtoSelecionadoObj.precoVenda * this.quantidadeParaAdicionar
       });
     }
 
-    this.produtoIdParaAdicionar = null;
+    this.limparProduto();
     this.quantidadeParaAdicionar = 1;
   }
 
-  /**
-   * Remove um item do carrinho com base no seu índice no array.
-   */
   removerItem(index: number): void {
     this.itensCarrinho.splice(index, 1);
   }
 
-  /**
-   * Preenche o formulário com os dados de um pedido existente para alteração e redireciona para a aba de cadastro.
-   */
+  // === EDIÇÃO E SALVAMENTO ===
+
   carregarParaEdicao(pedido: PedidoDetalheDTO): void {
     this.pedidoIdEmEdicao = pedido.id;
     this.clienteIdSelecionado = pedido.cliente.id;
+    this.termoBuscaCliente = `${pedido.cliente.nome} ${pedido.cliente.sobrenome}`;
     this.descontoDigitado = pedido.desconto || 0;
+    
+    // NOTA: mantive pedido.itensVenda conforme o seu DTO atual.
     this.itensCarrinho = pedido.itensVenda.map(item => ({
       produtoId: item.produto.prodId,
       nome: item.produto.nome,
@@ -170,36 +188,24 @@ export class Pedido implements OnInit {
     this.abaAtiva = 'cadastrar';
   }
 
-  /**
-   * Cancela o processo de edição limpando os campos do formulário.
-   */
   cancelarEdicao(): void {
     this.limparFormulario();
   }
 
-  /**
-   * Reseta o estado do formulário para os valores padrão.
-   */
   private limparFormulario(): void {
     this.pedidoIdEmEdicao = null;
-    this.clienteIdSelecionado = null;
+    this.limparCliente();
     this.descontoDigitado = 0;
     this.itensCarrinho = [];
-    this.produtoIdParaAdicionar = null;
+    this.limparProduto();
     this.quantidadeParaAdicionar = 1;
   }
 
-  /**
-   * Envia a requisição para salvar o pedido no backend (cria um novo ou atualiza um existente se estiver em modo de edição).
-   */
   salvarPedido(): void {
-    if (this.carregando || !this.podeSalvar) {
-      return;
-    }
+    if (this.carregando || !this.podeSalvar) return;
     this.carregando = true;
 
     const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
-
     const dto: PedidoRequestDTO = {
       clienteId: this.clienteIdSelecionado as number,
       desconto: this.descontoDigitado || 0,
@@ -209,7 +215,6 @@ export class Pedido implements OnInit {
       }))
     };
 
-    // Decide se chama a API de criar ou atualizar
     const requisicao = this.pedidoIdEmEdicao
       ? this.authPedidoService.atualizarPedido(this.pedidoIdEmEdicao, dto, usuarioAtual)
       : this.authPedidoService.criarPedido(dto, usuarioAtual);
@@ -217,15 +222,13 @@ export class Pedido implements OnInit {
     requisicao.subscribe({
       next: (resposta) => {
         this.carregando = false;
-        this.authNotificacaoService.sucesso(resposta?.mensagem || 'Pedido salvo com sucesso!');
+        this.authNotificacaoService.sucesso(resposta?.mensagem || 'Pedido salvo!');
         this.limparFormulario();
-        this.cdr.detectChanges();
       },
       error: (erro: HttpErrorResponse) => {
         this.carregando = false;
-        const mensagem = this.authNotificacaoService.extrairMensagemErro(erro, 'Não foi possível salvar o pedido.');
-        this.authNotificacaoService.erro(mensagem);
-        this.cdr.detectChanges();
+        const msg = this.authNotificacaoService.extrairMensagemErro(erro, 'Erro ao salvar o pedido.');
+        this.authNotificacaoService.erro(msg);
       }
     });
   }

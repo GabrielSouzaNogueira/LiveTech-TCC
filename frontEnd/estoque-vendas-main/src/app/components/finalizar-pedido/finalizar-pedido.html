@@ -1,40 +1,51 @@
-<div class="overlay" (click)="fecharPainel()">
-  <div class="painel" (click)="$event.stopPropagation()">
-    <h3>Finalizar Pedido #{{ pedidoId }}</h3>
-
-    <div class="resumo-valores">
-      <div>
-        <span>Total do pedido:</span>
-        <strong>{{ valorTotal | currency:'BRL' }}</strong>
-      </div>
-      <div>
-        <span>Total pago:</span>
-        <strong>{{ totalPago | currency:'BRL' }}</strong>
-      </div>
-      <div [class.faltante-destaque]="faltante > 0">
-        <span>Faltante:</span>
-        <strong>{{ faltante | currency:'BRL' }}</strong>
-      </div>
+<div class="overlay-modal" (click)="fecharPainel()">
+  <div class="modal-conteudo" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header">
+      <h3>Finalizar Pedido #{{ pedidoId }}</h3>
+      <button type="button" class="btn-fechar-modal" (click)="fecharPainel()">✕</button>
     </div>
 
-    <div class="linha-pagamento" *ngFor="let linha of linhasPagamento; let i = index">
-      <select [(ngModel)]="linha.formaPagId" name="formaPag{{i}}">
-        <option [ngValue]="null" disabled>Forma de pagamento</option>
-        <option *ngFor="let forma of formasPagamento" [ngValue]="forma.id">{{ forma.descricao }}</option>
-      </select>
+    <div class="modal-body">
+      <div class="resumo-valores">
+        <div class="linha-resumo">
+          <span>Total do pedido:</span>
+          <strong>{{ valorTotal | currency:'BRL' }}</strong>
+        </div>
+        <div class="linha-resumo">
+          <span>Total pago:</span>
+          <strong class="texto-verde">{{ totalPago | currency:'BRL' }}</strong>
+        </div>
+        <div class="linha-resumo linha-destaque" [class.faltante-alerta]="faltante > 0">
+          <span>Faltante:</span>
+          <strong>{{ faltante | currency:'BRL' }}</strong>
+        </div>
+      </div>
 
-      <input type="number" [(ngModel)]="linha.valorPago" name="valor{{i}}" placeholder="Valor" min="0" step="0.01">
+      <div class="linha-pagamento" *ngFor="let linha of linhasPagamento; let i = index">
+        <div class="input-grupo flex-1-4">
+          <select [(ngModel)]="linha.formaPagId" name="formaPag{{i}}">
+            <option [ngValue]="null" disabled>Forma de pagamento...</option>
+            <option *ngFor="let forma of formasPagamento" [ngValue]="forma.id">{{ forma.descricao }}</option>
+          </select>
+        </div>
 
-      <button type="button" class="btn-remover-linha" (click)="removerLinha(i)" [disabled]="linhasPagamento.length === 1">×</button>
+        <div class="input-grupo flex-1">
+          <input type="number" [(ngModel)]="linha.valorPago" name="valor{{i}}" placeholder="R$ 0,00" min="0" step="0.01">
+        </div>
+
+        <button type="button" class="btn-remover-linha" (click)="removerLinha(i)" [disabled]="linhasPagamento.length === 1" title="Remover linha">✕</button>
+      </div>
+
+      <button type="button" class="btn-adicionar-forma" (click)="adicionarLinha()">+ Adicionar forma de pagamento</button>
     </div>
 
-    <button type="button" class="btn-adicionar-forma" (click)="adicionarLinha()">+ Adicionar forma de pagamento</button>
-
-    <div class="acoes-painel">
-      <button type="button" class="btn-fechar" (click)="fecharPainel()">Cancelar</button>
-      <button type="button" class="btn-confirmar" [disabled]="carregando" (click)="confirmarPagamento()">
+    <div class="modal-footer acoes-painel">
+      <button type="button" class="btn-secundario" (click)="fecharPainel()">Cancelar</button>
+      <button type="button" class="btn-primario" [disabled]="carregando" (click)="confirmarPagamento()">
         {{ carregando ? 'Processando...' : 'Confirmar Pagamento' }}
       </button>
     </div>
+
   </div>
 </div>

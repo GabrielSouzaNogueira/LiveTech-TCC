@@ -1,93 +1,115 @@
 <div class="pedido-container">
-  <div>
+  <div class="card-minimalista">
+    
     <div class="navegacao-abas">
-      <button
-        type="button"
-        class="btn-aba"
-        [class.aba-ativa]="abaAtiva === 'cadastrar'"
-        (click)="alternarAba('cadastrar')">
-        {{ pedidoIdEmEdicao ? 'Editando Pedido #' + pedidoIdEmEdicao : 'Novo Pedido' }}
+      <button class="btn-aba" [class.aba-ativa]="abaAtiva === 'cadastrar'" (click)="alternarAba('cadastrar')">
+        {{ pedidoIdEmEdicao ? 'Editar Pedido #' + pedidoIdEmEdicao : 'Novo Pedido' }}
       </button>
-
-      <button
-        type="button"
-        class="btn-aba"
-        [class.aba-ativa]="abaAtiva === 'gerenciar'"
-        (click)="alternarAba('gerenciar')">
-        Pedidos Lançados
+      <button class="btn-aba" [class.aba-ativa]="abaAtiva === 'gerenciar'" (click)="alternarAba('gerenciar')">
+        Gestão de Pedidos
       </button>
     </div>
 
     @if (abaAtiva === 'cadastrar') {
-      <h2>{{ pedidoIdEmEdicao ? 'Editar Pedido' : 'Novo Pedido' }}</h2>
-      <p>Selecione o cliente, adicione os produtos e salve o pedido.</p>
-
-      <div class="form-group">
-        <label>Cliente:</label>
-        <select [(ngModel)]="clienteIdSelecionado" name="cliente">
-          <option [ngValue]="null" disabled>Selecione um cliente</option>
-          <option *ngFor="let cliente of clientes" [ngValue]="cliente.id">
-            {{ cliente.nome }} {{ cliente.sobrenome }}
-          </option>
-        </select>
+      <div class="cabecalho-form">
+        <h2>{{ pedidoIdEmEdicao ? 'Editando Registro' : 'Frente de Caixa' }}</h2>
+        <p>Busque o cliente e adicione os itens ao pedido.</p>
       </div>
 
+      <!-- AUTOCOMPLETE CLIENTE -->
+      <div class="form-group box-busca">
+        <label>Cliente:</label>
+        <div class="input-com-icone">
+          <input type="text" placeholder="Digite para buscar um cliente..."
+                 [(ngModel)]="termoBuscaCliente" 
+                 (focus)="dropdownClienteAberto = true" 
+                 (blur)="fecharDropdowns($event)"
+                 [disabled]="pedidoIdEmEdicao !== null">
+                 
+          <button *ngIf="clienteIdSelecionado && !pedidoIdEmEdicao" type="button" class="btn-limpar" (click)="limparCliente()">✕</button>
+        </div>
+        
+        <ul class="dropdown-list" *ngIf="dropdownClienteAberto && !clienteIdSelecionado && clientesFiltrados.length > 0">
+          <li *ngFor="let cliente of clientesFiltrados" (mousedown)="selecionarCliente(cliente)">
+            <span class="dropdown-nome">{{ cliente.nome }} {{ cliente.sobrenome }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- AUTOCOMPLETE PRODUTO E QUANTIDADE -->
       <div class="linha-adicionar-item">
-        <div class="form-group">
+        <div class="form-group box-busca flex-1">
           <label>Produto:</label>
-          <select [(ngModel)]="produtoIdParaAdicionar" name="produto">
-            <option [ngValue]="null" disabled>Selecione um produto</option>
-            <option *ngFor="let produto of produtos" [ngValue]="produto.prodId">
-              {{ produto.nome }} — {{ produto.precoVenda | currency:'BRL' }} (estoque: {{ produto.quantidade }})
-            </option>
-          </select>
+          <div class="input-com-icone">
+            <input type="text" placeholder="Buscar produto..."
+                   [(ngModel)]="termoBuscaProduto" 
+                   (focus)="dropdownProdutoAberto = true" 
+                   (blur)="fecharDropdowns($event)">
+                   
+            <button *ngIf="produtoSelecionadoObj" type="button" class="btn-limpar" (click)="limparProduto()">✕</button>
+          </div>
+          
+          <ul class="dropdown-list" *ngIf="dropdownProdutoAberto && !produtoSelecionadoObj && produtosFiltrados.length > 0">
+            <li *ngFor="let produto of produtosFiltrados" (mousedown)="selecionarProdutoBusca(produto)">
+              <span class="dropdown-nome">{{ produto.nome }}</span>
+              <span class="dropdown-detalhe">Estoque: {{ produto.quantidade }} | {{ produto.precoVenda | currency:'BRL' }}</span>
+            </li>
+          </ul>
         </div>
 
         <div class="form-group form-group-qtd">
-          <label>Quantidade:</label>
-          <input type="number" [(ngModel)]="quantidadeParaAdicionar" name="quantidade" min="1">
+          <label>Qtd:</label>
+          <input type="number" [(ngModel)]="quantidadeParaAdicionar" min="1">
         </div>
 
-        <button type="button" class="btn-adicionar" (click)="adicionarItem()">+ Adicionar</button>
+        <button type="button" class="btn-adicionar" (click)="adicionarItem()">Adicionar</button>
       </div>
 
-      <table class="tabela-carrinho" *ngIf="itensCarrinho.length > 0">
-        <thead>
-          <tr>
-            <th>Produto</th>
-            <th>Qtd</th>
-            <th>Preço Un.</th>
-            <th>Subtotal</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of itensCarrinho; let i = index">
-            <td>{{ item.nome }}</td>
-            <td>{{ item.quantidade }}</td>
-            <td>{{ item.precoVenda | currency:'BRL' }}</td>
-            <td>{{ item.subtotal | currency:'BRL' }}</td>
-            <td><button type="button" class="btn-remover-item" (click)="removerItem(i)">×</button></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <p class="sem-itens" *ngIf="itensCarrinho.length === 0">Nenhum produto adicionado ainda.</p>
-
-      <div class="form-group">
-        <label>Desconto:</label>
-        <input type="number" [(ngModel)]="descontoDigitado" name="desconto" min="0" step="0.01">
+      <!-- TABELA CARRINHO MINIMALISTA -->
+      <div class="tabela-container" *ngIf="itensCarrinho.length > 0">
+        <table class="tabela-carrinho">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th class="texto-centro">Qtd</th>
+              <th class="texto-direita">Preço Un.</th>
+              <th class="texto-direita">Subtotal</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of itensCarrinho; let i = index">
+              <td>{{ item.nome }}</td>
+              <td class="texto-centro">{{ item.quantidade }}</td>
+              <td class="texto-direita">{{ item.precoVenda | currency:'BRL' }}</td>
+              <td class="texto-direita fw-bold">{{ item.subtotal | currency:'BRL' }}</td>
+              <td class="texto-centro">
+                <button type="button" class="btn-remover-item" (click)="removerItem(i)">Remover</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div class="resumo-total">
-        <span>Total do Pedido:</span>
-        <strong>{{ valorTotalCarrinho | currency:'BRL' }}</strong>
+      <p class="sem-itens" *ngIf="itensCarrinho.length === 0">Carrinho vazio. Busque e adicione produtos acima.</p>
+
+      <!-- FECHAMENTO E TOTAIS -->
+      <div class="area-fechamento">
+        <div class="form-group form-desconto">
+          <label>Desconto Extra (R$):</label>
+          <input type="number" [(ngModel)]="descontoDigitado" min="0" step="0.01">
+        </div>
+
+        <div class="resumo-total">
+          <span class="label-total">Valor a Pagar:</span>
+          <span class="valor-total">{{ valorTotalCarrinho | currency:'BRL' }}</span>
+        </div>
       </div>
 
       <div class="acoes-form">
-        <button type="button" class="btn-cancelar-edicao" *ngIf="pedidoIdEmEdicao" (click)="cancelarEdicao()">Cancelar Edição</button>
-        <button type="button" [disabled]="carregando || !podeSalvar" (click)="salvarPedido()">
-          {{ carregando ? 'Salvando...' : (pedidoIdEmEdicao ? 'Salvar Alterações' : 'Abrir Pedido') }}
+        <button type="button" class="btn-secundario" *ngIf="pedidoIdEmEdicao" (click)="cancelarEdicao()">Cancelar Edição</button>
+        <button type="button" class="btn-primario" [disabled]="carregando || !podeSalvar" (click)="salvarPedido()">
+          {{ carregando ? 'Processando...' : (pedidoIdEmEdicao ? 'Salvar Modificações' : 'Finalizar e Abrir Pedido') }}
         </button>
       </div>
     }

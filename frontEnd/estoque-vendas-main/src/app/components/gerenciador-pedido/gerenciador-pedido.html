@@ -1,48 +1,145 @@
-<div>
-  <h3>Pedidos Lançados</h3>
+<div class="gestao-container">
+  
+  <!-- BARRA DE FILTROS -->
+  <div class="barra-filtros">
+    <div class="filtro-busca">
+      <input type="text" placeholder="Buscar por ID do Pedido..." 
+             [(ngModel)]="termoBuscaID" 
+             (keyup)="aplicarFiltros()">
+    </div>
+    
+    <div class="filtro-status">
+      <select [(ngModel)]="filtroStatus" (change)="aplicarFiltros()">
+        <option value="TODOS">Todos os Status</option>
+        <option value="ABERTA">Abertos</option>
+        <option value="FINALIZADA">Finalizados</option>
+        <option value="CANCELADA">Cancelados</option>
+        <option value="DEVOLVIDA">Devolvidos</option>
+      </select>
+    </div>
+  </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Cliente</th>
-        <th>Valor Total</th>
-        <th>Status</th>
-        <th>Data</th>
-        <th class="coluna-acao">Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let pedido of listaPedidos">
-        <td>{{ pedido.id }}</td>
-        <td>{{ pedido.nomeCliente }}</td>
-        <td>{{ pedido.valorTotal | currency:'BRL' }}</td>
-        <td>
-          <span class="badge" [ngClass]="'badge-' + pedido.status.toLowerCase()">
-            {{ pedido.status }}
-          </span>
-        </td>
-        <td>{{ pedido.dataVenda | date:'dd/MM/yyyy HH:mm' }}</td>
-        <td class="celula-acao">
-          <ng-container *ngIf="pedido.status === 'ABERTA'">
-            <button type="button" class="btn-acao btn-editar" (click)="editar(pedido)">Editar</button>
-            <button type="button" class="btn-acao btn-finalizar" (click)="abrirFinalizar(pedido)">Finalizar</button>
-            <button type="button" class="btn-acao btn-cancelar" (click)="cancelar(pedido)">Cancelar</button>
-          </ng-container>
+  <!-- TABELA PRINCIPAL -->
+  <div class="tabela-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Cliente</th>
+          <th class="texto-direita">Valor Total</th>
+          <th class="texto-centro">Status</th>
+          <th class="texto-centro">Data</th>
+          <th class="texto-centro">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pedido of listaPedidosFiltrada">
+          <td class="fw-bold text-muted">#{{ pedido.id }}</td>
+          <td>{{ pedido.nomeCliente }}</td>
+          <td class="texto-direita">{{ pedido.valorTotal | currency:'BRL' }}</td>
+          <td class="texto-centro">
+            <span class="badge" [ngClass]="'badge-' + pedido.status.toLowerCase()">
+              {{ pedido.status }}
+            </span>
+          </td>
+          <td class="texto-centro text-muted">{{ pedido.dataVenda | date:'dd/MM/yy HH:mm' }}</td>
+          <td class="texto-centro">
+            <button class="btn-visualizar" (click)="abrirDetalhes(pedido)">Visualizar Detalhes</button>
+          </td>
+        </tr>
 
-          <ng-container *ngIf="pedido.status === 'FINALIZADA'">
-            <button type="button" class="btn-acao btn-devolver" (click)="devolver(pedido)">Devolver</button>
-          </ng-container>
+        <tr *ngIf="listaPedidosFiltrada.length === 0 && !carregando">
+          <td colspan="6" class="sem-dados">Nenhum pedido encontrado com estes filtros.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
-          <span class="sem-acao" *ngIf="pedido.status === 'CANCELADA' || pedido.status === 'DEVOLVIDA'">—</span>
-        </td>
-      </tr>
+<!-- MODAL DE DETALHES (Master-Detail) -->
+<div class="overlay-modal" *ngIf="modalDetalhesAberto && pedidoEmDetalhe" (click)="fecharDetalhes()">
+  <div class="modal-conteudo" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header">
+      <div class="titulo-grupo">
+        <h3>Detalhes do Pedido #{{ pedidoEmDetalhe.id }}</h3>
+        <span class="badge" [ngClass]="'badge-' + pedidoEmDetalhe.status.toLowerCase()">{{ pedidoEmDetalhe.status }}</span>
+      </div>
+      
+      <div class="acoes-header">
+        <button class="btn-imprimir" (click)="imprimirPedido()" title="Imprimir / Salvar PDF">
+          <!-- Ícone de Impressora SVG Minimalista -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+        </button>
+        <button class="btn-fechar-modal" (click)="fecharDetalhes()">✕</button>
+      </div>
+    </div>
 
-      <tr *ngIf="listaPedidos.length === 0 && !carregando">
-        <td colspan="6" class="sem-dados">Nenhum pedido lançado ainda.</td>
-      </tr>
-    </tbody>
-  </table>
+    <div class="modal-body">
+      <div class="info-cliente-data">
+        <p><strong>Cliente:</strong> {{ pedidoEmDetalhe.cliente.nome }} {{ pedidoEmDetalhe.cliente.sobrenome }}</p>
+        <p><strong>Data:</strong> {{ pedidoEmDetalhe.dataVenda | date:'dd/MM/yyyy HH:mm:ss' }}</p>
+      </div>
+
+      <h4>Itens do Pedido</h4>
+      <table class="tabela-itens-detalhe">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th class="texto-centro">Qtd</th>
+            <th class="texto-direita">Vlr. Unit</th>
+            <th class="texto-direita">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of pedidoEmDetalhe.itensVenda">
+            <td>{{ item.produto.nome }}</td>
+            <td class="texto-centro">{{ item.quantidade }}</td>
+            <td class="texto-direita">{{ item.precoVenda | currency:'BRL' }}</td>
+            <td class="texto-direita">{{ (item.quantidade * item.precoVenda) | currency:'BRL' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="resumo-financeiro">
+        <p>Desconto: <span>{{ pedidoEmDetalhe.desconto | currency:'BRL' }}</span></p>
+        <p class="total-destaque">Total Pago: <span>{{ pedidoEmDetalhe.valorTotal | currency:'BRL' }}</span></p>
+      </div>
+      
+      <div class="pagamentos-info" *ngIf="pedidoEmDetalhe.pagVenda && pedidoEmDetalhe.pagVenda.length > 0">
+        <h4>Formas de Pagamento</h4>
+        <ul>
+          <li *ngFor="let pag of pedidoEmDetalhe.pagVenda">
+            {{ pag.formaPagto.descricao }} - <strong>{{ pag.valorPago | currency:'BRL' }}</strong>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <!-- Botões contextuais baseados no status -->
+      <ng-container *ngIf="pedidoEmDetalhe.status === 'ABERTA'">
+        <button class="btn-acao btn-cancelar" (click)="acaoCancelar()">Cancelar Pedido</button>
+        <div class="acoes-direita">
+          <button class="btn-acao btn-editar" (click)="acaoEditar()">Editar</button>
+          <button class="btn-acao btn-finalizar" (click)="acaoAbrirFinalizar()">Finalizar</button>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="pedidoEmDetalhe.status === 'FINALIZADA'">
+        <button class="btn-acao btn-devolver" (click)="acaoDevolver()">Processar Devolução</button>
+      </ng-container>
+      
+      <p class="aviso-status" *ngIf="pedidoEmDetalhe.status === 'CANCELADA' || pedidoEmDetalhe.status === 'DEVOLVIDA'">
+        Nenhuma ação disponível para pedidos neste status.
+      </p>
+    </div>
+
+  </div>
 </div>
 
 <app-finalizar-pedido

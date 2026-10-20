@@ -1,225 +1,291 @@
+/* CONTAINER BASE */
 .pedido-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
     min-height: 100vh;
-    background-color: white;
-    font-family: inherit;
-    padding: 1.5rem 1rem;
-    box-sizing: border-box;
+    background-color: #f8fafc; /* Fundo levemente cinza do sistema */
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    padding: 2rem 1rem;
 }
 
-.pedido-container > div {
+.card-minimalista {
     width: 100%;
-    max-width: 900px;
-    background: white;
-    border-radius: 8px;
-    padding: 1.75rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
+    max-width: 950px;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }
 
-.pedido-container h2 {
-    text-align: center;
-    margin-bottom: 0.25rem;
-    color: #1e293b;
+/* ABAS */
+.navegacao-abas {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 0;
+}
+
+.btn-aba {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: -2px; /* Sobrepõe a borda inferior */
+}
+
+.btn-aba:hover { color: #8BCF8B; }
+
+.aba-ativa {
+    color: #166534;
+    border-bottom-color: #8BCF8B;
+}
+
+/* CABEÇALHO */
+.cabecalho-form h2 {
+    color: #0f172a;
     font-size: 1.5rem;
     font-weight: 700;
+    margin: 0 0 0.25rem 0;
 }
 
-.pedido-container p {
-    text-align: center;
-    margin-bottom: 1.25rem;
+.cabecalho-form p {
     color: #64748b;
     font-size: 0.95rem;
+    margin-bottom: 2rem;
 }
 
+/* FORMULÁRIOS & AUTOCOMPLETE */
 .form-group {
     display: flex;
     flex-direction: column;
-    margin-bottom: 0.85rem;
+    margin-bottom: 1.25rem;
 }
 
 .form-group label {
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.5rem;
     font-weight: 600;
-    color: #475569;
+    color: #334155;
     font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
-.form-group input,
-.form-group select {
+.input-com-icone {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-com-icone input {
     width: 100%;
-    padding: 0.55rem 0.75rem;
-    font-size: 0.9rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    box-sizing: border-box;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    color: #0f172a;
+    transition: all 0.2s;
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.input-com-icone input:focus {
     outline: none;
+    background-color: #ffffff;
     border-color: #8BCF8B;
-    box-shadow: 0 0 5px rgba(139, 207, 139, 0.6);
+    box-shadow: 0 0 0 3px rgba(139, 207, 139, 0.2);
 }
 
-/* Linha de adicionar item ao carrinho */
+.input-com-icone input:disabled {
+    background-color: #f1f5f9;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.btn-limpar {
+    position: absolute;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 5px;
+}
+.btn-limpar:hover { color: #ef4444; }
+
+/* DROPDOWN CUSTOMIZADO */
+.box-busca { position: relative; }
+
+.dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 250px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin-top: 4px;
+    padding: 0;
+    list-style: none;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+}
+
+.dropdown-list li {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dropdown-list li:hover { background-color: #f0fdf4; }
+
+.dropdown-nome { font-weight: 500; color: #1e293b; }
+.dropdown-detalhe { font-size: 0.8rem; color: #64748b; }
+
+/* LINHA DO CARRINHO */
 .linha-adicionar-item {
     display: flex;
     align-items: flex-end;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
+    gap: 1rem;
+    margin-bottom: 2rem;
 }
 
-.linha-adicionar-item .form-group {
-    flex: 1;
-    margin-bottom: 0;
-}
+.flex-1 { flex: 1; margin-bottom: 0; }
 
-.form-group-qtd {
-    max-width: 110px;
+.form-group-qtd { width: 100px; margin-bottom: 0; }
+.form-group-qtd input {
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
 }
 
 .btn-adicionar {
-    padding: 0.55rem 1rem;
-    background: #8BCF8B;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.85rem;
+    padding: 0.75rem 1.5rem;
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #8BCF8B;
+    border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.2s;
     white-space: nowrap;
-    transition: background-color 0.3s;
+}
+.btn-adicionar:hover { background: #8BCF8B; color: white; }
+
+/* TABELA MINIMALISTA */
+.tabela-container {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
 }
 
-.btn-adicionar:hover {
-    background: #72c172;
-}
-
-/* Tabela do carrinho */
 .tabela-carrinho {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
 }
 
-.tabela-carrinho thead {
-    background-color: #f1f5f9;
+.tabela-carrinho th {
+    background-color: #f8fafc;
     color: #475569;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
 }
 
-.tabela-carrinho th,
 .tabela-carrinho td {
-    padding: 0.55rem 0.75rem;
+    padding: 1rem;
+    color: #1e293b;
     border-bottom: 1px solid #f1f5f9;
-    text-align: left;
 }
+
+.texto-centro { text-align: center; }
+.texto-direita { text-align: right; }
+.fw-bold { font-weight: 600; }
 
 .btn-remover-item {
     background: transparent;
     border: none;
     color: #ef4444;
-    font-size: 1.1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
     cursor: pointer;
-    line-height: 1;
-    padding: 0;
 }
+.btn-remover-item:hover { text-decoration: underline; }
 
 .sem-itens {
     text-align: center;
     color: #94a3b8;
-    font-size: 0.85rem;
-    margin-bottom: 1rem;
+    padding: 2rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px dashed #cbd5e1;
 }
 
-/* Resumo do total */
+/* ÁREA DE FECHAMENTO */
+.area-fechamento {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.form-desconto { width: 150px; margin-bottom: 0; }
+.form-desconto input { padding: 0.6rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+
 .resumo-total {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.85rem 1rem;
-    background: #f5fff5;
-    border: 1px solid #8BCF8B;
-    border-radius: 6px;
-    font-size: 1rem;
-    margin-bottom: 1.25rem;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
-.resumo-total strong {
-    color: #166534;
-    font-size: 1.15rem;
-}
+.label-total { font-size: 0.85rem; color: #64748b; text-transform: uppercase; font-weight: 600; }
+.valor-total { font-size: 1.8rem; color: #166534; font-weight: 700; }
 
-/* Ações do form */
+/* BOTÕES GERAIS */
 .acoes-form {
     display: flex;
-    gap: 0.75rem;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
 }
 
-.acoes-form button {
-    flex: 1;
-    padding: 0.55rem 1.2rem;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.9rem;
+.btn-primario, .btn-secundario {
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: all 0.2s;
+    font-size: 1rem;
 }
 
-.acoes-form button:not(.btn-cancelar-edicao) {
+.btn-primario {
     background: #8BCF8B;
     color: white;
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(139, 207, 139, 0.4);
 }
+.btn-primario:hover:not(:disabled) { transform: translateY(-1px); background: #72c172; }
+.btn-primario:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; }
 
-.acoes-form button:not(.btn-cancelar-edicao):hover {
-    background: #72c172;
-}
-
-.acoes-form button:disabled {
-    background: #c2e7c2;
-    cursor: not-allowed;
-}
-
-.btn-cancelar-edicao {
-    background: #f1f5f9 !important;
-    color: #475569 !important;
-    border: 1px solid #cbd5e1 !important;
-}
-
-/* Abas */
-.navegacao-abas {
-    display: flex;
-    gap: 0.6rem;
-    margin-bottom: 1.25rem;
-    border-bottom: 1px solid #e2e8f0;
-    padding-bottom: 0.75rem;
-}
-
-.btn-aba {
-    flex: 1;
-    padding: 0.55rem 0.75rem;
-    background: #f1f5f9;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
+.btn-secundario {
+    background: #ffffff;
     color: #475569;
-    font-weight: 600;
-    font-size: 0.85rem;
-    transition: 0.2s;
-    cursor: pointer;
+    border: 1px solid #cbd5e1;
 }
-
-.btn-aba:hover {
-    background: #e2f5e2;
-    border-color: #8BCF8B;
-}
-
-.aba-ativa {
-    background: #8BCF8B !important;
-    color: white !important;
-    border-color: #8BCF8B !important;
-}
+.btn-secundario:hover { background: #f8fafc; color: #0f172a; }
