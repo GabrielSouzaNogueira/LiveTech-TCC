@@ -3,6 +3,7 @@ package by.gabriel.gerenciadorEstoque.Model.Pedido;
 import java.math.BigDecimal;
 
 import by.gabriel.gerenciadorEstoque.Model.FormaPag.FormaPagto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,8 +19,9 @@ public class PagPedido {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "venda_id", nullable = false)
-    private Pedido venda;
+    @JoinColumn(name = "pedido_id", nullable = false)
+    @JsonIgnore
+    private Pedido pedido;
 
     @ManyToOne
     @JoinColumn(name = "forma_pagto_id", nullable = false)
@@ -30,9 +32,9 @@ public class PagPedido {
     public PagPedido() {
     }
 
-    public PagPedido(Long id, Pedido venda, FormaPagto formaPagto, BigDecimal valorPago) {
+    public PagPedido(Long id, Pedido pedido, FormaPagto formaPagto, BigDecimal valorPago) {
         this.id = id;
-        this.venda = venda;
+        this.pedido = pedido;
         this.formaPagto = formaPagto;
         this.valorPago = valorPago;
     }
@@ -45,12 +47,12 @@ public class PagPedido {
         this.id = id;
     }
 
-    public Pedido getVenda() {
-        return venda;
+    public Pedido getPedido() {
+        return pedido;
     }
 
-    public void setVenda(Pedido venda) {
-        this.venda = venda;
+    public void setPedido(Pedido pedido) {
+        this.pedido = pedido;
     }
 
     public FormaPagto getFormaPagto() {

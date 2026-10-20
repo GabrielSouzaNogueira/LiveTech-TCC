@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
 import by.gabriel.gerenciadorEstoque.Api.DTO.Pedido.Consultas.PedidoListDTO;
 import by.gabriel.gerenciadorEstoque.Enum.Movimentacao.AcaoMovimentacao;
 import by.gabriel.gerenciadorEstoque.Enum.Movimentacao.TipoEntidade;
@@ -35,7 +36,6 @@ import by.gabriel.gerenciadorEstoque.Repository.FormPagRespository.FormPagReposi
 import by.gabriel.gerenciadorEstoque.Repository.Produto.ProdutoRepository;
 import by.gabriel.gerenciadorEstoque.Repository.Usuario.UserRepository;
 import by.gabriel.gerenciadorEstoque.Repository.Pedido.PedidoRepository;
-import jakarta.transaction.Transactional;
 
 @Service
 public class PedidoService {
@@ -65,12 +65,12 @@ public class PedidoService {
         Cliente cliente = clienteRepository.findById(vDto.clienteId())
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado com o ID: " + vDto.clienteId()));
 
-        Pedido venda = new Pedido();
-        venda.setUsuario(userLogado);
-        venda.setCliente(cliente); // <-- Associa o objeto Cliente
-        venda.setDataVenda(LocalDateTime.now());
-        venda.setStatus(PedidoStatus.ABERTA);
-        venda.setDesconto(vDto.desconto() != null ? vDto.desconto() : BigDecimal.ZERO);
+        Pedido pedido = new Pedido();
+        pedido.setUsuario(userLogado);
+        pedido.setCliente(cliente); // <-- Associa o objeto Cliente
+        pedido.setDataVenda(LocalDateTime.now());
+        pedido.setStatus(PedidoStatus.ABERTA);
+        pedido.setDesconto(vDto.desconto() != null ? vDto.desconto() : BigDecimal.ZERO);
 
         BigDecimal valorTotalCalculado = BigDecimal.ZERO;
         List<ItensPedido> listaItens = new ArrayList<>();
@@ -97,7 +97,7 @@ public class PedidoService {
             }
 
             ItensPedido itemVenda = new ItensPedido();
-            itemVenda.setVenda(venda);
+            itemVenda.setPedido(pedido);
             itemVenda.setProduto(produto);
             itemVenda.setQuantidade(itemDto.quantidade());
             itemVenda.setPrecoUnitario(produto.getPrecoCusto());
@@ -109,11 +109,11 @@ public class PedidoService {
             valorTotalCalculado = valorTotalCalculado.add(subtotal);
         }
 
-        valorTotalCalculado = valorTotalCalculado.subtract(venda.getDesconto());
-        venda.setValorTotal(valorTotalCalculado);
-        venda.setItensVenda(listaItens);
+        valorTotalCalculado = valorTotalCalculado.subtract(pedido.getDesconto());
+        pedido.setValorTotal(valorTotalCalculado);
+        pedido.setItensVenda(listaItens);
 
-        Pedido vendaSalva = pedidoRepository.save(venda);
+        Pedido vendaSalva = pedidoRepository.save(pedido);
 
         return vendaSalva;
     }
@@ -156,7 +156,7 @@ public class PedidoService {
                     .orElseThrow(() -> new FormPagNotExistException("Forma de pagamento não encontrada"));
 
             PagPedido pagVenda = new PagPedido();
-            pagVenda.setVenda(venda);
+            pagVenda.setPedido(venda);
             pagVenda.setFormaPagto(formapagto);
             pagVenda.setValorPago(pagDto.valorPago());
 
@@ -182,7 +182,7 @@ public class PedidoService {
         Usuario userLogado = userRepository.findByNomeIgnoreCase(usuarioLogado)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado: " + usuarioLogado));
 
-        if (userLogado.getUserCargo() != UserCargo.ADMINISTRADOR || userLogado.getUserCargo() != UserCargo.DEV || userLogado.getUserCargo() != UserCargo.GERENTE) {
+        if (!(userLogado.getUserCargo().toString().equals("ADMINISTRADOR") || userLogado.getUserCargo().toString().equals("DEV")  || userLogado.getUserCargo().toString().equals("GERENTE"))) {
             throw new UserNotPermission("Usuario sem permissão para realizar esta ação");
         }
 
@@ -225,7 +225,7 @@ public class PedidoService {
                 }
 
                 ItensPedido itemVenda = new ItensPedido();
-                itemVenda.setVenda(pedido);
+                itemVenda.setPedido(pedido);
                 itemVenda.setProduto(produto);
                 itemVenda.setQuantidade(itemDto.quantidade());
                 itemVenda.setPrecoUnitario(produto.getPrecoCusto());
@@ -273,7 +273,7 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(vendaId)
                 .orElseThrow(() -> new PedidoNaoEncontrado("Pedido não encontrada"));
 
-        if (userLogado.getUserCargo() != UserCargo.ADMINISTRADOR || userLogado.getUserCargo() != UserCargo.DEV || userLogado.getUserCargo() != UserCargo.GERENTE) {
+        if (!(userLogado.getUserCargo().toString().equals("ADMINISTRADOR") || userLogado.getUserCargo().toString().equals("DEV"))) {
             throw new UserNotPermission("Usuario sem permissão para realizar esta ação");
         }
 
@@ -307,8 +307,14 @@ public class PedidoService {
         )).toList();
     }
 
+    @Transactional(readOnly = true)
     public Pedido buscarVendaPorId(Long id) {
-        return pedidoRepository.findById(id)
+        Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new PedidoNaoEncontrado("Pedido não encontrada com o ID: " + id));
+
+        pedido.getItensVenda().size();
+        pedido.getPagVenda().size();
+
+        return pedido;
     }
 }

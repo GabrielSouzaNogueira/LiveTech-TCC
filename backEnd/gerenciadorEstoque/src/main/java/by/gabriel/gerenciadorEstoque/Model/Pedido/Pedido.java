@@ -35,10 +35,10 @@ public class Pedido {
     @Enumerated(EnumType.STRING)
     private PedidoStatus status;
 
-    @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItensPedido> itensVenda = new ArrayList<>();
 
-    @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PagPedido> pagVenda = new ArrayList<>();
 
     public Pedido() {

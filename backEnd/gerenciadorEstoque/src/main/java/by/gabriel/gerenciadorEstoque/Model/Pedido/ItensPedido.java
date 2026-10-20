@@ -19,9 +19,9 @@ public class ItensPedido {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "venda_id", nullable = false)
+    @JoinColumn(name = "pedido_id", nullable = false)
     @JsonIgnore
-    private Pedido venda;
+    private Pedido pedido;
 
     @ManyToOne
     @JoinColumn(name = "produto_id", nullable = false)
@@ -36,9 +36,9 @@ public class ItensPedido {
     public ItensPedido() {
     }
 
-    public ItensPedido(Long id, Pedido venda, Produto produto, Integer quantidade, BigDecimal precoUnitario, BigDecimal precoVenda) {
+    public ItensPedido(Long id, Pedido pedido, Produto produto, Integer quantidade, BigDecimal precoUnitario, BigDecimal precoVenda) {
         this.id = id;
-        this.venda = venda;
+        this.pedido = pedido;
         this.produto = produto;
         this.quantidade = quantidade;
         this.precoUnitario = precoUnitario;
@@ -78,12 +78,12 @@ public class ItensPedido {
         this.precoVenda = precoVenda;
     }
 
-    public Pedido getVenda() {
-        return venda;
+    public Pedido getPedido() {
+        return pedido;
     }
 
-    public void setVenda(Pedido venda) {
-        this.venda = venda;
+    public void setPedido(Pedido venda) {
+        this.pedido = venda;
     }
 
     public Produto getProduto() {
