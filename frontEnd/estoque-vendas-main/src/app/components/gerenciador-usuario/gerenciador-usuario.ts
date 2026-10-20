@@ -2,7 +2,6 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthGerenciadorUsuario } from '../../services/auth-gerenciador-usuario';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { UserSelectDTO } from '../../models/user-select.dto';
 import { NgxMaskDirective } from 'ngx-mask';
@@ -16,109 +15,122 @@ import { AuthNotificacaoService } from '../../services/auth-notificacao';
   styleUrl: './gerenciador-usuario.css',
 })
 export class GerenciadorUsuario implements OnInit {
-  idSelecionado: string = '';
-  nomeDigitado: string = '';
-  senhaDigitada: string = '';
-  emailDigitado: string = '';
-  telefoneDigitado: string = '';
-  cargoDigitado: string = '';
+  listaUsuariosGeral: UserSelectDTO[] = [];
+  listaUsuariosFiltrada: UserSelectDTO[] = [];
 
-  listaUsuarios: UserSelectDTO[] = [];
+  termoBusca: string = '';
+  filtroStatus: string = 'TODOS';
+  carregandoLista: boolean = false;
 
-  carregando: boolean = false;
+  // Controle do Modal
+  usuarioEmEdicao: UserSelectDTO | null = null;
+  senhaDigitada: string = ''; // Mantemos a senha separada pois ela não vem da busca
+  modalAberto: boolean = false;
+  salvando: boolean = false;
 
   constructor(
     private AuthGerenciadorUsuarioService: AuthGerenciadorUsuario,
-    private router: Router,
     private cdr: ChangeDetectorRef,
     private AuthNotificacaoService: AuthNotificacaoService
   ) {}
-
-  get podeSalvar(): boolean {
-    return (
-      !!this.idSelecionado &&
-      this.nomeDigitado.trim().length > 0 &&
-      this.cargoDigitado.trim().length > 0
-    );
-  }
 
   ngOnInit(): void {
     this.carregarListaUsuarios();
   }
 
   carregarListaUsuarios(): void {
+    this.carregandoLista = true;
     this.AuthGerenciadorUsuarioService.listarUsuarios().subscribe({
       next: (dados) => {
-        this.listaUsuarios = dados;
+        this.listaUsuariosGeral = dados;
+        this.aplicarFiltros();
+        this.carregandoLista = false;
         this.cdr.detectChanges();
       },
-      error: (erro) => console.error('Erro ao buscar usuários', erro)
+      error: (erro) => {
+        console.error('Erro ao buscar usuários', erro);
+        this.carregandoLista = false;
+      }
     });
   }
 
-  selecionarUsuario(usuario: UserSelectDTO): void {
-    this.idSelecionado = usuario.userId;
-    this.nomeDigitado = usuario.nome;
-    this.emailDigitado = usuario.email;
-    this.telefoneDigitado = usuario.telefone || '';
-    this.cargoDigitado = usuario.cargo ? usuario.cargo.toUpperCase() : '';
+  aplicarFiltros(): void {
+    let lista = this.listaUsuariosGeral;
+
+    if (this.filtroStatus !== 'TODOS') {
+      lista = lista.filter(u => u.status === this.filtroStatus);
+    }
+
+    if (this.termoBusca) {
+      const termo = this.termoBusca.toLowerCase();
+      lista = lista.filter(u => 
+        u.nome.toLowerCase().includes(termo) || 
+        (u.email && u.email.toLowerCase().includes(termo))
+      );
+    }
+
+    this.listaUsuariosFiltrada = lista;
+  }
+
+  abrirModalEdicao(usuario: UserSelectDTO): void {
+    this.usuarioEmEdicao = { ...usuario };
+    // Ajusta o cargo para corresponder aos values do select (maiúsculas)
+    if (this.usuarioEmEdicao.cargo) {
+      this.usuarioEmEdicao.cargo = this.usuarioEmEdicao.cargo.toUpperCase();
+    }
+    this.senhaDigitada = ''; // Limpa a senha ao abrir
+    this.modalAberto = true;
+  }
+
+  fecharModal(): void {
+    this.modalAberto = false;
+    this.usuarioEmEdicao = null;
     this.senhaDigitada = '';
   }
 
   inativarUsuario(usuario: UserSelectDTO, event: Event): void {
     event.stopPropagation();
-
     const confirmacao = confirm(`Tem certeza que deseja inativar o usuário ${usuario.nome}?`);
-
-    if (!confirmacao) {
-      return;
-    }
+    if (!confirmacao) return;
 
     const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
     this.AuthGerenciadorUsuarioService.inativarUsuario(usuario.userId, usuarioAtual).subscribe({
       next: (resposta) => {
-        this.AuthNotificacaoService.sucesso(resposta?.mensagem || `Usuário ${usuario.nome} inativado com sucesso!`);
-        // pequeno atraso para dar tempo do back-end refletir a inativação antes de recarregar a lista
-        setTimeout(() => {
-          this.carregarListaUsuarios();
-        }, 300);
+        this.AuthNotificacaoService.sucesso(resposta?.mensagem || `Usuário inativado!`);
+        setTimeout(() => this.carregarListaUsuarios(), 300);
       },
       error: (erro: HttpErrorResponse) => {
-        const mensagem = this.AuthNotificacaoService.extrairMensagemErro(erro, 'Não foi possível inativar o usuário.');
+        const mensagem = this.AuthNotificacaoService.extrairMensagemErro(erro, 'Erro ao inativar usuário.');
         this.AuthNotificacaoService.erro(mensagem);
       }
     });
   }
 
   executarGerenciadorUsuario(): void {
-    if (this.carregando) {
-      return;
-    }
-    if (!this.podeSalvar) {
-      this.AuthNotificacaoService.erro('Selecione um usuário na lista e preencha os campos obrigatórios antes de salvar.');
-      return;
-    }
-    this.carregando = true;
+    if (!this.usuarioEmEdicao || this.salvando) return;
+    this.salvando = true;
 
     const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
 
     this.AuthGerenciadorUsuarioService.atualizarUsuario(
-      this.idSelecionado, this.nomeDigitado, this.senhaDigitada, this.emailDigitado, this.telefoneDigitado,
-      this.cargoDigitado, usuarioAtual
+      this.usuarioEmEdicao.userId, 
+      this.usuarioEmEdicao.nome, 
+      this.senhaDigitada, 
+      this.usuarioEmEdicao.email, 
+      this.usuarioEmEdicao.telefone,
+      this.usuarioEmEdicao.cargo, 
+      usuarioAtual
     ).subscribe({
       next: (resposta) => {
-        this.carregando = false;
-        this.cdr.detectChanges();
-        this.AuthNotificacaoService.sucesso(resposta?.mensagem || 'Atualização realizada com sucesso');
-        setTimeout(() => {
-          this.carregarListaUsuarios();
-        }, 300);
+        this.salvando = false;
+        this.AuthNotificacaoService.sucesso(resposta?.mensagem || 'Usuário atualizado!');
+        this.fecharModal();
+        setTimeout(() => this.carregarListaUsuarios(), 300);
       },
       error: (erro: HttpErrorResponse) => {
-        this.carregando = false;
-        this.cdr.detectChanges();
-        const mensagem = this.AuthNotificacaoService.extrairMensagemErro(erro, 'Atualização de usuário não foi possível');
-        this.AuthNotificacaoService.erro(mensagem);
+        this.salvando = false;
+        const msg = this.AuthNotificacaoService.extrairMensagemErro(erro, 'Erro ao atualizar.');
+        this.AuthNotificacaoService.erro(msg);
       }
     });
   }

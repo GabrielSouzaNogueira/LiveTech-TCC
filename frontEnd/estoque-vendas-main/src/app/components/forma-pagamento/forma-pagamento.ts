@@ -12,17 +12,20 @@ import { AuthNotificacaoService } from '../../services/auth-notificacao';
   imports: [FormsModule, CommonModule],
   templateUrl: './forma-pagamento.html',
   styleUrl: './forma-pagamento.css',
+  standalone: true
 })
 export class FormaPagamento implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   descricaoDigitado: string = '';
-
   listarFormaPag: SelectFormPag[] = [];
-
   carregando: boolean = false;
-
   inativando: Set<string> = new Set();
+
+  // --- Controle de Edição Inline na Tabela ---
+  itemEmEdicao: string | null = null;
+  novaDescricaoEdit: string = '';
+  salvandoEdicao: boolean = false;
 
   constructor(
     private authFormaPagamentoService: AuthFormaPagamento,
@@ -45,11 +48,54 @@ export class FormaPagamento implements OnInit {
         },
         error: (erro) => {
           console.error('Erro ao buscar as formas de pagamento', erro);
-          this.listarFormaPag = []; // evita manter dados desatualizados na tela em caso de erro
+          this.listarFormaPag = []; 
           this.cdr.detectChanges();
         },
       });
   }
+
+  // --- FUNÇÕES DE EDIÇÃO (Abrir, Cancelar e Salvar) ---
+
+  iniciarEdicao(item: SelectFormPag): void {
+    this.itemEmEdicao = item.descricao;
+    this.novaDescricaoEdit = item.descricao;
+  }
+
+  cancelarEdicao(): void {
+    this.itemEmEdicao = null;
+    this.novaDescricaoEdit = '';
+  }
+
+  salvarEdicao(descricaoAntiga: string): void {
+    if (!this.novaDescricaoEdit.trim() || this.salvandoEdicao) return;
+    
+    if (this.novaDescricaoEdit.trim().toUpperCase() === descricaoAntiga.toUpperCase()) {
+      this.cancelarEdicao(); // Nada mudou
+      return;
+    }
+
+    this.salvandoEdicao = true;
+    const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
+
+    // Chama o serviço (que definimos no auth-forma-pagamento.ts)
+    this.authFormaPagamentoService.atualizarFormaPagamento(descricaoAntiga, this.novaDescricaoEdit, usuarioAtual)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (resposta) => {
+          this.AuthNotificacaoService.sucesso(resposta?.mensagem || 'Forma de pagamento atualizada!');
+          this.salvandoEdicao = false;
+          this.cancelarEdicao();
+          setTimeout(() => this.carregarListaFormaPagamento(), 300);
+        },
+        error: (erro: HttpErrorResponse) => {
+          this.salvandoEdicao = false;
+          const msg = this.AuthNotificacaoService.extrairMensagemErro(erro, 'Erro ao atualizar.');
+          this.AuthNotificacaoService.erro(msg);
+        }
+      });
+  }
+
+  // --- FUNÇÕES DE INATIVAÇÃO ---
 
   inativarFormaPagamento(formaPagamento: SelectFormPag, event: Event): void {
     event.stopPropagation();
@@ -59,7 +105,7 @@ export class FormaPagamento implements OnInit {
     }
 
     const confirmacao = confirm(
-      `Tem certeza que quer inativar essa forma de pagamento ${formaPagamento.descricao}?`
+      `Tem certeza que quer inativar essa forma de pagamento: ${formaPagamento.descricao}?`
     );
 
     if (!confirmacao) {
@@ -67,7 +113,6 @@ export class FormaPagamento implements OnInit {
     }
 
     this.inativando.add(formaPagamento.descricao);
-
     const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
 
     this.authFormaPagamentoService
@@ -78,10 +123,6 @@ export class FormaPagamento implements OnInit {
           this.AuthNotificacaoService.sucesso(resposta?.mensagem || `Forma de pagamento ${formaPagamento.descricao} inativada com sucesso!`);
           this.inativando.delete(formaPagamento.descricao);
           this.cdr.detectChanges();
-          // dá tempo do back-end concluir antes de recarregar a lista
-          setTimeout(() => {
-            this.cdr.detectChanges();
-          }, 300);
           setTimeout(() => {
             this.carregarListaFormaPagamento();
           }, 300);
@@ -99,18 +140,15 @@ export class FormaPagamento implements OnInit {
     return this.inativando.has(formaPagamento.descricao);
   }
 
+  // --- FUNÇÃO DE CADASTRO (Criar novo) ---
+
   executarFormaPagamento(): void {
-    if (this.carregando) {
-      return;
-    }
+    if (this.carregando) return;
 
     const descricao = this.descricaoDigitado.trim();
-    if (!descricao) {
-      return;
-    }
+    if (!descricao) return;
 
     this.carregando = true;
-
     const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
 
     this.authFormaPagamentoService
@@ -122,7 +160,6 @@ export class FormaPagamento implements OnInit {
           this.descricaoDigitado = '';
           this.cdr.detectChanges();
           this.AuthNotificacaoService.sucesso(resposta?.mensagem || 'Cadastro realizado com sucesso');
-          // dá tempo do back-end concluir antes de recarregar a lista
           setTimeout(() => {
             this.carregarListaFormaPagamento();
           }, 300);

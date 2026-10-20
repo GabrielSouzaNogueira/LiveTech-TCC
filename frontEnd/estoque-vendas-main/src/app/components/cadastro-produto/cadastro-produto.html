@@ -1,13 +1,14 @@
 <div class="cadastro-produto-container">
-    <div>
-        <!-- botoes para mudar as abas -->
+    <div class="card-minimalista">
+        
+        <!-- BOTOES DE NAVEGACAO (ABAS) -->
         <div class="navegacao-abas">
             <button 
                 type="button" 
                 class="btn-aba" 
                 [class.aba-ativa]="abaAtiva === 'cadastrar'" 
                 (click)="alternarAba('cadastrar')">
-                Cadastrar Produto
+                Novo Produto
             </button>
 
             <button 
@@ -15,86 +16,104 @@
                 class="btn-aba" 
                 [class.aba-ativa]="abaAtiva === 'atualizar'" 
                 (click)="alternarAba('atualizar')">
-                Atualizar Produto
+                Gestão de Produtos
             </button>
         </div>
 
+        <!-- ABA DE CADASTRO -->
         @if (abaAtiva === 'cadastrar') {
-            <h2>Cadastro de Produto</h2>
+            <div class="cabecalho-form">
+                <h2>Cadastro de Produto</h2>
+                <p>Preencha os dados abaixo para adicionar um item ao catálogo.</p>
+            </div>
 
-            <p>Preencha todos os campos com * para cadastrar o Produto!</p>
+            <form class="formulario-grid" #form="ngForm" (ngSubmit)="executarCadastroProduto()">
+                
+                <div class="form-group span-2">
+                    <label for="username">Descrição do Produto:</label>
+                    <input 
+                        type="text"
+                        id="username"
+                        name="username"
+                        [(ngModel)]="nomeDigitado"
+                        placeholder="Ex: Capinha Silicone Transparente"
+                        required>
+                </div>
 
-            <form class="form-group" #form="ngForm" (ngSubmit)="executarCadastroProduto()">
-                <label for="username">* Descrição do Produto: </label>
-                <input 
-                type="text"
-                id="username"
-                name="username"
-                [(ngModel)]="nomeDigitado"
-                placeholder="Digite a descrição do Produto"
-                required>
+                <div class="form-group">
+                    <label for="marca">Marca:</label>
+                    <input 
+                        type="text"
+                        id="marca"
+                        name="marca"
+                        [(ngModel)]="marcaDigitada"
+                        placeholder="Fabricante"
+                        required>
+                </div>
 
-                <label for="marca">* Marca do produto: </label>
-                <input 
-                type="text"
-                id="marca"
-                name="marca"
-                [(ngModel)]="marcaDigitada"
-                placeholder="Digite a marca do produto"
-                required>
+                <div class="form-group">
+                    <label for="codBarra">Código de Barras:</label>
+                    <input 
+                        type="text"
+                        id="codBarra"
+                        name="codBarra"
+                        [(ngModel)]="codBarraDigitada"
+                        placeholder="Apenas números"
+                        maxlength="13"
+                        (input)="codBarraDigitada = codBarraDigitada.replace(/\D/g, '')">
+                </div>
 
-                <label for="codBarra">Codigo de barra: </label>
-                <input 
-                type="text"
-                id="codBarra"
-                name="codBarra"
-                [(ngModel)]="codBarraDigitada"
-                placeholder="Digite o codigo de barra do produto"
-                step="1"
-                maxlength="13"
-                (input)="codBarraDigitada = codBarraDigitada.replace(/\D/g, '')">
+                <div class="form-group">
+                    <label for="quantidade">Qtd. Inicial (Estoque):</label>
+                    <input 
+                        type="number"
+                        id="quantidade"
+                        name="quantidade"
+                        [(ngModel)]="quantidadeDigitada"
+                        placeholder="0"
+                        step="1"
+                        min="0"
+                        required>
+                </div>
 
-                <label for="quantidade">* Quantidade do produto: </label>
-                <input 
-                type="number"
-                id="quantidade"
-                name="quantidade"
-                [(ngModel)]="quantidadeDigitada"
-                placeholder="Digite a quantidade produto"
-                step="1"
-                min="0"
-                required>
+                <div class="form-group"></div> <!-- Espaçador para empurrar os preços para a próxima linha se quiser -->
 
-                <label for="precoCusto">* Preço de Custo: </label>
-                <input 
-                type="number"
-                id="precoCusto"
-                name="precoCusto"
-                [(ngModel)]="precoCustoDigitado"
-                placeholder="0.00"
-                step="0.01"
-                min="0"
-                required>
+                <div class="form-group">
+                    <label for="precoCusto">Preço de Custo (R$):</label>
+                    <input 
+                        type="number"
+                        id="precoCusto"
+                        name="precoCusto"
+                        [(ngModel)]="precoCustoDigitado"
+                        placeholder="0.00"
+                        step="0.01"
+                        min="0"
+                        required>
+                </div>
 
-                <label for="precoVenda">* Preço de venda: </label>
-                <input 
-                type="number"
-                id="precoVenda"
-                name="precoVenda"
-                [(ngModel)]="precoVendaDigitado"
-                placeholder="0.00"
-                step="0.01"
-                min="0"
-                required>
+                <div class="form-group">
+                    <label for="precoVenda">Preço de Venda (R$):</label>
+                    <input 
+                        type="number"
+                        id="precoVenda"
+                        name="precoVenda"
+                        [(ngModel)]="precoVendaDigitado"
+                        placeholder="0.00"
+                        step="0.01"
+                        min="0"
+                        required>
+                </div>
 
-                <button type="submit" [disabled]="form.invalid || carregando">
-                    {{carregando ? 'Entrando...' : 'Cadastrar'}}
-                </button>
+                <div class="acoes-form span-2">
+                    <button type="submit" class="btn-primario" [disabled]="form.invalid || carregando">
+                        {{carregando ? 'Salvando...' : 'Cadastrar Produto'}}
+                    </button>
+                </div>
             </form>
         }
-                <!-- exibe a tela de atualizar -->
+        
+        <!-- ABA DE GESTÃO/ATUALIZAÇÃO -->
         @if (abaAtiva === 'atualizar') {
-            <!-- chamamos diretamente o componente de -->
             <app-gerenciador-produto></app-gerenciador-produto>
         }
     </div>

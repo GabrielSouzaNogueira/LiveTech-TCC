@@ -1,13 +1,14 @@
 <div class="cadastro-usuario-container">
-    <div>
-        <!-- botoes para mudar as abas -->
+    <div class="card-minimalista">
+        
+        <!-- BOTOES DE NAVEGACAO (ABAS) -->
         <div class="navegacao-abas">
             <button 
                 type="button" 
                 class="btn-aba" 
                 [class.aba-ativa]="abaAtiva === 'cadastrar'" 
                 (click)="alternarAba('cadastrar')">
-                Cadastrar Usuario
+                Novo Usuário
             </button>
 
             <button 
@@ -15,69 +16,86 @@
                 class="btn-aba" 
                 [class.aba-ativa]="abaAtiva === 'atualizar'" 
                 (click)="alternarAba('atualizar')">
-                Atualizar Usuario
+                Gestão de Usuários
             </button>
         </div>
 
+        <!-- ABA DE CADASTRO -->
         @if (abaAtiva === 'cadastrar') {
-            <h2>Cadastro de Usuario</h2>
+            <div class="cabecalho-form">
+                <h2>Cadastro de Usuário</h2>
+                <p>Preencha os dados abaixo para conceder acesso ao sistema.</p>
+            </div>
 
-            <p>Preencha todos os campos com * para cadastrar o Usuario!</p>
+            <form class="formulario-grid" #form="ngForm" (ngSubmit)="executarCadastroUsuario()">
+                
+                <div class="form-group span-2">
+                    <label for="username">Nome Completo:</label>
+                    <input 
+                        type="text"
+                        id="username"
+                        name="username"
+                        [(ngModel)]="nomeDigitado"
+                        placeholder="Ex: João da Silva"
+                        required>
+                </div>
 
-            <form class="form-group" #form="ngForm" (ngSubmit)="executarCadastroUsuario()">
-                <label for="username">* Usuario: </label>
-                <input 
-                type="text"
-                id="username"
-                name="username"
-                [(ngModel)]="nomeDigitado"
-                placeholder="Digite o nome do usuario"
-                required>
+                <div class="form-group">
+                    <label for="email">E-mail:</label>
+                    <input 
+                        type="email"
+                        id="email"
+                        name="email"
+                        [(ngModel)]="emailDigitado"
+                        placeholder="joao@empresa.com">
+                </div>
 
-                <label for="password">* Senha: </label>
-                <input 
-                type="password"
-                id="password"
-                name="password"
-                [(ngModel)]="senhaDigitada"
-                placeholder="Digite sua senha"
-                required>
+                <div class="form-group">
+                    <label for="telefone">Telefone:</label>
+                    <input 
+                        type="text" 
+                        id="telefone"
+                        name="telefone"
+                        [(ngModel)]="telefoneDigitado"
+                        placeholder="(00) 00000-0000"
+                        mask="(00) 00000-0000">
+                </div>
 
-                <label for="email">Email: </label>
-                <input 
-                type="email"
-                id="email"
-                name="email"
-                [(ngModel)]="emailDigitado"
-                placeholder="Digite seu email">
-
-                <label for="telefone">Telefone: </label>
-                <input 
-                type="text" 
-                id="telefone"
-                name="telefone"
-                placeholder="(62) 90000-0000"
-                mask="(00) 00000-0000">
-
-                <label for="cargo">* Cargo: </label>
+                <div class="form-group">
+                    <label for="cargo">Cargo/Perfil de Acesso:</label>
                     <select 
-                    name="cargo" 
-                    id="cargo"
-                    [(ngModel)]="cargoDigitado"
-                    required>
-                        <option value="" disabled>Selecione uma opção</option>
+                        name="cargo" 
+                        id="cargo"
+                        [(ngModel)]="cargoDigitado"
+                        required>
+                        <option value="" disabled>Selecione um cargo</option>
                         <option value="BALCONISTA">Balconista</option>
                         <option value="ADMINISTRADOR">Administrador</option>
                         <option value="GERENTE">Gerente</option>
                     </select>
-                <button type="submit" [disabled]="form.invalid || carregando">
-                    {{carregando ? 'Entrando...' : 'Cadastrar'}}
-                </button>            
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Senha Provisória:</label>
+                    <input 
+                        type="password"
+                        id="password"
+                        name="password"
+                        [(ngModel)]="senhaDigitada"
+                        placeholder="Crie uma senha de acesso"
+                        required>
+                </div>
+
+                <div class="acoes-form span-2">
+                    <button type="submit" class="btn-primario" [disabled]="form.invalid || carregando">
+                        {{carregando ? 'Salvando...' : 'Cadastrar Usuário'}}
+                    </button>
+                </div>
             </form>
         }
-        <!-- exibe a tela de atualizar -->
+        
+        <!-- ABA DE GESTÃO -->
         @if (abaAtiva === 'atualizar') {
-            <!-- chamamos diretamente o componente de -->
             <app-gerenciador-usuario></app-gerenciador-usuario>
         }
     </div>

@@ -1,63 +1,83 @@
 <div class="forma-pagamento-container">
-  <div>
-    <h2>Gerenciador de Formas de Pagamento</h2>
-    <p>Cadastre uma nova forma de pagamento ou gerencie as existentes abaixo</p>
+  
+  <!-- CABEÇALHO E CADASTRO RÁPIDO -->
+  <div class="card-minimalista">
+    <div class="cabecalho-form">
+      <h2>Formas de Pagamento</h2>
+      <p>Cadastre uma nova forma de pagamento ou gerencie as existentes abaixo.</p>
+    </div>
 
-    <form (submit)="executarFormaPagamento()">
-      <div class="form-group">
-        <label>Descrição:</label>
-
-        <input
-          type="text"
-          [(ngModel)]="descricaoDigitado"
-          name="descricao"
-          placeholder="Ex: Cartão de Crédito, Dinheiro, Pix..."
-          required
-        />
+    <form (submit)="executarFormaPagamento()" class="form-cadastro-inline">
+      <div class="form-group flex-2">
+        <input type="text" [(ngModel)]="descricaoDigitado" name="descricao" placeholder="Ex: Cartão de Crédito, Pix, Dinheiro..." required />
       </div>
-
-      <button
-        type="submit"
-        [disabled]="carregando || !descricaoDigitado.trim()"
-      >
-        {{ carregando ? 'Cadastrando....' : 'Cadastrar Forma de Pagamento' }}
-      </button>
+      <div class="acoes-form flex-1">
+        <button type="submit" class="btn-primario" [disabled]="carregando || !descricaoDigitado.trim()">
+          {{ carregando ? 'Salvando...' : 'Cadastrar' }}
+        </button>
+      </div>
     </form>
   </div>
 
-  <div>
-    <h3>Formas de Pagamento Cadastradas</h3>
+  <!-- TABELA COM EDIÇÃO INLINE -->
+  <div class="card-minimalista card-tabela">
+    <div class="tabela-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Descrição da Forma de Pagamento</th>
+            <th class="texto-centro">Status</th>
+            <th class="texto-centro">Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of listarFormaPag; trackBy: trackByDescricao">
+            
+            <td class="fw-bold">
+              <!-- VISUALIZAÇÃO NORMAL (Aparece se não estiver a editar) -->
+              <span *ngIf="itemEmEdicao !== item.descricao">{{ item.descricao }}</span>
+              
+              <!-- MODO DE EDIÇÃO (Aparece quando clica em Editar) -->
+              <div *ngIf="itemEmEdicao === item.descricao" class="edicao-inline">
+                <input type="text" [(ngModel)]="novaDescricaoEdit" class="input-edicao" (keyup.enter)="salvarEdicao(item.descricao)">
+                <button class="btn-salvar-mini" (click)="salvarEdicao(item.descricao)" [disabled]="salvandoEdicao" title="Salvar">✔</button>
+                <button class="btn-cancelar-mini" (click)="cancelarEdicao()" title="Cancelar">✕</button>
+              </div>
+            </td>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Descrição</th>
-          <th>Status</th>
-          <th class="coluna-acao">Ação</th>
-        </tr>
-      </thead>
+            <td class="texto-centro">
+              <span class="badge" [ngClass]="item.status === 'ATIVO' ? 'badge-ativa' : 'badge-inativa'">
+                {{ item.status }}
+              </span>
+            </td>
 
-      <tbody>
-        <tr *ngFor="let item of listarFormaPag; trackBy: trackByDescricao">
-          <td>{{ item.descricao }}</td>
-          <td>{{ item.status }}</td>
+            <td class="celula-acao">
+              <!-- Botão Editar (Some se já estiver em edição) -->
+              <button *ngIf="item.status === 'ATIVO' && itemEmEdicao !== item.descricao" 
+                      class="btn-visualizar" 
+                      (click)="iniciarEdicao(item)">
+                Editar
+              </button>
 
-          <td class="celula-acao">
-            <button
-              type="button"
-              class="btn-inativar"
-              [disabled]="isInativando(item)"
-              (click)="inativarFormaPagamento(item, $event)"
-            >
-              {{ isInativando(item) ? 'Inativando...' : 'Inativar' }}
-            </button>
-          </td>
-        </tr>
+              <!-- Botão Inativar / Lixeira (Some se já estiver em edição) -->
+              <button *ngIf="item.status === 'ATIVO' && itemEmEdicao !== item.descricao" 
+                      type="button" 
+                      class="btn-acao-rapida btn-perigo" 
+                      [disabled]="isInativando(item)" 
+                      (click)="inativarFormaPagamento(item, $event)" 
+                      title="Inativar Forma de Pagamento">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+              </button>
+            </td>
 
-        <tr *ngIf="listarFormaPag.length === 0">
-          <td colspan="3" class="sem-dados">Nenhuma forma de pagamento cadastrada.</td>
-        </tr>
-      </tbody>
-    </table>
+          </tr>
+          <tr *ngIf="listarFormaPag.length === 0">
+            <td colspan="3" class="sem-dados">Nenhuma forma de pagamento cadastrada.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>

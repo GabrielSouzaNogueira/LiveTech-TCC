@@ -1,115 +1,81 @@
-<div>
-
-  <div>
-<h2>Gerenciador de Serviços</h2>
-
-<p>Clique em um serviço da lista abaixo para editar os dados</p>
-
-<form (submit)="executarGerenciadorServicos()">
-
-  <div class="form-group">
-
-    <label>Descrição do Serviço:</label>
-
-    <input
-      type="text"
-      [(ngModel)]="descServicoSelecionado"
-      name="descServico"
-      placeholder="Descrição do serviço"
-      required>
-
+<div class="gestao-container">
+  
+  <div class="barra-filtros">
+    <div class="filtro-busca">
+      <input type="text" placeholder="Buscar por Descrição..." [(ngModel)]="termoBusca" (keyup)="aplicarFiltros()">
+    </div>
+    <div class="filtro-status">
+      <select [(ngModel)]="filtroStatus" (change)="aplicarFiltros()">
+        <option value="TODOS">Todos os Status</option>
+        <option value="ATIVO">Ativos</option>
+        <option value="INATIVO">Inativos</option>
+      </select>
+    </div>
   </div>
 
-  <div class="form-group">
-
-    <label>Preço do Serviço:</label>
-
-    <input
-      type="number"
-      [(ngModel)]="precoServicoSelecionado"
-      name="precoServico"
-      placeholder="Preço do serviço"
-      step="0.01" 
-      min="0"
-      required>
-
+  <div class="tabela-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Descrição do Serviço</th>
+          <th class="texto-direita">Preço Base</th>
+          <th class="texto-centro">Status</th>
+          <th class="texto-centro">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let servico of listaServicosFiltrada">
+          <td class="fw-bold">{{ servico.descServico }}</td>
+          <td class="texto-direita">{{ servico.precoServico | currency:'BRL' }}</td>
+          <td class="texto-centro">
+            <span class="badge" [ngClass]="servico.status === 'ATIVO' ? 'badge-ativa' : 'badge-inativa'">
+              {{ servico.status }}
+            </span>
+          </td>
+          <td class="celula-acao">
+            <button class="btn-visualizar" (click)="abrirModalEdicao(servico)">Editar</button>
+            <button *ngIf="servico.status === 'ATIVO'" class="btn-acao-rapida btn-perigo" [disabled]="isInativando(servico)" (click)="inativarServicos(servico, $event)" title="Inativar Serviço">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="listaServicosFiltrada.length === 0 && !carregando">
+          <td colspan="4" class="sem-dados">Nenhum serviço encontrado.</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
+</div>
 
-  <button
-    type="submit"
-    [disabled]="carregando || !podeSalvar">
+<!-- MODAL FLUTUANTE -->
+<div class="overlay-modal" *ngIf="modalAberto && servicoEmEdicao" (click)="fecharModal()">
+  <div class="modal-conteudo" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header">
+      <h3>Editar Serviço</h3>
+      <button class="btn-fechar-modal" (click)="fecharModal()">✕</button>
+    </div>
 
-    {{ carregando ? 'Atualizando...' : 'Salvar Alterações' }}
+    <div class="modal-body">
+      <form class="formulario-grid" #editForm="ngForm">
+        <div class="form-group span-2">
+          <label>Descrição do Serviço:</label>
+          <input type="text" name="descEdit" [(ngModel)]="servicoEmEdicao.descServico" required>
+        </div>
+        <div class="form-group span-2">
+          <label>Preço Base (R$):</label>
+          <input type="number" name="precoEdit" [(ngModel)]="servicoEmEdicao.precoServico" step="0.01" required>
+        </div>
+      </form>
+    </div>
 
-  </button>
-
-</form>
-
+    <div class="modal-footer">
+      <button type="button" class="btn-secundario" (click)="fecharModal()">Cancelar</button>
+      <button type="button" class="btn-primario" [disabled]="editForm.invalid || salvando" (click)="executarGerenciadorServicos()">
+        {{ salvando ? 'Salvando...' : 'Salvar Alterações' }}
+      </button>
+    </div>
   </div>
-
-  <div>
-
-<h3>Serviços Cadastrados</h3>
-
-<table>
-
-  <thead>
-
-    <tr>
-
-      <th>Descrição</th>
-
-      <th>Preço</th>
-
-      <th>Status</th>
-
-      <th class="coluna-acao">Ação</th>
-
-    </tr>
-
-  </thead>
-
-  <tbody>
-
-    <!-- Percorre a lista de serviços -->
-
-    <tr
-      *ngFor="let servico of ListarServicos"
-      (click)="selecionarServicos(servico)"
-      [class.linha-selecionada]="servico.servicosId === servicosIdSelecionado">
-
-      <td>
-        {{ servico.descServico }}
-      </td>
-
-      <td>
-        {{ servico.precoServico }}
-      </td>
-
-      <td>
-        {{ servico.status }}
-      </td>
-
-      <td class="celila-acao">
-
-        <button
-          type="button"
-          class="btn-inativar"
-          [disabled]="isInativando(servico)"
-          (click)="inativarServicos(servico, $event)">
-
-          {{ isInativando(servico) ? 'Inativando...' : 'Inativar' }}
-
-        </button>
-
-      </td>
-
-    </tr>
-
-  </tbody>
-
-</table>
-
-  </div>
-
 </div>

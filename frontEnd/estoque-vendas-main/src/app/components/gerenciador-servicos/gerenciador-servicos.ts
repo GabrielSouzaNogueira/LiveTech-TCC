@@ -13,135 +13,127 @@ import { HttpErrorResponse } from '@angular/common/http';
   imports: [FormsModule, CommonModule],
   templateUrl: './gerenciador-servicos.html',
   styleUrl: './gerenciador-servicos.css',
+  standalone: true
 })
-export class GerenciadorServicos implements OnInit{
-  servicosIdSelecionado: string = '';
-  descServicoSelecionado: string = '';
-  precoServicoSelecionado: number = 0;
-  
-  ListarServicos: ServicosDTO[] = [];
+export class GerenciadorServicos implements OnInit {
+  listaServicosGeral: ServicosDTO[] = [];
+  listaServicosFiltrada: ServicosDTO[] = [];
 
+  termoBusca: string = '';
+  filtroStatus: string = 'TODOS';
   carregando: boolean = false;
 
-  constructor(private AuthGerenciadorServicoService: AuthGerenciadorServicos, 
-    private router: Router, 
-    private cdr: ChangeDetectorRef, 
-    private authNotificacaoService: AuthNotificacaoService) {}
-
+  // Controle do Modal
+  servicoEmEdicao: ServicosDTO | null = null;
+  modalAberto: boolean = false;
+  salvando: boolean = false;
   inativando: Set<string> = new Set();
 
-  get podeSalvar(): boolean {
-    return (
-      !!this.servicosIdSelecionado &&
-      this.descServicoSelecionado.trim().length > 0 &&
-      this.precoServicoSelecionado != null
-    );
-  }
-  
   private readonly destroyRef = inject(DestroyRef);
-  
+
+  constructor(
+    private AuthGerenciadorServicoService: AuthGerenciadorServicos, 
+    private cdr: ChangeDetectorRef, 
+    private authNotificacaoService: AuthNotificacaoService
+  ) {}
+
   ngOnInit(): void {
     this.carregarListaServicos();
   }
 
   carregarListaServicos(): void {
-    this.AuthGerenciadorServicoService
-      .listarServicos()
+    this.carregando = true;
+    this.AuthGerenciadorServicoService.listarServicos()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (dados) => {
-          this.ListarServicos = dados;
+          this.listaServicosGeral = dados;
+          this.aplicarFiltros();
+          this.carregando = false;
           this.cdr.detectChanges();
         },
         error: (erro) => {
-          console.error('Erro ao buscar os servicos', erro);
-          this.ListarServicos = []; // evita manter dados desatualizados na tela em caso de erro
+          console.error('Erro ao buscar serviços', erro);
+          this.carregando = false;
           this.cdr.detectChanges();
-        },
+        }
       });
   }
 
-    selecionarServicos(servico: ServicosDTO): void {
-      this.servicosIdSelecionado = servico.servicosId;
-      this.descServicoSelecionado = servico.descServico;
-      this.precoServicoSelecionado = servico.precoServico;
+  aplicarFiltros(): void {
+    let lista = this.listaServicosGeral;
+    if (this.filtroStatus !== 'TODOS') {
+      lista = lista.filter(s => s.status === this.filtroStatus);
     }
+    if (this.termoBusca) {
+      const termo = this.termoBusca.toLowerCase();
+      lista = lista.filter(s => s.descServico.toLowerCase().includes(termo));
+    }
+    this.listaServicosFiltrada = lista;
+  }
 
-  inativarServicos(servicos: ServicosDTO, event: Event): void {
+  abrirModalEdicao(servico: ServicosDTO): void {
+    this.servicoEmEdicao = { ...servico };
+    this.modalAberto = true;
+  }
+
+  fecharModal(): void {
+    this.modalAberto = false;
+    this.servicoEmEdicao = null;
+  }
+
+  inativarServicos(servico: ServicosDTO, event: Event): void {
     event.stopPropagation();
+    if (this.inativando.has(servico.servicosId)) return;
 
-    if (this.inativando.has(servicos.servicosId)) {
-      return;
-    }
+    const confirmacao = confirm(`Deseja inativar o serviço: ${servico.descServico}?`);
+    if (!confirmacao) return;
 
-    const confirmacao = confirm(
-      `Tem certeza que quer inativar essa forma de pagamento ${servicos.descServico}?`
-    );
-
-    if (!confirmacao) {
-      return;
-    }
-
-    this.inativando.add(servicos.servicosId);
-
+    this.inativando.add(servico.servicosId);
     const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
 
-    this.AuthGerenciadorServicoService
-      .inativarServicos(servicos.servicosId, usuarioAtual)
+    this.AuthGerenciadorServicoService.inativarServicos(servico.servicosId, usuarioAtual)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-          next: (resposta) => {
-            this.authNotificacaoService.sucesso(resposta?.mensagem || `O serviço ${servicos.servicosId} inativada com sucesso!`);
-            this.inativando.delete(servicos.servicosId);
-            this.cdr.detectChanges();
-            // dá tempo do back-end concluir antes de recarregar a lista
-            setTimeout(() => {
-              this.cdr.detectChanges();
-            }, 300);
-            setTimeout(() => {
-              this.carregarListaServicos();
-            }, 300);
-          },
-        error: (erro: HttpErrorResponse) => {
-          const mensagem = this.authNotificacaoService.extrairMensagemErro(erro, 'Não foi possível inativar');
-          this.authNotificacaoService.erro(mensagem);
-          this.inativando.delete(servicos.servicosId);
-          this.cdr.detectChanges();
+        next: (resposta) => {
+          this.authNotificacaoService.sucesso(resposta?.mensagem || 'Serviço inativado!');
+          this.inativando.delete(servico.servicosId);
+          setTimeout(() => this.carregarListaServicos(), 300);
         },
+        error: (erro: HttpErrorResponse) => {
+          const msg = this.authNotificacaoService.extrairMensagemErro(erro, 'Erro ao inativar.');
+          this.authNotificacaoService.erro(msg);
+          this.inativando.delete(servico.servicosId);
+        }
       });
   }
 
-  isInativando(servicos: ServicosDTO): boolean {
-    return this.inativando.has(servicos.servicosId);
+  isInativando(servico: ServicosDTO): boolean {
+    return this.inativando.has(servico.servicosId);
   }
 
   executarGerenciadorServicos(): void {
-    if (this.carregando) {
-      return;
-    }
-    if (!this.podeSalvar) {
-      this.authNotificacaoService.erro('Selecione um serviço na lista e preencha os campos obrigatórios antes de salvar.');
-      return;
-    }
-    this.carregando = true;
+    if (!this.servicoEmEdicao || this.salvando) return;
+    this.salvando = true;
 
     const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
 
     this.AuthGerenciadorServicoService.atualizarServicos(
-      this.servicosIdSelecionado, this.descServicoSelecionado, this.precoServicoSelecionado, usuarioAtual).subscribe({
+      this.servicoEmEdicao.servicosId, 
+      this.servicoEmEdicao.descServico, 
+      this.servicoEmEdicao.precoServico, 
+      usuarioAtual
+    ).subscribe({
       next: (resposta) => {
-        this.carregando = false;
-        this.cdr.detectChanges();
-        this.authNotificacaoService.sucesso(resposta?.mensagem || 'Atualização de servço realizada com sucesso');
-        setTimeout(() => {
-          this.carregarListaServicos();
-        }, 300);
+        this.salvando = false;
+        this.authNotificacaoService.sucesso(resposta?.mensagem || 'Serviço atualizado com sucesso!');
+        this.fecharModal();
+        setTimeout(() => this.carregarListaServicos(), 300);
       },
       error: (erro: HttpErrorResponse) => {
-        this.carregando = false;
-        this.cdr.detectChanges();
-        const mensagem = this.authNotificacaoService.extrairMensagemErro(erro, 'Atualização de serviço não foi possível');
-        this.authNotificacaoService.erro(mensagem);
+        this.salvando = false;
+        const msg = this.authNotificacaoService.extrairMensagemErro(erro, 'Erro ao atualizar.');
+        this.authNotificacaoService.erro(msg);
       }
     });
   }

@@ -44,8 +44,11 @@ public class FormPagController {
 
     }
 
-    @PatchMapping("/atualizar/{descricao}")
-    public ResponseEntity<ResponseDTO> atualizar(@PathVariable String descricao, @RequestBody UpdateFormPagDTO dto, @RequestHeader("X-Usuario-Logado") String userLogado) {
+    @PatchMapping("/update/{descricao}")
+    public ResponseEntity<ResponseDTO> atualizar(
+            @PathVariable String descricao,
+            @RequestBody UpdateFormPagDTO dto,
+            @RequestHeader("X-Usuario-Logado") String userLogado) {
 
         Boolean formaPagto = formPagService.atualizar(descricao, dto, userLogado);
 
@@ -59,10 +62,9 @@ public class FormPagController {
 
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO(
                 true,
-                "Forma de pagamento atualizado com sucesso!",
+                "Forma de pagamento atualizada com sucesso!",
                 Instant.now().toString())
         );
-
     }
 
     @PatchMapping("/delete/{descricao}")

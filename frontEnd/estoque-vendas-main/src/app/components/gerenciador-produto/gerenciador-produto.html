@@ -1,85 +1,128 @@
-<div>
-
-  <div>
-    <h2>Gerenciador de Produtos</h2>
-    <p>Clique em um produto da lista abaixo para editar os dados</p>
-
-    <form (submit)="executarGerenciadorProduto()">
-
-      <div class="form-group">
-        <label>Descrição:</label>
-        <input type="text" [(ngModel)]="nomeDigitado" name="nome" placeholder="Descrição do produto" required>
-      </div>
-
-      <div class="form-group">
-        <label>Marca:</label>
-        <input type="text" [(ngModel)]="marcaDigitada" name="marca" placeholder="Marca" required>
-      </div>
-
-      <div class="form-group">
-        <label>Código de Barras:</label>
-        <input type="text" [(ngModel)]="codBarraDigitada" name="codBarra" placeholder="Código de barras">
-      </div>
-
-      <div class="form-group">
-        <label>Quantidade:</label>
-        <input type="number" [(ngModel)]="quantidadeDigitada" name="quantidade" placeholder="Quantidade" required>
-      </div>
-
-      <div class="form-group">
-        <label>Preço de Custo:</label>
-        <input type="number" [(ngModel)]="precoCustoDigitado" name="precoCusto" placeholder="Preço de custo" step="0.01" min="0" required>
-      </div>
-
-      <div class="form-group">
-        <label>Preço de Venda:</label>
-        <input type="number" [(ngModel)]="precoVendaDigitado" name="precoVenda" placeholder="Preço de venda" step="0.01" min="0" required>
-      </div>
-
-      <button type="submit" [disabled]="carregando || !podeSalvar">
-        {{ carregando ? 'Atualizando...' : 'Salvar Alterações' }}
-      </button>
-    </form>
+<div class="gestao-container">
+  
+  <!-- BARRA DE FILTROS -->
+  <div class="barra-filtros">
+    <div class="filtro-busca">
+      <input type="text" placeholder="Buscar por Nome ou Código de Barras..." 
+             [(ngModel)]="termoBuscaNome" 
+             (keyup)="aplicarFiltros()">
+    </div>
+    <div class="filtro-status">
+      <select [(ngModel)]="filtroStatus" (change)="aplicarFiltros()">
+        <option value="TODOS">Todos os Status</option>
+        <option value="ATIVO">Ativos</option>
+        <option value="INATIVO">Inativos</option>
+      </select>
+    </div>
   </div>
 
-  <div>
-    <h3>Produtos Cadastrados</h3>
-
+  <!-- TABELA PRINCIPAL -->
+  <div class="tabela-wrapper">
     <table>
       <thead>
         <tr>
           <th>Descrição</th>
           <th>Marca</th>
-          <th>Código de Barras</th>
-          <th>Quantidade</th>
-          <th>Preço de Custo</th>
-          <th>Preço de Venda</th>
-          <th>Status</th>
-          <th class="coluna-acao">Ação</th>
+          <th class="texto-centro">Estoque</th>
+          <th class="texto-direita">Preço (Venda)</th>
+          <th class="texto-centro">Status</th>
+          <th class="texto-centro">Ação</th>
         </tr>
       </thead>
       <tbody>
-        <!-- O *ngFor percorre a listaProdutos e cria uma linha para cada um -->
-            <tr *ngFor="let produto of listaProdutos" 
-                (click)="selecionarProduto(produto)" 
-                [class.linha-selecionada]="produto.prodId === prodIdSelecionado">
-            <td>{{ produto.nome }}</td>
-            <td>{{ produto.marca }}</td>
-            <td>{{ produto.codBarra }}</td>
-            <td>{{ produto.quantidade }}</td>
-            <td>{{ produto.precoCusto }}</td>
-            <td>{{ produto.precoVenda }}</td>
-            <td>{{ produto.prodStatus }}</td>
-            <td class="celila-acao">
-              <button type="button" 
-                      class="btn-inativar" 
-                      (click)="inativarProduto(produto, $event)">
-                Inativar
-              </button>
-            </td>
-            </tr>
+        <!-- Usa a lista filtrada em vez da lista cheia -->
+        <tr *ngFor="let produto of listaProdutosFiltrada">
+          <td class="fw-bold">
+            {{ produto.nome }}
+            <span class="info-secundaria">{{ produto.codBarra || 'Sem cód.' }}</span>
+          </td>
+          <td>{{ produto.marca }}</td>
+          <td class="texto-centro" [class.texto-alerta]="produto.quantidade <= 5">{{ produto.quantidade }}</td>
+          <td class="texto-direita">{{ produto.precoVenda | currency:'BRL' }}</td>
+          <td class="texto-centro">
+            <span class="badge" [ngClass]="produto.prodStatus === 'ATIVO' ? 'badge-ativa' : 'badge-inativa'">
+              {{ produto.prodStatus }}
+            </span>
+          </td>
+          <td class="celula-acao">
+            <!-- Abre o Modal Flutuante -->
+            <button class="btn-visualizar" (click)="abrirModalEdicao(produto)">Editar</button>
+            <button *ngIf="produto.prodStatus === 'ATIVO'" class="btn-acao-rapida btn-perigo" (click)="inativar(produto, $event)" title="Inativar Produto">
+                <!-- Ícone de Lixeira SVG Minimalista -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+            </button>
+          </td>
+        </tr>
+        
+        <!-- Mensagem de lista vazia -->
+        <tr *ngIf="listaProdutosFiltrada.length === 0 && !carregandoLista">
+          <td colspan="6" class="sem-dados">Nenhum produto encontrado.</td>
+        </tr>
       </tbody>
     </table>
   </div>
+</div>
 
+<!-- ============================================== -->
+<!-- MODAL DE EDIÇÃO FLUTUANTE                      -->
+<!-- ============================================== -->
+<div class="overlay-modal" *ngIf="modalAberto && produtoEmEdicao" (click)="fecharModal()">
+  <div class="modal-conteudo" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header">
+      <h3>Editar Produto</h3>
+      <button class="btn-fechar-modal" (click)="fecharModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <form class="formulario-grid" #editForm="ngForm">
+        
+        <div class="form-group span-2">
+          <label>Descrição:</label>
+          <input type="text" name="nomeEdit" [(ngModel)]="produtoEmEdicao.nome" required>
+        </div>
+
+        <div class="form-group">
+          <label>Marca:</label>
+          <input type="text" name="marcaEdit" [(ngModel)]="produtoEmEdicao.marca" required>
+        </div>
+
+        <div class="form-group">
+          <label>Código de Barras:</label>
+          <input type="text" name="codBarraEdit" [(ngModel)]="produtoEmEdicao.codBarra">
+        </div>
+
+        <div class="form-group">
+          <label>Quantidade no Estoque:</label>
+          <input type="number" name="qtdEdit" [(ngModel)]="produtoEmEdicao.quantidade" required>
+        </div>
+
+        <div class="form-group"></div> <!-- Espaçador invisível para quebrar linha -->
+
+        <div class="form-group">
+          <label>Preço de Custo (R$):</label>
+          <input type="number" name="custoEdit" [(ngModel)]="produtoEmEdicao.precoCusto" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+          <label>Preço de Venda (R$):</label>
+          <input type="number" name="vendaEdit" [(ngModel)]="produtoEmEdicao.precoVenda" step="0.01" required>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secundario" (click)="fecharModal()">Cancelar</button>
+      <button type="button" class="btn-primario" [disabled]="editForm.invalid || salvando" (click)="salvarAlteracoes()">
+        {{ salvando ? 'Salvando...' : 'Salvar Alterações' }}
+      </button>
+    </div>
+
+  </div>
 </div>

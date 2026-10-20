@@ -1,216 +1,47 @@
-/* Título principal */
-
-h2 {
-    text-align: center;
-    color: #1e293b;
-    margin-bottom: 0.25rem;
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-
-
-/* Título da tabela */
-
-h3 {
-    text-align: center;
-    color: #1e293b;
-    margin-top: 1.75rem;
-    margin-bottom: 1rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid #e2e8f0;
-    font-size: 1.05rem;
-    font-weight: 700;
-}
-
-
-/* Texto explicativo */
-
-p {
-    text-align: center;
-    color: #64748b;
-    margin-bottom: 1.25rem;
-    font-size: 0.95rem;
-}
-
-
-/* Organização do formulário */
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 0.85rem;
-}
-
-
-/* Labels */
-
-.form-group label {
-    margin-bottom: 0.35rem;
-    font-weight: 600;
-    color: #475569;
-    font-size: 0.85rem;
-}
-
-
-/* Campos de entrada */
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 0.55rem 0.75rem;
-    font-size: 0.9rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    box-sizing: border-box;
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-
-/* Campo selecionado */
-
-.form-group input:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: #8BCF8B;
-    box-shadow: 0 0 5px rgba(139, 207, 139, 0.6);
-}
-
-
-/* Placeholder */
-
-.form-group input::placeholder {
-    color: #94a3b8;
-}
-
-
-/* Botão Salvar */
-
-button {
-    width: 100%;
-    margin-top: 0.75rem;
-    padding: 0.55rem 1.2rem;
-    background-color: #8BCF8B;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-
-/* Hover do botão */
-
-button:hover {
-    background-color: #72c172;
-}
-
-
-/* Clique do botão */
-
-button:active {
-    transform: scale(0.98);
-}
-
-
-/* Botão desabilitado */
-
-button:disabled {
-    background-color: #c2e7c2;
-    cursor: not-allowed;
-    transform: none;
-}
-
-
-/* Tabela */
-
-table {
-    width: 100%;
-    margin-top: 1rem;
-    border-collapse: collapse;
-    font-size: 0.9rem;
-}
-
-
-/* Cabeçalho */
-
-thead {
-    background-color: #8BCF8B;
-    color: white;
-}
-
-
-/* Células */
-
-th,
-td {
-    padding: 0.75rem 1rem;
-    border: 1px solid #e2e8f0;
-    text-align: center;
-}
-
-
-/* Linhas da tabela */
-
-tbody tr {
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-
-/* Hover das linhas */
-
-tbody tr:hover {
-    background-color: #f5fff5;
-}
-
-
-/* Centralização e alinhamento da coluna de ação */
-
-.coluna-acao,
-.celila-acao {
-    text-align: center;
-}
-
-
-/* Botão simples de inativar */
-
-.btn-inativar {
-    background: transparent;
-    border: 1px solid #ef4444;
-    color: #ef4444;
-    padding: 0.3rem 0.65rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin: 0;
-}
-
-
-/* Hover do botão Inativar */
-
-.btn-inativar:hover {
-    background-color: #ef4444;
-    color: white;
-}
-
-
-/* Botão Inativar desabilitado */
-
-.btn-inativar:disabled {
-    background-color: transparent;
-    border-color: #fca5a5;
-    color: #fca5a5;
-    cursor: not-allowed;
-}
-
-
-/* Destaque visual da linha selecionada */
-
-.linha-selecionada {
-    background-color: #e2f5e2 !important;
-}
-
+.gestao-container { width: 100%; }
+.barra-filtros { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+.filtro-busca { flex: 2; }
+.filtro-status { flex: 1; }
+.barra-filtros input, .barra-filtros select { width: 100%; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; color: #334155; outline: none; transition: all 0.2s; font-size: 0.95rem; }
+.barra-filtros input:focus, .barra-filtros select:focus { border-color: #8BCF8B; background: #fff; }
+.tabela-wrapper { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+thead { background-color: #f8fafc; }
+th { padding: 1rem; text-align: left; color: #475569; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; font-size: 0.8rem;}
+td { padding: 1rem; border-bottom: 1px solid #f1f5f9; color: #1e293b; vertical-align: middle;}
+tbody tr:hover { background-color: #f0fdf4; }
+.texto-centro { text-align: center; }
+.texto-direita { text-align: right; }
+.fw-bold { font-weight: 600; }
+.sem-dados { text-align: center; padding: 2.5rem; color: #94a3b8; }
+.celula-acao { display: flex; gap: 0.5rem; justify-content: center; }
+.btn-visualizar { background: transparent; border: 1px solid #8BCF8B; color: #166534; padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+.btn-visualizar:hover { background: #8BCF8B; color: white; }
+.btn-acao-rapida { background: transparent; border: none; cursor: pointer; padding: 0.4rem; border-radius: 6px; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+.btn-acao-rapida:hover { background: #fee2e2; }
+.btn-acao-rapida:disabled { color: #cbd5e1; cursor: not-allowed; background: transparent; }
+.btn-perigo { color: #ef4444; }
+.badge { display: inline-block; padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+.badge-ativa { background: #dcfce7; color: #166534; }
+.badge-inativa { background: #f1f5f9; color: #64748b; }
+.overlay-modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.modal-conteudo { background: #fff; border-radius: 12px; width: 100%; max-width: 550px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); animation: fadeIn 0.2s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid #e2e8f0; }
+.modal-header h3 { margin: 0; color: #0f172a; font-size: 1.15rem; }
+.btn-fechar-modal { background: transparent; border: none; font-size: 1.25rem; color: #64748b; cursor: pointer; margin: 0; padding: 0;}
+.btn-fechar-modal:hover { color: #ef4444; }
+.modal-body { padding: 1.5rem; }
+.formulario-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem 1.5rem; }
+.span-2 { grid-column: span 2; }
+.form-group { display: flex; flex-direction: column; }
+.form-group label { margin-bottom: 0.5rem; font-weight: 600; color: #334155; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.form-group input { width: 100%; padding: 0.75rem 1rem; font-size: 0.95rem; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; color: #0f172a; transition: all 0.2s; box-sizing: border-box; }
+.form-group input:focus { outline: none; background-color: #ffffff; border-color: #8BCF8B; box-shadow: 0 0 0 3px rgba(139, 207, 139, 0.2); }
+.modal-footer { padding: 1.25rem 1.5rem; border-top: 1px solid #e2e8f0; display: flex; gap: 1rem; background: #f8fafc; border-radius: 0 0 12px 12px; }
+.modal-footer button { width: 50%; margin: 0; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 1rem; }
+.btn-primario { background: #8BCF8B; color: white; border: none; box-shadow: 0 4px 6px -1px rgba(139, 207, 139, 0.4); }
+.btn-primario:hover:not(:disabled) { transform: translateY(-1px); background: #72c172; }
+.btn-primario:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; }
+.btn-secundario { background: #ffffff; color: #475569; border: 1px solid #cbd5e1; }
+.btn-secundario:hover { background: #f8fafc; color: #0f172a; }

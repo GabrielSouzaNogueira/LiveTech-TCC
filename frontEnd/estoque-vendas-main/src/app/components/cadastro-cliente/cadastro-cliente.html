@@ -1,13 +1,14 @@
 <div class="cadastro-cliente-container">
-    <div>
-
+    <div class="card-minimalista">
+        
+        <!-- BOTOES DE NAVEGACAO (ABAS) -->
         <div class="navegacao-abas">
             <button 
                 type="button" 
                 class="btn-aba" 
                 [class.aba-ativa]="abaAtiva === 'cadastrar'" 
                 (click)="alternarAba('cadastrar')">
-                Cadastrar Usuario
+                Novo Cliente
             </button>
 
             <button 
@@ -15,58 +16,71 @@
                 class="btn-aba" 
                 [class.aba-ativa]="abaAtiva === 'atualizar'" 
                 (click)="alternarAba('atualizar')">
-                Atualizar Usuario
+                Gestão de Clientes
             </button>
         </div>
 
+        <!-- ABA DE CADASTRO -->
         @if (abaAtiva === 'cadastrar') {
-            <h2>Cadastro de Cliente</h2>
+            <div class="cabecalho-form">
+                <h2>Cadastro de Cliente</h2>
+                <p>Preencha os dados abaixo para adicionar um novo cliente à base.</p>
+            </div>
 
-            <p>Preencha todos os campos com * para cadastrar o cliente!</p>
+            <form class="formulario-grid" #form="ngForm" (ngSubmit)="executarCadastroCliente()">
+                
+                <div class="form-group span-2">
+                    <label for="username">Nome:</label>
+                    <input 
+                        type="text"
+                        name="username"
+                        id="username"
+                        [(ngModel)]="nomeDigitado"
+                        placeholder="Primeiro nome do cliente"
+                        required>  
+                </div>
 
-            <form class="form-group" #form="ngForm" (ngSubmit)="executarCadastroCliente()">
-                <label for="username">* Nome do cliente: </label>
-                <input 
-                type="text"
-                name="username"
-                id="username"
-                [(ngModel)]="nomeDigitado"
-                placeholder="Digite o nome do cliente"
-                required>  
+                <div class="form-group span-2">
+                    <label for="sobrenome">Sobrenome:</label>
+                    <input 
+                        type="text"
+                        name="sobrenome"
+                        id="sobrenome"
+                        [(ngModel)]="sobrenomeDigitado"
+                        placeholder="Apelido/Sobrenome completo">
+                </div>
 
-                <label for="sobrenome">Sobrenome do cliente: </label>
-                <input 
-                type="text"
-                name="sobrenome"
-                id="sobrenome"
-                [(ngModel)]="sobrenomeDigitado"
-                placeholder="Digite o sobrenome do cliente">
+                <div class="form-group">
+                    <label for="email">E-mail:</label>
+                    <input 
+                        type="email"
+                        name="email"
+                        id="email"
+                        [(ngModel)]="emailDigitado"
+                        placeholder="cliente@email.com">
+                </div>
 
-                <label for="email">Email: </label>
-                <input 
-                type="text"
-                name="email"
-                id="email"
-                [(ngModel)]="emailDigitado"
-                placeholder="Digite o email do cliente">
+                <div class="form-group">
+                    <label for="telefone">Telefone:</label>
+                    <input 
+                        type="text"
+                        name="telefone"
+                        [(ngModel)]="telefoneDigitado"
+                        placeholder="(00) 00000-0000"
+                        mask="(00) 00000-0000">
+                </div>
 
-                <label for="telefone">Telefone: </label>
-                <input 
-                type="text"
-                name="telefone"
-                [(ngModel)]="telefoneDigitado"
-                placeholder="(62) 90000-0000"
-                mask="(00) 00000-0000">
-
-                <button type="submit" [disabled]="form.invalid || carregando">
-                    {{carregando ? 'Entrando...' : 'Cadastrar'}}
-                </button>  
+                <div class="acoes-form span-2">
+                    <button type="submit" class="btn-primario" [disabled]="form.invalid || carregando">
+                        {{carregando ? 'Salvando...' : 'Cadastrar Cliente'}}
+                    </button>
+                </div>
             </form>
         }
-                <!-- exibe a tela de atualizar -->
+        
+        <!-- ABA DE GESTÃO -->
         @if (abaAtiva === 'atualizar') {
-            <!-- chamamos diretamente o componente de -->
-             <app-gerenciador-cliente></app-gerenciador-cliente>
+            <app-gerenciador-cliente></app-gerenciador-cliente>
         }
     </div>
 </div>

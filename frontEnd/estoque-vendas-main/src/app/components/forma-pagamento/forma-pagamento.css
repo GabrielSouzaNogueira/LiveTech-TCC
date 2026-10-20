@@ -1,225 +1,87 @@
-.forma-pagamento-container {
-  padding: 1.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  font-family: inherit;
-  color: #1e293b;
+/* CONTAINER BASE */
+.forma-pagamento-container { display: flex; flex-direction: column; align-items: center; gap: 2rem; min-height: 100vh; background-color: #f8fafc; padding: 2rem 1rem; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; box-sizing: border-box; }
+.card-minimalista { width: 100%; max-width: 800px; background: #ffffff; border-radius: 12px; padding: 2.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); box-sizing: border-box;}
+.card-tabela { padding: 1.5rem; }
+
+/* CABEÇALHO E FORMULÁRIO INLINE */
+.cabecalho-form h2 { color: #0f172a; font-size: 1.5rem; font-weight: 700; margin: 0 0 0.25rem 0; text-align: center;}
+.cabecalho-form p { color: #64748b; font-size: 0.95rem; margin-bottom: 2rem; text-align: center;}
+
+.form-cadastro-inline { display: flex; gap: 1rem; align-items: stretch; }
+.flex-2 { flex: 2; margin: 0; }
+.flex-1 { flex: 1; margin: 0; }
+
+.form-group input { width: 100%; height: 100%; padding: 0.75rem 1rem; font-size: 0.95rem; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; color: #0f172a; transition: all 0.2s; box-sizing: border-box; }
+.form-group input:focus { outline: none; background-color: #ffffff; border-color: #8BCF8B; box-shadow: 0 0 0 3px rgba(139, 207, 139, 0.2); }
+
+.acoes-form { display: flex; align-items: stretch; }
+.btn-primario { width: 100%; height: 100%; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 600; font-size: 1rem; background: #8BCF8B; color: white; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(139, 207, 139, 0.4); }
+.btn-primario:hover:not(:disabled) { transform: translateY(-1px); background: #72c172; }
+.btn-primario:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; }
+
+/* TABELA */
+.tabela-wrapper { border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+thead { background-color: #f8fafc; }
+th { padding: 1rem; text-align: left; color: #475569; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; font-size: 0.8rem;}
+td { padding: 1rem; border-bottom: 1px solid #f1f5f9; color: #1e293b; vertical-align: middle;}
+tbody tr:hover { background-color: #f0fdf4; }
+
+.texto-centro { text-align: center; }
+.fw-bold { font-weight: 600; }
+.sem-dados { text-align: center; padding: 2.5rem; color: #94a3b8; }
+
+.celula-acao { display: flex; gap: 0.5rem; justify-content: center; }
+.btn-visualizar { background: transparent; border: 1px solid #8BCF8B; color: #166534; padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+.btn-visualizar:hover { background: #8BCF8B; color: white; }
+
+.btn-acao-rapida { background: transparent; border: none; cursor: pointer; padding: 0.4rem; border-radius: 6px; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+.btn-acao-rapida:hover { background: #fee2e2; }
+.btn-acao-rapida:disabled { color: #cbd5e1; cursor: not-allowed; background: transparent; }
+.btn-perigo { color: #ef4444; }
+
+.badge { display: inline-block; padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+.badge-ativa { background: #dcfce7; color: #166534; }
+.badge-inativa { background: #f1f5f9; color: #64748b; }
+
+/* =========================================
+   MÁGICA DA EDIÇÃO INLINE NA TABELA
+   ========================================= */
+.edicao-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.forma-pagamento-container h2 {
-  text-align: center;
-  color: #1e293b;
-  margin-bottom: 0.25rem;
-  font-size: 1.5rem;
-  font-weight: 700;
+.input-edicao {
+    padding: 0.4rem 0.5rem;
+    border: 1px solid #8BCF8B;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    outline: none;
+    flex: 1;
 }
 
-.forma-pagamento-container > div:first-child {
-  margin-bottom: 1.5rem;
+.btn-salvar-mini {
+    background: #166534;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.4rem 0.6rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
 }
+.btn-salvar-mini:hover:not(:disabled) { background: #14532d; }
 
-.forma-pagamento-container > div:first-child > p {
-  text-align: center;
-  color: #64748b;
-  margin-bottom: 1.25rem;
-  font-size: 0.95rem;
+.btn-cancelar-mini {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.4rem 0.6rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
 }
-
-/* Formulário */
-
-.forma-pagamento-container form {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  margin-bottom: 0.85rem;
-}
-
-.form-group label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #475569;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.55rem 0.75rem;
-  font-size: 0.9rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  box-sizing: border-box;
-  outline: none;
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.form-group input:focus {
-  border-color: #8bcf8b;
-  box-shadow: 0 0 5px rgba(139, 207, 139, 0.6);
-}
-
-.form-group input::placeholder {
-  color: #94a3b8;
-}
-
-/* Botão de cadastro */
-
-.forma-pagamento-container form button {
-  width: 100%;
-  margin-top: 0.75rem;
-  padding: 0.55rem 1.2rem;
-  background-color: #8bcf8b;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-.forma-pagamento-container form button:hover {
-  background-color: #72c172;
-}
-
-.forma-pagamento-container form button:active {
-  transform: scale(0.98);
-}
-
-.forma-pagamento-container form button:disabled {
-  background-color: #c2e7c2;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Título da tabela */
-
-.forma-pagamento-container h3 {
-  text-align: center;
-  color: #1e293b;
-  margin-top: 1.75rem;
-  margin-bottom: 1rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid #e2e8f0;
-  font-size: 1.05rem;
-  font-weight: 700;
-}
-
-/* Tabela */
-
-.forma-pagamento-container table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: #ffffff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  font-size: 0.9rem;
-}
-
-.forma-pagamento-container thead {
-  background-color: #8bcf8b;
-  color: white;
-}
-
-.forma-pagamento-container th,
-.forma-pagamento-container td {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #f1f5f9;
-  text-align: center;
-}
-
-.forma-pagamento-container th {
-  font-weight: 600;
-  border-bottom: 1px solid #72c172;
-}
-
-.forma-pagamento-container tbody tr {
-  transition: background-color 0.2s;
-}
-
-.forma-pagamento-container tbody tr:hover {
-  background-color: #f5fff5;
-}
-
-.coluna-acao,
-.celula-acao {
-  text-align: center;
-}
-
-/* Botão inativar */
-
-.btn-inativar {
-  width: auto !important;
-  margin: 0 !important;
-  padding: 0.35rem 0.85rem !important;
-  background: transparent !important;
-  border: 1px solid #ef4444 !important;
-  color: #ef4444 !important;
-  border-radius: 4px !important;
-  font-size: 0.75rem !important;
-  font-weight: 700 !important;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-inativar:hover {
-  background-color: #ef4444 !important;
-  color: white !important;
-}
-
-.btn-inativar:active {
-  transform: scale(0.98);
-}
-
-.btn-inativar:disabled {
-  border-color: #cbd5e1 !important;
-  color: #94a3b8 !important;
-  background: transparent !important;
-  cursor: not-allowed;
-}
-
-/* Sem dados */
-
-.sem-dados {
-  text-align: center;
-  color: #64748b;
-  padding: 1.5rem;
-  font-size: 0.9rem;
-}
-
-/* Responsivo */
-
-@media (max-width: 768px) {
-  .forma-pagamento-container {
-    padding: 1rem;
-  }
-
-  .forma-pagamento-container h2 {
-    font-size: 1.25rem;
-  }
-
-  .forma-pagamento-container h3 {
-    font-size: 0.95rem;
-  }
-
-  .forma-pagamento-container table {
-    font-size: 0.8rem;
-  }
-
-  .forma-pagamento-container th,
-  .forma-pagamento-container td {
-    padding: 0.5rem 0.4rem;
-  }
-
-  .btn-inativar {
-    padding: 0.3rem 0.6rem !important;
-    font-size: 0.7rem !important;
-  }
-}
+.btn-cancelar-mini:hover { background: #dc2626; }

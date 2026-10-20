@@ -1,67 +1,89 @@
+<div class="gestao-container">
+  
+  <!-- BARRA DE FILTROS -->
+  <div class="barra-filtros">
+    <div class="filtro-busca" style="flex: 1;">
+      <input type="text" placeholder="Buscar por Nome, Sobrenome ou E-mail..." 
+             [(ngModel)]="termoBusca" 
+             (keyup)="aplicarFiltros()">
+    </div>
+  </div>
 
-<div>
-    <div>
-        <h2>Gerenciador de Clientes</h2>
-        <p>Clique em um cliente da lista abaixo para editar os dados</p>
+  <!-- TABELA PRINCIPAL -->
+  <div class="tabela-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>E-mail</th>
+          <th class="texto-centro">Telefone</th>
+          <th class="texto-centro">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cliente of listaClientesFiltrada">
+          <td class="fw-bold">{{ cliente.nome }} {{ cliente.sobrenome }}</td>
+          <td>{{ cliente.email || '—' }}</td>
+          <td class="texto-centro">{{ cliente.telefone || '—' }}</td>
+          <td class="celula-acao">
+            <button class="btn-visualizar" (click)="abrirModalEdicao(cliente)">Editar</button>
+            <button class="btn-acao-rapida btn-perigo" (click)="inativarCliente(cliente, $event)" title="Inativar Cliente">
+              <!-- Ícone de Lixeira SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="listaClientesFiltrada.length === 0 && !carregandoLista">
+          <td colspan="4" class="sem-dados">Nenhum cliente encontrado.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
-        <form (submit)="executarGerenciadorCliente()">
+<!-- MODAL DE EDIÇÃO -->
+<div class="overlay-modal" *ngIf="modalAberto && clienteEmEdicao" (click)="fecharModal()">
+  <div class="modal-conteudo" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header">
+      <h3>Editar Cliente</h3>
+      <button class="btn-fechar-modal" (click)="fecharModal()">✕</button>
+    </div>
 
-        <div class="form-group">
-            <label>Nome:</label>
-            <input type="text" [(ngModel)]="nomeDigitado" name="nome" placeholder="Nome do cliente" required>
-        </div>
-
-        <div class="form-group">
-            <label>Sobrenome</label>
-            <input type="text" [(ngModel)]="sobrenomeDigitado" name="sobrenome" placeholder="Sobre Nome do cliente">
-        </div>
+    <div class="modal-body">
+      <form class="formulario-grid" #editForm="ngForm">
         
-        <div class="form-group">
-            <label>E-mail:</label>
-            <input type="email" [(ngModel)]="emailDigitado" name="email" placeholder="E-mail">
+        <div class="form-group span-2">
+          <label>Nome:</label>
+          <input type="text" name="nomeEdit" [(ngModel)]="clienteEmEdicao.nome" required>
+        </div>
+
+        <div class="form-group span-2">
+          <label>Sobrenome:</label>
+          <input type="text" name="sobrenomeEdit" [(ngModel)]="clienteEmEdicao.sobrenome">
         </div>
 
         <div class="form-group">
-            <label>Telefone:</label>
-            <input type="text" [(ngModel)]="telefoneDigitado" name="telefone" placeholder="Telefone" mask="(00) 00000-0000">
+          <label>E-mail:</label>
+          <input type="email" name="emailEdit" [(ngModel)]="clienteEmEdicao.email">
         </div>
 
-        <button type="submit" [disabled]="carregando || !podeSalvar">
-            {{ carregando ? 'Atualizando...' : 'Salvar Alterações' }}
-        </button>
-        </form>
+        <div class="form-group">
+          <label>Telefone:</label>
+          <input type="text" name="telefoneEdit" [(ngModel)]="clienteEmEdicao.telefone" mask="(00) 00000-0000">
+        </div>
+
+      </form>
     </div>
 
-    <div>
-        <h3>Clientes Cadastrados</h3>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>SobreNome</th>
-                    <th>E-mail</th>
-                    <th>Telefone</th>
-                    <th class="coluna-acao">Ação</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let user of listarClientes"
-                (click)="selecionarCliente(user)"
-                [class.linha-selecionada]="user.id === idDigitado">
-                    <td>{{ user.nome }}</td>
-                    <td>{{ user.sobrenome }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.telefone }}</td>
-                    <td class="celila-acao">
-                        <button type="button" 
-                                class="btn-inativar" 
-                                (click)="inativarCliente(user, $event)">
-                            Inativar
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="modal-footer">
+      <button type="button" class="btn-secundario" (click)="fecharModal()">Cancelar</button>
+      <button type="button" class="btn-primario" [disabled]="editForm.invalid || salvando" (click)="executarGerenciadorCliente()">
+        {{ salvando ? 'Salvando...' : 'Salvar Alterações' }}
+      </button>
     </div>
+
+  </div>
 </div>

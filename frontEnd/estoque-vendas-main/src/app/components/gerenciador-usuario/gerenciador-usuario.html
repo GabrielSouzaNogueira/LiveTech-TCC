@@ -1,85 +1,113 @@
-<div>
+<div class="gestao-container">
   
-  <div>
-    <h2>Gerenciador de Usuarios</h2>
-    <p>Clique em um usuario da lista abaixo para editar os dados</p>
-
-    <form (submit)="executarGerenciadorUsuario()">
-      
-      <div class="form-group">
-        <label>Nome:</label>
-        <input type="text" [(ngModel)]="nomeDigitado" name="nome" placeholder="Nome do usuário" required>
-      </div>
-
-      <div class="form-group">
-        <label>E-mail:</label>
-        <input type="email" [(ngModel)]="emailDigitado" name="email" placeholder="E-mail">
-      </div>
-
-      <div class="form-group">
-        <label>Telefone:</label>
-        <input type="text" [(ngModel)]="telefoneDigitado" name="telefone" placeholder="Telefone" mask="(00) 00000-0000">
-      </div>
-
-      <div class="form-group">
-        <label>Cargo:</label>
-        <select 
-        name="cargo" 
-        id="cargo"
-        [(ngModel)]="cargoDigitado"
-        required>
-            <option value="" disabled>Selecione uma opção</option>
-            <option value="BALCONISTA">Balconista</option>
-            <option value="ADMINISTRADOR">Administrador</option>
-            <option value="GERENTE">Gerente</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Nova Senha:</label>
-        <input type="password" [(ngModel)]="senhaDigitada" name="senha" placeholder="Digite uma nova senha">
-      </div>
-
-      <button type="submit" [disabled]="carregando || !podeSalvar">
-        {{ carregando ? 'Atualizando...' : 'Salvar Alterações' }}
-      </button>
-    </form>
+  <!-- BARRA DE FILTROS -->
+  <div class="barra-filtros">
+    <div class="filtro-busca">
+      <input type="text" placeholder="Buscar por Nome ou E-mail..." 
+             [(ngModel)]="termoBusca" 
+             (keyup)="aplicarFiltros()">
+    </div>
+    <div class="filtro-status">
+      <select [(ngModel)]="filtroStatus" (change)="aplicarFiltros()">
+        <option value="TODOS">Todos os Status</option>
+        <option value="ATIVO">Ativos</option>
+        <option value="INATIVO">Inativos</option>
+      </select>
+    </div>
   </div>
 
-  <div>
-    <h3>Usuarios Cadastrados</h3>
-    
+  <!-- TABELA PRINCIPAL -->
+  <div class="tabela-wrapper">
     <table>
       <thead>
         <tr>
-          <th>Nome</th>
+          <th>Nome do Usuário</th>
           <th>E-mail</th>
-          <th>Telefone</th>
-          <th>Cargo</th>
-          <th>Status</th>
-          <th class="coluna-acao">Ação</th>
+          <th class="texto-centro">Telefone</th>
+          <th class="texto-centro">Cargo</th>
+          <th class="texto-centro">Status</th>
+          <th class="texto-centro">Ação</th>
         </tr>
       </thead>
       <tbody>
-        <!-- O *ngFor percorre a listaUsuarios e cria uma linha para cada um -->
-            <tr *ngFor="let user of listaUsuarios" 
-                (click)="selecionarUsuario(user)" 
-                [class.linha-selecionada]="user.userId === idSelecionado">
-            <td>{{ user.nome }}</td>
-            <td>{{ user.email }}</td>
-            <td>{{ user.telefone }}</td>
-            <td>{{ user.cargo }}</td>
-            <td>{{ user.status }}</td>
-            <td class="celila-acao">
-              <button type="button" 
-                      class="btn-inativar" 
-                      (click)="inativarUsuario(user, $event)">
-                Inativar
-              </button>
-            </td>
-            </tr>
+        <tr *ngFor="let user of listaUsuariosFiltrada">
+          <td class="fw-bold">{{ user.nome }}</td>
+          <td>{{ user.email || '—' }}</td>
+          <td class="texto-centro">{{ user.telefone || '—' }}</td>
+          <td class="texto-centro"><span class="badge-cargo">{{ user.cargo }}</span></td>
+          <td class="texto-centro">
+            <span class="badge" [ngClass]="user.status === 'ATIVO' ? 'badge-ativa' : 'badge-inativa'">
+              {{ user.status }}
+            </span>
+          </td>
+          <td class="celula-acao">
+            <button class="btn-visualizar" (click)="abrirModalEdicao(user)">Editar</button>
+            <button *ngIf="user.status === 'ATIVO'" class="btn-acao-rapida btn-perigo" (click)="inativarUsuario(user, $event)" title="Inativar">
+              <!-- Ícone de Lixeira SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="listaUsuariosFiltrada.length === 0 && !carregandoLista">
+          <td colspan="6" class="sem-dados">Nenhum usuário encontrado.</td>
+        </tr>
       </tbody>
     </table>
   </div>
+</div>
 
+<!-- MODAL DE EDIÇÃO -->
+<div class="overlay-modal" *ngIf="modalAberto && usuarioEmEdicao" (click)="fecharModal()">
+  <div class="modal-conteudo" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header">
+      <h3>Editar Usuário</h3>
+      <button class="btn-fechar-modal" (click)="fecharModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <form class="formulario-grid" #editForm="ngForm">
+        
+        <div class="form-group span-2">
+          <label>Nome Completo:</label>
+          <input type="text" name="nomeEdit" [(ngModel)]="usuarioEmEdicao.nome" required>
+        </div>
+
+        <div class="form-group">
+          <label>E-mail:</label>
+          <input type="email" name="emailEdit" [(ngModel)]="usuarioEmEdicao.email">
+        </div>
+
+        <div class="form-group">
+          <label>Telefone:</label>
+          <input type="text" name="telefoneEdit" [(ngModel)]="usuarioEmEdicao.telefone" mask="(00) 00000-0000">
+        </div>
+
+        <div class="form-group">
+          <label>Cargo/Acesso:</label>
+          <select name="cargoEdit" [(ngModel)]="usuarioEmEdicao.cargo" required>
+            <option value="BALCONISTA">Balconista</option>
+            <option value="ADMINISTRADOR">Administrador</option>
+            <option value="GERENTE">Gerente</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Nova Senha (Opcional):</label>
+          <input type="password" name="senhaEdit" [(ngModel)]="senhaDigitada" placeholder="Preencha apenas para alterar">
+        </div>
+
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secundario" (click)="fecharModal()">Cancelar</button>
+      <button type="button" class="btn-primario" [disabled]="editForm.invalid || salvando" (click)="executarGerenciadorUsuario()">
+        {{ salvando ? 'Salvando...' : 'Salvar Alterações' }}
+      </button>
+    </div>
+
+  </div>
 </div>
