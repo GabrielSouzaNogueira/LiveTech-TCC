@@ -18,9 +18,8 @@ export class Sidebar {
     this.estaRecolhida = !this.estaRecolhida;
   }
 
-  // metodo de logout
   fazerLogout(): void {
-    localStorage.removeItem('usuarioLogado'); // encerra a sessão de verdade
+    localStorage.removeItem('usuarioLogado');
     this.router.navigate(['']);
   }
 }

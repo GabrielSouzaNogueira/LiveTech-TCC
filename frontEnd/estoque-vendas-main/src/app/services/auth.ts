@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class Auth {
   //aqui e url basica da API
-  private apiUrl = 'http://localhost:8080/usuario/login' //ATUALIZADO
+  private apiUrl = 'http://localhost:8080/usuario/login'
 
   //para fazer requisiçoes http como get post etc.
   constructor(private http: HttpClient) {}

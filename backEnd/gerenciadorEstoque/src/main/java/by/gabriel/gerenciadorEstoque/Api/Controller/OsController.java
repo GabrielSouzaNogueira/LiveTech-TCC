@@ -1,6 +1,7 @@
 package by.gabriel.gerenciadorEstoque.Api.Controller;
 
 import by.gabriel.gerenciadorEstoque.Api.DTO.OS.OsDTO;
+import by.gabriel.gerenciadorEstoque.Api.DTO.OS.consultas.OsListDTO;
 import by.gabriel.gerenciadorEstoque.Api.DTO.Response.OsResponseDTO;
 import by.gabriel.gerenciadorEstoque.Model.OS.OrdemServico;
 import by.gabriel.gerenciadorEstoque.Services.OsService;
@@ -31,16 +32,18 @@ public class OsController {
         return ResponseEntity.status(HttpStatus.CREATED).body(converterParaResponseDTO(novaOs, "Ordem de Serviço criada com sucesso!"));
     }
 
-    // --- 2. LISTAR TODAS ---
+    // --- FINALIZAR OS ---
+    @PatchMapping("/finalizar/{id}")
+    public ResponseEntity<OsResponseDTO> finalizarOrdemServico(@PathVariable Long id) {
+        OrdemServico osFinalizada = osService.finalizarOs(id);
+        return ResponseEntity.ok(converterParaResponseDTO(osFinalizada, "Ordem de Serviço finalizada com sucesso!"));
+    }
+
+    // --- 2. LISTAR TODAS (Retorna a lista otimizada com o OsListDTO) ---
     @GetMapping
-    public ResponseEntity<List<OsResponseDTO>> listarTodas() {
-        List<OrdemServico> ordens = osService.listarTodas();
-
-        List<OsResponseDTO> response = ordens.stream()
-                .map(os -> converterParaResponseDTO(os, null))
-                .toList();
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<List<OsListDTO>> listarTodas() {
+        List<OsListDTO> ordens = osService.listarTodas();
+        return ResponseEntity.ok(ordens);
     }
 
     // --- 3. BUSCAR POR ID ---
@@ -63,7 +66,6 @@ public class OsController {
     // --- 5. DELETAR OS ---
     @DeleteMapping("/deletar/{id}")
     public ResponseEntity<Void> deletarOrdemServico(@PathVariable Long id) {
-
         osService.deletarOs(id);
         return ResponseEntity.noContent().build();
     }

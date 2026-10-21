@@ -1,18 +1,13 @@
-/* Layout Principal com Flexbox para alinhar Sidebar e Conteúdo */
-.dashboard-layout {
-  display: flex;
-  min-height: 100vh;
-  background-color: #f8fafc;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
 /* Área de Conteúdo Principal */
 .dashboard-conteudo {
-  flex: 1;
-  padding: 30px;
+  padding: 2.5rem;
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 3rem;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f8fafc; /* Fundo claro do sistema */
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 /* Cabeçalho do Dashboard */
@@ -21,73 +16,109 @@
   justify-content: space-between;
   align-items: center;
   background-color: #ffffff;
-  padding: 20px 25px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  border: 1px solid #e2e8f0;
 }
 
 .titulo-container h1 {
   margin: 0;
-  font-size: 24px;
-  color: #1e293b;
+  font-size: 1.6rem;
+  color: #0f172a;
   font-weight: 700;
 }
 
 .mensagem-boas-vindas {
-  margin: 5px 0 0 0;
-  font-size: 14px;
+  margin: 0.35rem 0 0 0;
+  font-size: 1rem;
   color: #64748b;
 }
 
 /* Botão de Logout */
 .btn-logout {
-  background-color: #fee2e2;
+  background-color: #ffffff;
   color: #ef4444;
   border: 1px solid #fca5a5;
-  padding: 10px 18px;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .btn-logout:hover {
-  background-color: #ef4444;
-  color: #ffffff;
-  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
+  background-color: #fef2f2;
+  border-color: #ef4444;
 }
 
-/* Card Visual de Boas-Vindas */
-.card-boas-vindas {
-  background: white;
-  border-radius: 10px;
-  padding: 30px;
+/* ATALHOS RÁPIDOS EM DESTAQUE */
+.atalhos-section h2 {
+  font-size: 1.35rem;
+  color: #1e293b;
+  margin: 0 0 1.5rem 0;
+}
+
+.atalhos-grid {
   display: flex;
-  align-items: center;
-  gap: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  border-left: 5px solid #8bcf8b; /* Detalhe verde combinando com o seu sistema */
+  flex-wrap: wrap; /* Permite descer de linha se a tela for muito pequena */
+  gap: 1.5rem;
+  justify-content: flex-start;
 }
 
-.card-icone {
-  font-size: 40px;
-  background-color: #f1f8f1;
-  padding: 15px;
+/* Cartão Redesenhado - Tamanho Fixo */
+.atalho-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  
+  /* Mantém as caixinhas perfeitas lado a lado */
+  width: 250px; 
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.atalho-card:hover {
+  transform: translateY(-5px);
+  /* Sombra neutra original em vez de ficar com a borda verde */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+
+.atalho-icone {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  /* Cor ciano/azul clarinho original da sua print */
+  background: #e6f4f1; 
+  color: #2c7a7b; 
+  width: 65px; 
+  height: 65px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.card-texto h2 {
-  margin: 0;
-  font-size: 20px;
+.atalho-card h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
   color: #0f172a;
+  font-weight: 700;
+  white-space: nowrap; 
 }
 
-.card-texto p {
-  margin: 5px 0 0 0;
-  color: #475569;
-  font-size: 14px;
+.atalho-card p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+  line-height: 1.4;
 }

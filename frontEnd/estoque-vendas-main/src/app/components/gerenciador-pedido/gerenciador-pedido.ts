@@ -98,7 +98,124 @@ export class GerenciadorPedido implements OnInit {
   }
 
   imprimirPedido(): void {
-      window.print();
+    if (!this.pedidoEmDetalhe) {
+      this.authNotificacaoService.erro('Nenhum pedido selecionado para impressão.');
+      return;
+    }
+
+    const pedido = this.pedidoEmDetalhe;
+    const janela = window.open('', '', 'width=800,height=600');
+    
+    if (janela) {
+      const dataAtual = new Date().toLocaleDateString('pt-BR');
+      
+      const dataPedido = pedido.dataVenda ? new Date(pedido.dataVenda).toLocaleDateString('pt-BR') : dataAtual;
+      // Ajustado para ler o objeto cliente (nome + sobrenome)
+      const nomeCliente = pedido.cliente ? `${pedido.cliente.nome} ${pedido.cliente.sobrenome}` : 'Consumidor Final';
+      const valorTotal = pedido.valorTotal ? pedido.valorTotal.toFixed(2).replace('.', ',') : '0,00';
+      const desconto = pedido.desconto ? pedido.desconto.toFixed(2).replace('.', ',') : '0,00';
+
+      // Ajustado para ler 'itensVenda' e os atributos corretos do 'ItemPedidoDetalheDTO'
+      let itensHtml = '';
+      if (pedido.itensVenda && pedido.itensVenda.length > 0) {
+        itensHtml = `
+          <div class="section">
+            <h3>Itens do Pedido</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
+              <thead>
+                <tr style="background-color: #f8f9fa; border-bottom: 2px solid #ddd;">
+                  <th style="padding: 10px; text-align: left;">Produto</th>
+                  <th style="padding: 10px; text-align: center;">Qtd</th>
+                  <th style="padding: 10px; text-align: right;">Val. Unit.</th>
+                  <th style="padding: 10px; text-align: right;">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${pedido.itensVenda.map((item: any) => `
+                  <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 10px;">${item.produto ? item.produto.nome : 'Item #' + item.id}</td>
+                    <td style="padding: 10px; text-align: center;">${item.quantidade}</td>
+                    <td style="padding: 10px; text-align: right;">R$ ${item.precoUnitario ? item.precoUnitario.toFixed(2).replace('.', ',') : '0,00'}</td>
+                    <td style="padding: 10px; text-align: right;">R$ ${item.precoVenda ? item.precoVenda.toFixed(2).replace('.', ',') : '0,00'}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      const html = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Impressão - Pedido #${pedido.id}</title>
+            <style>
+              body { font-family: 'Arial', sans-serif; color: #333; line-height: 1.6; padding: 30px; max-width: 800px; margin: 0 auto; }
+              .header { text-align: center; border-bottom: 2px solid #2e7d32; padding-bottom: 15px; margin-bottom: 25px; }
+              .header h1 { margin: 0; color: #2e7d32; font-size: 24px; text-transform: uppercase; }
+              .header p { margin: 5px 0 0 0; font-size: 14px; color: #666; }
+              .section { margin-bottom: 25px; }
+              .section h3 { border-bottom: 1px solid #ddd; padding-bottom: 8px; margin-bottom: 15px; color: #444; font-size: 16px; text-transform: uppercase; }
+              .row { display: flex; margin-bottom: 8px; font-size: 14px; }
+              .label { font-weight: bold; min-width: 150px; color: #555; }
+              .value { flex: 1; }
+              .total-box { background: #f8f9fa; border: 1px solid #ddd; padding: 15px; text-align: right; border-radius: 6px; margin-top: 30px; }
+              .total-box span { font-size: 20px; font-weight: bold; color: #2e7d32; }
+              .desconto-texto { font-size: 14px; color: #d32f2f; margin-bottom: 5px; font-weight: normal; }
+              .signatures { display: flex; justify-content: space-between; margin-top: 80px; }
+              .signature-line { border-top: 1px solid #333; width: 45%; text-align: center; padding-top: 8px; font-size: 14px; }
+              .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #777; }
+              
+              @media print {
+                body { padding: 0; }
+                .total-box { -webkit-print-color-adjust: exact; background: #f8f9fa !important; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>Recibo de Pedido #${pedido.id}</h1>
+              <p>Data de Emissão: ${dataAtual}</p>
+            </div>
+
+            <div class="section">
+              <h3>Dados do Cliente</h3>
+              <div class="row"><div class="label">Nome:</div> <div class="value">${nomeCliente}</div></div>
+            </div>
+
+            <div class="section">
+              <h3>Informações do Pedido</h3>
+              <div class="row"><div class="label">Status:</div> <div class="value">${pedido.status}</div></div>
+              <div class="row"><div class="label">Data do Pedido:</div> <div class="value">${dataPedido}</div></div>
+            </div>
+
+            ${itensHtml}
+
+            <div class="total-box">
+              ${pedido.desconto > 0 ? `<div class="desconto-texto">Desconto aplicado: R$ ${desconto}</div>` : ''}
+              Total Geral: <span>R$ ${valorTotal}</span>
+            </div>
+
+            <div class="signatures">
+              <div class="signature-line">Assinatura do Cliente</div>
+              <div class="signature-line">Assinatura do Responsável</div>
+            </div>
+
+            <div class="footer">
+              <p>Documento gerado pelo sistema de Gestão e Controle.</p>
+            </div>
+          </body>
+        </html>
+      `;
+      
+      janela.document.write(html);
+      janela.document.close();
+      
+      setTimeout(() => {
+        janela.print();
+      }, 250);
+    }
   }
 
   // --- AÇÕES DENTRO DO MODAL ---

@@ -1,22 +1,27 @@
 <div class="login-container">
-    <div>
-        <h2>Acesso ao sistema de Estoque e Vendas</h2>
+    <div class="card-login">
+        
+        <div class="login-header">
+            <div class="logo-placeholder">📦</div>
+            <h2>Estoque & Vendas</h2>
+            <p>Insira suas credenciais para acessar o sistema.</p>
+        </div>
 
         <!-- (ngSubmit) faz o Enter dentro de qualquer input do form chamar executarLogin() -->
         <form (ngSubmit)="executarLogin()">
             <div class="form-group">
-                <label for="username">Usuario: </label>
+                <label for="username">Usuário</label>
                 <input 
                     type="text"
                     id="username"
                     name="username"
                     [(ngModel)]="usuarioDigitado"
-                    placeholder="Digite seu usuario"
+                    placeholder="Digite seu usuário"
                     required>
             </div>
 
             <div class="form-group">
-                <label for="password">Senha: </label>
+                <label for="password">Senha</label>
                 <input 
                     type="password"
                     id="password"
@@ -25,9 +30,10 @@
                     placeholder="Digite sua senha"
                     required>
             </div>
+            
             <!-- type="submit" faz o Enter e o clique chamarem o mesmo (ngSubmit) do form -->
-            <button type="submit" [disabled]="carregando">
-                {{carregando ? 'Entrando...' : 'Entrar'}}
+            <button type="submit" class="btn-primario" [disabled]="carregando">
+                {{ carregando ? 'Entrando...' : 'Entrar' }}
             </button>
         </form> 
     </div>

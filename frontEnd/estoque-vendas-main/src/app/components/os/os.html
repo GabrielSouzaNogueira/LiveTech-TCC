@@ -1,0 +1,141 @@
+<div class="os-container">
+  
+  <div class="os-header">
+    <div class="titulo-container">
+      <h1>Ordens de Serviço</h1>
+      <p>Abertura, edição e gestão de chamados técnicos e orçamentos.</p>
+    </div>
+  </div>
+
+  <div class="tabs-container">
+    <button class="tab-btn" [class.ativa]="abaAtiva === 'abrir'" (click)="mudarAba('abrir')">
+      {{ editandoId ? 'Editar OS #' + editandoId : 'Nova OS' }}
+    </button>
+    <button class="tab-btn" [class.ativa]="abaAtiva === 'gestao'" (click)="mudarAba('gestao')">Gestão de OS</button>
+  </div>
+
+  <div class="aba-conteudo" *ngIf="abaAtiva === 'abrir'">
+    <form class="form-os" (ngSubmit)="salvarOS()">
+      
+      <div class="os-card">
+        <h3>Dados Principais</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Cliente *</label>
+            <select [(ngModel)]="novaOs.clienteId" name="clienteId" required>
+              <option value="0" disabled>Selecione o Cliente</option>
+              <option *ngFor="let c of clientesLista" [value]="c.id">{{ c.nome }} {{ c.sobrenome }}</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Equipamento *</label>
+            <input type="text" [(ngModel)]="novaOs.equipamento" name="equipamento" placeholder="Ex: Notebook Dell Inspiron" required>
+          </div>
+
+          <div class="form-group">
+            <label>Data de Previsão *</label>
+            <input type="date" [(ngModel)]="novaOs.dataPrevisao" name="dataPrevisao" required>
+          </div>
+          
+          <div class="form-group">
+            <label>Desconto (R$)</label>
+            <input type="number" [(ngModel)]="novaOs.desconto" name="desconto" placeholder="0.00">
+          </div>
+        </div>
+
+        <div class="form-group mt-3">
+            <label>Defeito Relatado / Observações</label>
+            <textarea [(ngModel)]="novaOs.defeitoRelatado" name="defeito" rows="3" placeholder="Descreva o problema relatado..."></textarea>
+        </div>
+      </div>
+
+      <div class="os-card grid-2-cols">
+        <div class="bloco-itens">
+          <h3>Produtos/Peças</h3>
+          <div class="add-item-row">
+            <select [(ngModel)]="produtoSelecionadoId" name="prodId">
+                <option value="0" disabled>Selecione o Produto</option>
+                <option *ngFor="let p of produtosLista" [value]="p.prodId">{{ p.nome }}</option>
+            </select>
+            <input type="number" [(ngModel)]="produtoQtd" name="prodQtd" min="1" class="input-qtd">
+            <button type="button" class="btn-secundario" (click)="adicionarProduto()">+</button>
+          </div>
+          <ul class="lista-itens-add">
+            <li *ngFor="let item of novaOs.itensProduto">
+              <span class="item-badge">{{ item.quantidade }}x</span> {{ getNomeProduto(item.produtoId) }}
+            </li>
+            <li *ngIf="novaOs.itensProduto.length === 0" class="texto-vazio">Nenhum produto adicionado.</li>
+          </ul>
+        </div>
+
+        <div class="bloco-itens">
+          <h3>Serviços</h3>
+          <div class="add-item-row">
+            <select [(ngModel)]="servicoSelecionadoId" name="servId">
+                <option value="0" disabled>Selecione o Serviço</option>
+                <option *ngFor="let s of servicosLista" [value]="s.servicosId">{{ s.descServico }}</option>
+            </select>
+            <input type="number" [(ngModel)]="servicoQtd" name="servQtd" min="1" class="input-qtd">
+            <button type="button" class="btn-secundario" (click)="adicionarServico()">+</button>
+          </div>
+          <ul class="lista-itens-add">
+            <li *ngFor="let item of novaOs.itensServico">
+              <span class="item-badge">{{ item.quantidade }}x</span> {{ getNomeServico(item.servicoId) }}
+            </li>
+            <li *ngIf="novaOs.itensServico.length === 0" class="texto-vazio">Nenhum serviço adicionado.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acoes-rodape">
+        <button type="button" class="btn-cancelar" *ngIf="editandoId" (click)="cancelarEdicao()">Cancelar Edição</button>
+        <button type="submit" class="btn-primario">{{ editandoId ? 'Atualizar Ordem de Serviço' : 'Salvar Ordem de Serviço' }}</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="aba-conteudo" *ngIf="abaAtiva === 'gestao'">
+    <div class="os-card">
+      <table class="tabela-moderna">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Equipamento</th>
+            <th>Data Previsão</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let os of listaOS">
+            <td class="fw-bold">#{{ os.id }}</td>
+            <td>{{ os.nomeCliente }}</td>
+            <td>{{ os.descricaoEquipamento }}</td>
+            <td>{{ os.dataPrevisao | date:'dd/MM/yyyy' }}</td>
+            <td class="fw-bold text-success">{{ os.valorTotalGeral | currency:'BRL' }}</td>
+            <td>
+              <span class="badge" [ngClass]="{
+                'badge-aberta': os.status === 'ABERTA',
+                'badge-finalizada': os.status === 'FINALIZADA',
+                'badge-cancelada': os.status === 'CANCELADA'
+              }">{{ os.status }}</span>
+            </td>
+            <td class="acoes-tabela">
+              <button class="btn-acao check" *ngIf="os.status === 'ABERTA'" (click)="finalizarOS(os.id)" title="Finalizar OS">✅</button>
+              <button class="btn-acao edit" *ngIf="os.status === 'ABERTA'" (click)="editarOS(os)" title="Editar">✏️</button>
+              <button class="btn-acao print" (click)="imprimirOS(os)" title="Imprimir Recibo">🖨️</button>
+              <button class="btn-acao deletar" *ngIf="os.status !== 'FINALIZADA'" (click)="excluirOS(os.id)" title="Excluir">🗑️</button>
+            </td>
+          </tr>
+          <tr *ngIf="listaOS.length === 0">
+            <td colspan="7" class="texto-vazio text-center">Nenhuma Ordem de Serviço encontrada.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

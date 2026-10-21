@@ -11,6 +11,9 @@ import { CadastroCliente } from './components/cadastro-cliente/cadastro-cliente'
 import { Servicos } from './components/servicos/servicos';
 import { Pedido } from './components/pedido/pedido';
 
+// IMPORT DA NOVA TELA DE OS (Ajuste o caminho se necessário)
+import { OsComponent } from './components/os/os'; 
+
 //aqui criamos as rotas das paginas
 export const routes: Routes = [
     {path: '', component: Login},
@@ -22,6 +25,10 @@ export const routes: Routes = [
     {path: 'servicos', component: Servicos, canActivate: [authGuard]},
     {path: 'forma-pagamento', component: FormaPagamento, canActivate: [authGuard]},
     {path: 'pedido', component: Pedido, canActivate: [authGuard]},
+    
+    // ROTA DA ORDEM DE SERVIÇO
+    {path: 'os', component: OsComponent, canActivate: [authGuard]},
+    
     // rota para caso o usuario digite algo que nao existe, ele cai no login de novo
     {path: '**', redirectTo: ''}
 ];

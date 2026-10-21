@@ -1,98 +1,125 @@
-/* Container principal da tela de login */
+/* Container principal da tela de login com fundo suave */
 .login-container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: white;
-    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f8fafc;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    box-sizing: border-box;
 }
 
-/* Caixa onde fica o formulario */
-.login-container > div {
-    width: 380px;
-    background-color: white;
-    padding: 35px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+/* Caixa onde fica o formulário (Card Minimalista) */
+.login-container .card-login {
+    width: 100%;
+    max-width: 400px;
+    background-color: #ffffff;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    box-sizing: border-box;
 }
 
-/* Titulo da tela */
-.login-container h2 {
+/* Cabeçalho do login (Logótipo e títulos) */
+.login-header {
     text-align: center;
-    color: black;
-    margin-bottom: 30px;
-    font-size: 24px;
+    margin-bottom: 2rem;
 }
 
-/* Cada grupo do formulario */
+.logo-placeholder {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.login-container h2 {
+    color: #0f172a;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+}
+
+.login-header p {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Cada grupo do formulário */
 .form-group {
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px;
+    margin-bottom: 1.25rem;
 }
 
-/* Texto das labels */
+/* Texto das labels padronizado */
 .form-group label {
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #333;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #334155;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
-/* Campos de texto */
+/* Campos de texto atualizados */
 .form-group input {
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    color: #0f172a;
+    transition: all 0.2s;
+    box-sizing: border-box;
 }
 
-/* Campo selecionado */
+/* Campo selecionado / focado */
 .form-group input:focus {
     outline: none;
+    background-color: #ffffff;
     border-color: #8BCF8B;
-    box-shadow: 0 0 5px rgba(139, 207, 139, 0.6);
+    box-shadow: 0 0 0 3px rgba(139, 207, 139, 0.2);
 }
 
 /* Texto do placeholder */
 .form-group input::placeholder {
-    color: #999;
+    color: #94a3b8;
 }
 
-/* Botao Entrar */
-button {
+/* Botão Entrar com padrão corporativo */
+.btn-primario {
     width: 100%;
-    padding: 12px;
+    margin-top: 0.5rem;
+    padding: 0.8rem 1.5rem;
     background-color: #8BCF8B;
     color: white;
     border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: bold;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(139, 207, 139, 0.4);
 }
 
-/* Efeito ao passar o mouse no botao */
-button:hover {
+/* Efeito ao passar o mouse no botão */
+.btn-primario:hover:not(:disabled) {
     background-color: #72c172;
+    transform: translateY(-1px);
 }
 
-/* Efeito ao clicar no botao */
-button:active {
-    transform: scale(0.98);
-}
-/* ... seu CSS anterior continua igual ... */
-
-/* Efeito ao clicar no botao */
-button:active {
+/* Efeito ao clicar no botão */
+.btn-primario:active {
     transform: scale(0.98);
 }
 
 /* Estado do botão quando estiver desabilitado */
-button:disabled {
-    background-color: #c2e7c2 !important;
+.btn-primario:disabled {
+    background-color: #cbd5e1 !important;
+    box-shadow: none;
     cursor: not-allowed;
     transform: none !important;
 }

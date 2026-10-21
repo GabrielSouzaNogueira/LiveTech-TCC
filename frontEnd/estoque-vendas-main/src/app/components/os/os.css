@@ -1,0 +1,298 @@
+/* Container Base */
+.os-container {
+    padding: 24px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+.os-header {
+    margin-bottom: 24px;
+}
+
+.titulo-container h1 {
+    font-size: 24px;
+    color: #2c3e50;
+    margin: 0 0 8px 0;
+}
+
+.titulo-container p {
+    color: #6c757d;
+    margin: 0;
+}
+
+/* Tabs */
+.tabs-container {
+    display: flex;
+    gap: 12px;
+    border-bottom: 2px solid #e9ecef;
+    margin-bottom: 24px;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #6c757d;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    color: #2c3e50;
+}
+
+.tab-btn.ativa {
+    color: #2e7d32;
+    border-bottom-color: #2e7d32;
+}
+
+/* Cards */
+.os-card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    margin-bottom: 24px;
+}
+
+.os-card h3 {
+    margin: 0 0 20px 0;
+    font-size: 16px;
+    color: #34495e;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 12px;
+}
+
+/* Formulário - Layout e Inputs */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.grid-2-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+/* Unifica o estilo de TODOS os inputs, selects e textareas para manter a mesma altura */
+.form-group input, 
+.form-group select, 
+.form-group textarea,
+.add-item-row select,
+.add-item-row input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    background-color: #fff;
+    color: #333;
+    box-sizing: border-box;
+}
+
+.form-group input:focus, 
+.form-group select:focus, 
+.form-group textarea:focus,
+.add-item-row select:focus,
+.add-item-row input:focus {
+    border-color: #2e7d32;
+    outline: none;
+}
+
+.mt-3 {
+    margin-top: 16px;
+}
+
+/* Ajustes da linha de Adicionar Produtos/Serviços */
+.add-item-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: stretch; /* Força todos os elementos (select, input, botão) a terem a mesma altura */
+}
+
+.add-item-row select {
+    flex: 1; /* Ocupa o maior espaço horizontal possível */
+    width: auto;
+}
+
+.add-item-row input.input-qtd {
+    width: 80px; /* Largura fixa para o input de número */
+    flex: none;
+    text-align: center;
+}
+
+/* Botão '+' */
+.btn-secundario {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0 16px;
+    font-weight: bold;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-secundario:hover {
+    background: #1b5e20;
+}
+
+/* Listas de itens adicionados */
+.lista-itens-add {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.lista-itens-add li {
+    padding: 12px;
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+/* Estilo elegante para quando a lista está vazia */
+.lista-itens-add li.texto-vazio {
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 1px dashed #ced4da;
+    justify-content: center;
+    font-style: italic;
+    box-shadow: none;
+}
+
+.item-badge {
+    background: #2e7d32;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Botões Rodapé */
+.acoes-rodape {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-primario {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-primario:hover {
+    background: #1b5e20;
+}
+
+.btn-cancelar {
+    background: #fff;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-cancelar:hover {
+    background: #dc3545;
+    color: white;
+}
+
+/* Tabela Moderna */
+.tabela-moderna {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabela-moderna th {
+    text-align: left;
+    padding: 14px;
+    font-size: 13px;
+    color: #6c757d;
+    text-transform: uppercase;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.tabela-moderna td {
+    padding: 14px;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.fw-bold { font-weight: 600; }
+.text-success { color: #2e7d32; }
+
+/* Badges Status */
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.badge-aberta { background: #e3f2fd; color: #0d47a1; }
+.badge-finalizada { background: #e8f5e9; color: #1b5e20; }
+.badge-cancelada { background: #ffebee; color: #b71c1c; }
+
+/* Botões Ação Tabela */
+.acoes-tabela {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-acao {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: 0.2s;
+}
+
+.btn-acao:hover { background: #f1f3f5; }
+.btn-acao.deletar:hover { background: #fee2e2; }
+
+@media (max-width: 768px) {
+    .grid-2-cols { grid-template-columns: 1fr; }
+}

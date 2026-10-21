@@ -1,16 +1,53 @@
 <div class="dashboard-conteudo">
+  <!-- CABEÇALHO DE BOAS-VINDAS -->
   <header class="dashboard-header">
     <div class="titulo-container">
-      <h1>Painel de Controle</h1>
-      <p class="mensagem-boas-vindas">Você está logado no Sistema de Estoque e Vendas!</p>
+      <h1>Olá, {{ usuarioNome }}! 👋</h1>
+      <p class="mensagem-boas-vindas">Bem-vindo(a) de volta ao Sistema de Estoque e Vendas.</p>
     </div>
+    <button class="btn-logout" (click)="fazerLogout()">Sair do Sistema</button>
   </header>
 
-  <section class="card-boas-vindas">
-    <div class="card-icone">📦</div>
-    <div class="card-texto">
-      <h2>Bem-vindo ao Sistema!</h2>
-      <p>Utilize o menu lateral para gerenciar usuários, controlar o estoque e realizar vendas.</p>
+  <!-- ATALHOS RÁPIDOS EM DESTAQUE -->
+  <section class="atalhos-section">
+    <h2>Acesso Rápido</h2>
+    <div class="atalhos-grid">
+      
+      <!-- ROTA: 'os' (Ordem de Serviço) -->
+      <div class="atalho-card" (click)="navegarPara('os')">
+        <div class="atalho-icone">📋</div>
+        <h3>Ordens de Serviço</h3>
+        <p>Abrir e gerir chamados ou orçamentos.</p>
+      </div>
+
+      <!-- ROTA: 'pedido' -->
+      <div class="atalho-card" (click)="navegarPara('pedido')">
+        <div class="atalho-icone">🛒</div>
+        <h3>Frente de Caixa</h3>
+        <p>Abrir um novo pedido de venda.</p>
+      </div>
+
+      <!-- ROTA: 'cadastro-produto' -->
+      <div class="atalho-card" (click)="navegarPara('cadastro-produto')">
+        <div class="atalho-icone">🏷️</div>
+        <h3>Produtos</h3>
+        <p>Cadastrar itens ou atualizar estoque.</p>
+      </div>
+
+      <!-- ROTA: 'cadastro-cliente' -->
+      <div class="atalho-card" (click)="navegarPara('cadastro-cliente')">
+        <div class="atalho-icone">🤝</div>
+        <h3>Clientes</h3>
+        <p>Gerenciar carteira de clientes.</p>
+      </div>
+
+      <!-- ROTA: 'servicos' -->
+      <div class="atalho-card" (click)="navegarPara('servicos')">
+        <div class="atalho-icone">🛠️</div>
+        <h3>Serviços</h3>
+        <p>Adicionar ou gerir catálogo de serviços.</p>
+      </div>
+
     </div>
   </section>
 </div>

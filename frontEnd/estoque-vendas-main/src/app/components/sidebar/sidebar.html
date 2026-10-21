@@ -24,6 +24,15 @@
           <span class="texto-link" *ngIf="!estaRecolhida">Pedidos</span>
         </a>
       </li>
+      
+      <!-- NOVA ROTA DA ORDEM DE SERVIÇO AQUI -->
+      <li>
+        <a routerLink="/os" routerLinkActive="link-ativo" class="nav-item">
+          <span class="icone">📋</span>
+          <span class="texto-link" *ngIf="!estaRecolhida">Ordem de Serviço</span>
+        </a>
+      </li>
+
       <li>
         <a routerLink="/cadastro-cliente" routerLinkActive="link-ativo" class="nav-item">
           <span class="icone">👤</span>
@@ -36,8 +45,7 @@
           <span class="texto-link" *ngIf="!estaRecolhida">Cadastro de usuários</span>
         </a>
       </li>
-      <!-- Adicione novos menus aqui futuramente (Ex: Produtos, Vendas) -->
-       <li>
+      <li>
         <a routerLink="/cadastro-produto" routerLinkActive="link-ativo" class="nav-item">
           <span class="icone">🏷️</span>
           <span class="texto-link" *ngIf="!estaRecolhida">Cadastro de Produtos</span>
@@ -51,8 +59,8 @@
        </li>
        <li>
           <a routerLink="/servicos" routerLinkActive="link-ativo" class="nav-item">
-            <span class="icone">⚙️​</span>
-            <span class="text-link" *ngIf="!estaRecolhida">Serviços</span>
+            <span class="icone">⚙️</span>
+            <span class="texto-link" *ngIf="!estaRecolhida">Serviços</span>
           </a>
        </li>
        <li>
