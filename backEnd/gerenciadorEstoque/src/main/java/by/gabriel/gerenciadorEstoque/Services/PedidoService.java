@@ -295,16 +295,7 @@ public class PedidoService {
 
     // --- 6. LISTAR TODAS AS VENDAS (Resumo para a Tabela) ---
     public List<PedidoListDTO> listarTodosOsPedidos() {
-
-        List<Pedido> vendas = pedidoRepository.findAll();
-
-        return vendas.stream().map(venda -> new PedidoListDTO(
-                venda.getId(),
-                venda.getCliente().getNome(),
-                venda.getValorTotal(),
-                venda.getStatus(),
-                venda.getDataVenda()
-        )).toList();
+        return pedidoRepository.filtrarPedidos(null, null, null, null);
     }
 
     @Transactional(readOnly = true)

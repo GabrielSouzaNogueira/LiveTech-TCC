@@ -116,17 +116,7 @@ public class OsService {
 
     // --- LISTAGEM E BUSCA ---
     public List<OsListDTO> listarTodas() {
-        List<OrdemServico> ordens = osRepository.findAll();
-
-        return ordens.stream().map(os -> new OsListDTO(
-                os.getId(),
-                os.getCliente().getNome(),
-                os.getDescricaoEquipamento(),
-                os.getValorTotalGeral(),
-                os.getStatus(),
-                os.getDataAbertura(),
-                os.getDataPrevisao()
-        )).toList();
+        return osRepository.filtrarOS(null, null, null, null);
     }
 
     public OrdemServico buscarPorId(Long id) {
