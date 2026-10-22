@@ -1,0 +1,105 @@
+.relatorios-container {
+    padding: 24px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+.header {
+    margin-bottom: 32px;
+}
+
+.titulo-container h1 {
+    font-size: 24px;
+    color: #2c3e50;
+    margin: 0 0 8px 0;
+}
+
+.titulo-container p {
+    color: #6c757d;
+    margin: 0;
+}
+
+.topicos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+.topico-card {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.topico-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.topico-header h2 {
+    margin: 0;
+    font-size: 16px;
+    color: #34495e;
+}
+
+.topico-header .icon {
+    font-size: 20px;
+}
+
+.icone-pedido { border-top: 4px solid #2e7d32; }
+.icone-os { border-top: 4px solid #0288d1; }
+.icone-produto { border-top: 4px solid #f57c00; }
+.icone-cliente { border-top: 4px solid #7b1fa2; }
+.icone-usuario { border-top: 4px solid #607d8b; }
+
+.lista-relatorios {
+    list-style: none;
+    padding: 16px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-grow: 1;
+}
+
+.btn-relatorio {
+    width: 100%;
+    text-align: left;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #495057;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.btn-relatorio::after {
+    content: '→';
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.2s ease;
+}
+
+.btn-relatorio:hover {
+    border-color: #adb5bd;
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+.btn-relatorio:hover::after {
+    opacity: 1;
+    transform: translateX(0);
+}

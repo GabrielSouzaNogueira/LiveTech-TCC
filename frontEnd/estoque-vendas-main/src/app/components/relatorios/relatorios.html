@@ -1,0 +1,76 @@
+<div class="relatorios-container">
+  <div class="header">
+    <div class="titulo-container">
+      <h1>Central de Relatórios</h1>
+      <p>Gere e exporte relatórios consolidados do sistema.</p>
+    </div>
+  </div>
+
+  <div class="topicos-grid">
+    
+    <!-- Relatórios de Usuários -->
+    <div class="topico-card">
+      <div class="topico-header icone-usuario">
+        <span class="icon">🔐</span>
+        <h2>Usuários do Sistema</h2>
+      </div>
+      <ul class="lista-relatorios">
+        <li>
+          <!-- O routerLink aqui faz a ligação com a rota criada[cite: 2] -->
+          <button class="btn-relatorio" routerLink="/relatorios/usuarios-inativos">Lista de Usuários Inativos</button>
+        </li>
+        <li><button class="btn-relatorio">Auditoria de Ações (Logs)</button></li>
+      </ul>
+    </div>
+
+    <!-- Relatórios de Pedidos -->
+    <div class="topico-card">
+      <div class="topico-header icone-pedido">
+        <span class="icon">🛒</span>
+        <h2>Pedidos e Vendas</h2>
+      </div>
+      <ul class="lista-relatorios">
+        <li><button class="btn-relatorio">Faturamento por Período</button></li>
+        <li><button class="btn-relatorio">Pedidos Finalizados e Cancelados</button></li>
+      </ul>
+    </div>
+
+    <!-- Relatórios de OS -->
+    <div class="topico-card">
+      <div class="topico-header icone-os">
+        <span class="icon">🛠️</span>
+        <h2>Ordens de Serviço</h2>
+      </div>
+      <ul class="lista-relatorios">
+        <li><button class="btn-relatorio">OS por Status (Abertas, Finalizadas)</button></li>
+        <li><button class="btn-relatorio">Faturamento de OS e Serviços</button></li>
+      </ul>
+    </div>
+
+    <!-- Relatórios de Produtos/Estoque -->
+    <div class="topico-card">
+      <div class="topico-header icone-produto">
+        <span class="icon">📦</span>
+        <h2>Produtos e Estoque</h2>
+      </div>
+      <ul class="lista-relatorios">
+        <li><button class="btn-relatorio">Posição Atual do Estoque</button></li>
+        <li><button class="btn-relatorio">Produtos Mais Vendidos</button></li>
+        <li><button class="btn-relatorio">Histórico de Movimentações</button></li>
+      </ul>
+    </div>
+
+    <!-- Relatórios de Clientes -->
+    <div class="topico-card">
+      <div class="topico-header icone-cliente">
+        <span class="icon">👥</span>
+        <h2>Clientes</h2>
+      </div>
+      <ul class="lista-relatorios">
+        <li><button class="btn-relatorio">Lista de Clientes Ativos</button></li>
+        <li><button class="btn-relatorio">Histórico de Compras por Cliente</button></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
