@@ -1,0 +1,39 @@
+<div class="relatorio-container">
+  <div class="header-acoes">
+    <div>
+      <h2>Relatório: Usuários Inativados</h2>
+      <p>Lista de todos os usuários que não possuem mais acesso ao sistema.</p>
+    </div>
+    <button class="btn-imprimir" (click)="imprimirTabela()">🖨️ Imprimir / PDF</button>
+  </div>
+
+  <div class="alerta-erro" *ngIf="erroMsg">{{ erroMsg }}</div>
+  
+  <div class="carregando" *ngIf="carregando">Carregando dados...</div>
+
+  <div class="tabela-container" *ngIf="!carregando && !erroMsg">
+    <table class="tabela-padrao">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>E-mail</th>
+          <th>Telefone</th>
+          <th>Cargo</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usr of listaInativos">
+          <td><strong>{{ usr.nome }}</strong></td>
+          <td>{{ usr.email }}</td>
+          <td>{{ usr.telefone }}</td>
+          <td><span class="badge badge-cargo">{{ usr.userCargo }}</span></td>
+          <td><span class="badge badge-inativo">{{ usr.userStatus }}</span></td>
+        </tr>
+        <tr *ngIf="listaInativos.length === 0">
+          <td colspan="5" class="texto-centro">Nenhum usuário inativo encontrado.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

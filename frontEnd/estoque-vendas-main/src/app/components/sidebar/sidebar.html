@@ -25,7 +25,6 @@
         </a>
       </li>
       
-      <!-- NOVA ROTA DA ORDEM DE SERVIÇO AQUI -->
       <li>
         <a routerLink="/os" routerLinkActive="link-ativo" class="nav-item">
           <span class="icone">📋</span>
@@ -67,6 +66,14 @@
         <a routerLink="/forma-pagamento" routerLinkActive="link-ativo" class="nav-item">
           <span class="icone">💲</span>
           <span class="texto-link" *ngIf="!estaRecolhida">Formas de Pagamento</span>
+        </a>
+       </li>
+       
+       <!-- NOVA ROTA DE RELATÓRIOS -->
+       <li>
+        <a routerLink="/relatorios" routerLinkActive="link-ativo" class="nav-item">
+          <span class="icone">📑</span>
+          <span class="texto-link" *ngIf="!estaRecolhida">Relatórios</span>
         </a>
        </li>
     </ul>

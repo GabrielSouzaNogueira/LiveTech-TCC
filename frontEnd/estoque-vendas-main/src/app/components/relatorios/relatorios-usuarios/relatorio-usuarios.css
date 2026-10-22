@@ -1,0 +1,26 @@
+.relatorio-container { padding: 24px; font-family: 'Inter', sans-serif; background: #fff; min-height: 100vh;}
+.header-acoes { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid #eee; padding-bottom: 16px;}
+.header-acoes h2 { margin: 0; color: #333; }
+.header-acoes p { margin: 4px 0 0 0; color: #666; font-size: 14px; }
+.btn-imprimir { background: #0056b3; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+.btn-imprimir:hover { background: #004494; }
+
+.tabela-container { overflow-x: auto; }
+.tabela-padrao { width: 100%; border-collapse: collapse; text-align: left; }
+.tabela-padrao th { background: #f8f9fa; padding: 12px; border-bottom: 2px solid #dee2e6; color: #495057; font-weight: 600; }
+.tabela-padrao td { padding: 12px; border-bottom: 1px solid #e9ecef; color: #333; }
+.texto-centro { text-align: center; color: #666; }
+
+.badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+.badge-inativo { background: #fee2e2; color: #b91c1c; }
+.badge-cargo { background: #e0f2fe; color: #0284c7; }
+
+.alerta-erro { background: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 16px; }
+
+/* Oculta tudo na hora de imprimir, exceto a tabela */
+@media print {
+  body * { visibility: hidden; }
+  .relatorio-container, .relatorio-container * { visibility: visible; }
+  .relatorio-container { position: absolute; left: 0; top: 0; width: 100%; padding: 0;}
+  .btn-imprimir { display: none; }
+}

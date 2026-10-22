@@ -38,7 +38,10 @@ public class SecurityConfig {
 
                     .requestMatchers("/os/**").permitAll()
 
-                // Qualquer outra requisição exige autenticação
+                    .requestMatchers("/relatorio/usuario/**").permitAll()
+
+                    .requestMatchers("/relatorio/produto/**").permitAll()
+
                 .anyRequest().authenticated()
             );
 

@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/pedido")
-@CrossOrigin(originPatterns = "*") // Importante para o seu frontend Angular
+@CrossOrigin(originPatterns = "*")
 public class PedidoController {
 
     private final PedidoService vendaService;

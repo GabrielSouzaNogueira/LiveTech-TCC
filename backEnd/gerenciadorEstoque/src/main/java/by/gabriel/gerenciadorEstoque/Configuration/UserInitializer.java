@@ -27,11 +27,10 @@ public class UserInitializer {
                         "123",
                         "EmailTeste@email.com",
                         null,
-                        UserCargo.ADMINISTRADOR,
+                        UserCargo.DEV,
                         UserStatus.ATIVO
                 );
 
-                // 3. Salva no banco de dados
                 usuarioRepository.save(adminPadrao);
 
                 System.out.println("✅ Usuário padrão criado com sucesso!");
