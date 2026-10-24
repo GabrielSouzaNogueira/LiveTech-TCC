@@ -1,26 +1,74 @@
+/* CONTAINER E CABEÇALHO (Mantido do original) */
 .relatorio-container { padding: 24px; font-family: 'Inter', sans-serif; background: #fff; min-height: 100vh;}
 .header-acoes { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid #eee; padding-bottom: 16px;}
 .header-acoes h2 { margin: 0; color: #333; }
 .header-acoes p { margin: 4px 0 0 0; color: #666; font-size: 14px; }
-.btn-imprimir { background: #0056b3; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+
+/* BOTÃO DE IMPRIMIR */
+.btn-imprimir { background: #0056b3; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 500;}
 .btn-imprimir:hover { background: #004494; }
 
-.tabela-container { overflow-x: auto; }
-.tabela-padrao { width: 100%; border-collapse: collapse; text-align: left; }
-.tabela-padrao th { background: #f8f9fa; padding: 12px; border-bottom: 2px solid #dee2e6; color: #495057; font-weight: 600; }
-.tabela-padrao td { padding: 12px; border-bottom: 1px solid #e9ecef; color: #333; }
+/* ---------------------------------------------------
+   ESTRUTURA DA TABELA DE RELATÓRIO
+--------------------------------------------------- */
+.tabela-container { overflow-x: auto; margin-top: 16px; }
+.tabela-padrao { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+
+/* BORDAS COMPLETAS: Cria a grade e as divisórias verticais */
+.tabela-padrao th, 
+.tabela-padrao td { 
+  padding: 12px; 
+  border: 1px solid #dee2e6; /* Essa linha cria a divisória de colunas e linhas */
+}
+
+/* DESTAQUE DO CABEÇALHO */
+.tabela-padrao th { 
+  background: #f8f9fa; 
+  color: #495057; 
+  font-weight: 600; 
+  border-bottom: 2px solid #adb5bd; /* Base um pouco mais escura para separar dos dados */
+}
+
+.tabela-padrao td { color: #333; }
 .texto-centro { text-align: center; color: #666; }
 
+/* EFEITOS DE LEITURA (Novo: ajuda na leitura de linhas muito longas) */
+.tabela-padrao tbody tr:nth-child(even) { background-color: #fdfdfd; }
+.tabela-padrao tbody tr:hover { background-color: #f1f3f5; }
+
+/* ---------------------------------------------------
+   BADGES E ALERTAS
+--------------------------------------------------- */
 .badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; }
 .badge-inativo { background: #fee2e2; color: #b91c1c; }
 .badge-cargo { background: #e0f2fe; color: #0284c7; }
+.alerta-erro { background: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 16px; border: 1px solid #f5c6cb; }
 
-.alerta-erro { background: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 16px; }
-
-/* Oculta tudo na hora de imprimir, exceto a tabela */
+/* ---------------------------------------------------
+   REGRAS DE IMPRESSÃO / PDF
+--------------------------------------------------- */
 @media print {
   body * { visibility: hidden; }
   .relatorio-container, .relatorio-container * { visibility: visible; }
   .relatorio-container { position: absolute; left: 0; top: 0; width: 100%; padding: 0;}
-  .btn-imprimir { display: none; }
+  
+  /* Esconde os botões e a interface ao imprimir */
+  .header-acoes { border-bottom: none; }
+  .btn-imprimir { display: none !important; }
+  .alerta-erro { display: none !important; }
+
+  /* Garante que a grade (bordas) saia preta e nítida no papel/PDF */
+  .tabela-padrao th, 
+  .tabela-padrao td { 
+    border: 1px solid #000 !important; 
+    color: #000 !important;
+  }
+
+  /* Força a impressora a não apagar as cores de fundo (backgrounds das badges e cabeçalho) */
+  .tabela-padrao th, .badge {
+    -webkit-print-color-adjust: exact !important; 
+    print-color-adjust: exact !important;
+  }
+  
+  .tabela-padrao th { background-color: #e9ecef !important; }
 }
