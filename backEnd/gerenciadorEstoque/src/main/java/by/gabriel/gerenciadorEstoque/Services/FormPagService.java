@@ -1,9 +1,11 @@
 package by.gabriel.gerenciadorEstoque.Services;
 
+import java.lang.management.LockInfo;
 import java.util.List;
 
 import by.gabriel.gerenciadorEstoque.Enum.Movimentacao.AcaoMovimentacao;
 import by.gabriel.gerenciadorEstoque.Enum.Movimentacao.TipoEntidade;
+import by.gabriel.gerenciadorEstoque.Exception.FormaPag.FormaPagStatusInvalid;
 import by.gabriel.gerenciadorEstoque.Model.Movimentacao.Movimentacao;
 import by.gabriel.gerenciadorEstoque.Repository.Movimentacao.MovimentacaoRepository;
 import org.springframework.stereotype.Service;
@@ -85,7 +87,7 @@ public class FormPagService {
     }
 
     @Transactional
-    public Boolean atualizar(String descricaoAntiga, UpdateFormPagDTO dto, String usuarioLogado) {
+    public Boolean atualizar(Long id, UpdateFormPagDTO dto, String usuarioLogado) {
 
         FormaPagto formaPagto;
 
@@ -100,30 +102,18 @@ public class FormPagService {
             throw new UserNotPermission("Usuario não possui permissão para realizar está ação");
         }
 
-        // 1. Busca a forma de pagamento pelo nome ANTIGO
-        formaPagto = formPagRepository.findByDescricaoIgnoreCase(descricaoAntiga)
+        formaPagto = formPagRepository.findById(id)
                 .orElseThrow(() -> new FormPagNotExistException("Forma de pagamento não existente no sistema"));
 
-        if(dto.descricao() != null && !dto.descricao().isBlank()) {
-
-            // 2. Verifica se o NOVO nome já existe (para não duplicar)
-            if(!descricaoAntiga.equalsIgnoreCase(dto.descricao()) &&
-                    formPagRepository.existsByDescricaoIgnoreCaseAndStatus(dto.descricao(), FormaPagStatus.ATIVO)){
-                throw new FormPagAlreadyExistException("Forma de pagamento já existente no sistema!");
-            }
-
-            // 3. Atualiza com o NOVO nome
-            formaPagto.setDescricao(dto.descricao().toUpperCase());
-            formPagRepository.save(formaPagto);
-
-            // OBS: Pode colar aqui também a sua lógica do movimentacaoRepository.save() se precisar manter o histórico!
+        if (formaPagto.getStatus() != FormaPagStatus.ATIVO){
+            throw new FormaPagStatusInvalid("Forma de pagamento já está inativada no sistema");
         }
 
         return true;
     }
 
     @Transactional
-    public Boolean delecao(String descricao, String usuarioLogado) {
+    public Boolean delecao(Long id, String usuarioLogado) {
 
         FormaPagto formaPagto;
 
@@ -139,7 +129,7 @@ public class FormPagService {
             throw new UserNotPermission("Usuario não possui permissão para realizar está ação");
         }
 
-        formaPagto = formPagRepository.findByDescricaoIgnoreCase(descricao).orElseThrow(() -> new FormPagNotExistException("Forma de pagamento com o nome: " + descricao +" não foi encontrado"));
+        formaPagto = formPagRepository.findById(id).orElseThrow(() -> new FormPagNotExistException("Forma de pagamento com o id: " + id +" não foi encontrado"));
 
         formaPagto.setStatus(FormaPagStatus.DESATIVADO);
         formPagRepository.save(formaPagto);
@@ -157,4 +147,10 @@ public class FormPagService {
         return true;
     }
 
+    public FormaPagto buscarPorId(Long id) {
+
+        FormaPagto formaPagto = formPagRepository.findById(id).orElseThrow(() -> new FormPagNotExistException("Forma de pagamento não encontrada com este Id"));
+
+        return formaPagto;
+    }
 }

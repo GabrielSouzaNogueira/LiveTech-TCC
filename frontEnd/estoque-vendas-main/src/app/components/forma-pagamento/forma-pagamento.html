@@ -31,16 +31,17 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of listarFormaPag; trackBy: trackByDescricao">
+          <!-- ATUALIZADO: trackById -->
+          <tr *ngFor="let item of listarFormaPag; trackBy: trackById">
             
             <td class="fw-bold">
-              <!-- VISUALIZAÇÃO NORMAL (Aparece se não estiver a editar) -->
-              <span *ngIf="itemEmEdicao !== item.descricao">{{ item.descricao }}</span>
+              <!-- VISUALIZAÇÃO NORMAL (Aparece se não estiver a editar) ATUALIZADO -->
+              <span *ngIf="itemEmEdicaoId !== item.id">{{ item.descricao }}</span>
               
-              <!-- MODO DE EDIÇÃO (Aparece quando clica em Editar) -->
-              <div *ngIf="itemEmEdicao === item.descricao" class="edicao-inline">
-                <input type="text" [(ngModel)]="novaDescricaoEdit" class="input-edicao" (keyup.enter)="salvarEdicao(item.descricao)">
-                <button class="btn-salvar-mini" (click)="salvarEdicao(item.descricao)" [disabled]="salvandoEdicao" title="Salvar">✔</button>
+              <!-- MODO DE EDIÇÃO (Aparece quando clica em Editar) ATUALIZADO -->
+              <div *ngIf="itemEmEdicaoId === item.id" class="edicao-inline">
+                <input type="text" [(ngModel)]="novaDescricaoEdit" class="input-edicao" (keyup.enter)="salvarEdicao(item.id)">
+                <button class="btn-salvar-mini" (click)="salvarEdicao(item.id)" [disabled]="salvandoEdicao" title="Salvar">✔</button>
                 <button class="btn-cancelar-mini" (click)="cancelarEdicao()" title="Cancelar">✕</button>
               </div>
             </td>
@@ -52,15 +53,15 @@
             </td>
 
             <td class="celula-acao">
-              <!-- Botão Editar (Some se já estiver em edição) -->
-              <button *ngIf="item.status === 'ATIVO' && itemEmEdicao !== item.descricao" 
+              <!-- Botão Editar (Some se já estiver em edição) ATUALIZADO -->
+              <button *ngIf="item.status === 'ATIVO' && itemEmEdicaoId !== item.id" 
                       class="btn-visualizar" 
                       (click)="iniciarEdicao(item)">
                 Editar
               </button>
 
-              <!-- Botão Inativar / Lixeira (Some se já estiver em edição) -->
-              <button *ngIf="item.status === 'ATIVO' && itemEmEdicao !== item.descricao" 
+              <!-- Botão Inativar / Lixeira (Some se já estiver em edição) ATUALIZADO -->
+              <button *ngIf="item.status === 'ATIVO' && itemEmEdicaoId !== item.id" 
                       type="button" 
                       class="btn-acao-rapida btn-perigo" 
                       [disabled]="isInativando(item)" 

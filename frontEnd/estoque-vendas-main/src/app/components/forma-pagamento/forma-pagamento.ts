@@ -20,17 +20,18 @@ export class FormaPagamento implements OnInit {
   descricaoDigitado: string = '';
   listarFormaPag: SelectFormPag[] = [];
   carregando: boolean = false;
-  inativando: Set<string> = new Set();
+  inativando: Set<number> = new Set(); // Alterado para armazenar IDs
 
-  // --- Controle de Edição Inline na Tabela ---
-  itemEmEdicao: string | null = null;
+  // --- Controle de Edição Inline na Tabela ancorado em ID ---
+  itemEmEdicaoId: number | null = null;
+  descricaoOriginal: string = '';
   novaDescricaoEdit: string = '';
   salvandoEdicao: boolean = false;
 
   constructor(
     private authFormaPagamentoService: AuthFormaPagamento,
     private cdr: ChangeDetectorRef,
-    private AuthNotificacaoService: AuthNotificacaoService
+    private authNotificacaoService: AuthNotificacaoService
   ) {}
 
   ngOnInit(): void {
@@ -54,43 +55,61 @@ export class FormaPagamento implements OnInit {
       });
   }
 
-  // --- FUNÇÕES DE EDIÇÃO (Abrir, Cancelar e Salvar) ---
+  // --- FUNÇÕES DE EDIÇÃO ---
 
   iniciarEdicao(item: SelectFormPag): void {
-    this.itemEmEdicao = item.descricao;
-    this.novaDescricaoEdit = item.descricao;
+    const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
+
+    // Busca o registro atualizado pelo ID no backend antes de abrir o campo
+    this.authFormaPagamentoService
+      .buscarPorId(item.id, usuarioAtual)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (dados) => {
+          this.itemEmEdicaoId = dados.id;
+          this.descricaoOriginal = dados.descricao;
+          this.novaDescricaoEdit = dados.descricao;
+          this.cdr.detectChanges();
+        },
+        error: (erro: HttpErrorResponse) => {
+          const msg = this.authNotificacaoService.extrairMensagemErro(erro, 'Erro ao carregar dados para edição.');
+          this.authNotificacaoService.erro(msg);
+        }
+      });
   }
 
   cancelarEdicao(): void {
-    this.itemEmEdicao = null;
+    this.itemEmEdicaoId = null;
+    this.descricaoOriginal = '';
     this.novaDescricaoEdit = '';
   }
 
-  salvarEdicao(descricaoAntiga: string): void {
+  salvarEdicao(id: number): void {
     if (!this.novaDescricaoEdit.trim() || this.salvandoEdicao) return;
     
-    if (this.novaDescricaoEdit.trim().toUpperCase() === descricaoAntiga.toUpperCase()) {
-      this.cancelarEdicao(); // Nada mudou
+    if (this.novaDescricaoEdit.trim().toUpperCase() === this.descricaoOriginal.toUpperCase()) {
+      this.cancelarEdicao();
       return;
     }
 
     this.salvandoEdicao = true;
     const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
 
-    // Chama o serviço (que definimos no auth-forma-pagamento.ts)
-    this.authFormaPagamentoService.atualizarFormaPagamento(descricaoAntiga, this.novaDescricaoEdit, usuarioAtual)
+    this.authFormaPagamentoService
+      .atualizarFormaPagamento(id, this.novaDescricaoEdit.trim(), usuarioAtual)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (resposta) => {
-          this.AuthNotificacaoService.sucesso(resposta?.mensagem || 'Forma de pagamento atualizada!');
+          this.authNotificacaoService.sucesso(resposta?.mensagem || 'Forma de pagamento atualizada!');
           this.salvandoEdicao = false;
           this.cancelarEdicao();
-          setTimeout(() => this.carregarListaFormaPagamento(), 300);
+          this.carregarListaFormaPagamento();
         },
         error: (erro: HttpErrorResponse) => {
           this.salvandoEdicao = false;
-          const msg = this.AuthNotificacaoService.extrairMensagemErro(erro, 'Erro ao atualizar.');
-          this.AuthNotificacaoService.erro(msg);
+          const msg = this.authNotificacaoService.extrairMensagemErro(erro, 'Erro ao atualizar.');
+          this.authNotificacaoService.erro(msg);
+          this.cdr.detectChanges();
         }
       });
   }
@@ -100,47 +119,47 @@ export class FormaPagamento implements OnInit {
   inativarFormaPagamento(formaPagamento: SelectFormPag, event: Event): void {
     event.stopPropagation();
 
-    if (this.inativando.has(formaPagamento.descricao)) {
+    if (this.inativando.has(formaPagamento.id)) {
       return;
     }
 
     const confirmacao = confirm(
-      `Tem certeza que quer inativar essa forma de pagamento: ${formaPagamento.descricao}?`
+      `Tem certeza que deseja inativar a forma de pagamento "${formaPagamento.descricao}"?`
     );
 
     if (!confirmacao) {
       return;
     }
 
-    this.inativando.add(formaPagamento.descricao);
+    this.inativando.add(formaPagamento.id);
     const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
 
     this.authFormaPagamentoService
-      .inativarFormaPagamento(formaPagamento.descricao, usuarioAtual)
+      .inativarFormaPagamento(formaPagamento.id, usuarioAtual)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (resposta) => {
-          this.AuthNotificacaoService.sucesso(resposta?.mensagem || `Forma de pagamento ${formaPagamento.descricao} inativada com sucesso!`);
-          this.inativando.delete(formaPagamento.descricao);
+          this.authNotificacaoService.sucesso(
+            resposta?.mensagem || `Forma de pagamento "${formaPagamento.descricao}" inativada com sucesso!`
+          );
+          this.inativando.delete(formaPagamento.id);
           this.cdr.detectChanges();
-          setTimeout(() => {
-            this.carregarListaFormaPagamento();
-          }, 300);
+          this.carregarListaFormaPagamento();
         },
         error: (erro: HttpErrorResponse) => {
-          const mensagem = this.AuthNotificacaoService.extrairMensagemErro(erro, 'Não foi possível inativar');
-          this.AuthNotificacaoService.erro(mensagem);
-          this.inativando.delete(formaPagamento.descricao);
+          const mensagem = this.authNotificacaoService.extrairMensagemErro(erro, 'Não foi possível inativar');
+          this.authNotificacaoService.erro(mensagem);
+          this.inativando.delete(formaPagamento.id);
           this.cdr.detectChanges();
         },
       });
   }
 
   isInativando(formaPagamento: SelectFormPag): boolean {
-    return this.inativando.has(formaPagamento.descricao);
+    return this.inativando.has(formaPagamento.id);
   }
 
-  // --- FUNÇÃO DE CADASTRO (Criar novo) ---
+  // --- FUNÇÃO DE CADASTRO ---
 
   executarFormaPagamento(): void {
     if (this.carregando) return;
@@ -159,21 +178,19 @@ export class FormaPagamento implements OnInit {
           this.carregando = false;
           this.descricaoDigitado = '';
           this.cdr.detectChanges();
-          this.AuthNotificacaoService.sucesso(resposta?.mensagem || 'Cadastro realizado com sucesso');
-          setTimeout(() => {
-            this.carregarListaFormaPagamento();
-          }, 300);
+          this.authNotificacaoService.sucesso(resposta?.mensagem || 'Cadastro realizado com sucesso');
+          this.carregarListaFormaPagamento();
         },
         error: (erro: HttpErrorResponse) => {
           this.carregando = false;
           this.cdr.detectChanges();
-          const mensagem = this.AuthNotificacaoService.extrairMensagemErro(erro, 'Cadastro não foi possível');
-          this.AuthNotificacaoService.erro(mensagem);
+          const mensagem = this.authNotificacaoService.extrairMensagemErro(erro, 'Cadastro não foi possível');
+          this.authNotificacaoService.erro(mensagem);
         },
       });
   }
 
-  trackByDescricao(_index: number, item: SelectFormPag): string {
-    return item.descricao;
+  trackById(_index: number, item: SelectFormPag): number {
+    return item.id;
   }
 }

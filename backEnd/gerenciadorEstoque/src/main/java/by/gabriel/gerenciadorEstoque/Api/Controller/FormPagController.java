@@ -6,6 +6,7 @@ import by.gabriel.gerenciadorEstoque.Api.DTO.FormPagDTO.UpdateFormPagDTO;
 import by.gabriel.gerenciadorEstoque.Api.DTO.Response.ResponseDTO;
 import by.gabriel.gerenciadorEstoque.Model.FormaPag.FormaPagto;
 import by.gabriel.gerenciadorEstoque.Services.FormPagService;
+import org.apache.juli.logging.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,13 +45,13 @@ public class FormPagController {
 
     }
 
-    @PatchMapping("/update/{descricao}")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<ResponseDTO> atualizar(
-            @PathVariable String descricao,
+            @PathVariable Long id,
             @RequestBody UpdateFormPagDTO dto,
             @RequestHeader("X-Usuario-Logado") String userLogado) {
 
-        Boolean formaPagto = formPagService.atualizar(descricao, dto, userLogado);
+        Boolean formaPagto = formPagService.atualizar(id, dto, userLogado);
 
         if(!formaPagto) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO(
@@ -67,10 +68,10 @@ public class FormPagController {
         );
     }
 
-    @PatchMapping("/delete/{descricao}")
-    public ResponseEntity<ResponseDTO> delecao(@PathVariable String descricao, @RequestHeader("X-Usuario-Logado") String userLogado) {
+    @PatchMapping("/delete/{id}")
+    public ResponseEntity<ResponseDTO> delecao(@PathVariable Long id, @RequestHeader("X-Usuario-Logado") String userLogado) {
 
-        Boolean deletado = formPagService.delecao(descricao, userLogado);
+        Boolean deletado = formPagService.delecao(id, userLogado);
 
         if (!deletado) {
 
@@ -88,5 +89,12 @@ public class FormPagController {
         ));
     }
 
+    @GetMapping("/buscar/{id}")
+    public ResponseEntity<FormaPagto> buscarPorId(@PathVariable Long id) {
+
+        FormaPagto formaPagto = formPagService.buscarPorId(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(formaPagto);
+    }
 
 }

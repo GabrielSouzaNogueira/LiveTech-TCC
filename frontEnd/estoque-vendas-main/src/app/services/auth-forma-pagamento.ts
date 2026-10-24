@@ -15,12 +15,34 @@ export class AuthFormaPagamento {
     return this.http.get<SelectFormPag[]>(`${this.apiUrl}/listar`);
   }
 
-  inativarFormaPagamento(descricao: string, usuarioLogado: string): Observable<any> {
+  // Busca por ID antes de abrir o modal/campos de edição
+  buscarPorId(id: number, usuarioLogado: string): Observable<SelectFormPag> {
     const headers = new HttpHeaders({
       'X-Usuario-Logado': usuarioLogado
     });
 
-    return this.http.patch<any>(`${this.apiUrl}/delete/${descricao}`, {}, { headers: headers });
+    return this.http.get<SelectFormPag>(`${this.apiUrl}/buscar/${id}`, { headers });
+  }
+
+  // Atualização agora ancorada no ID em vez de depender da descrição textual
+  atualizarFormaPagamento(id: number, novaDescricao: string, usuarioLogado: string): Observable<any> {
+    const dadosAtualizarFormaPagamento = {
+      descricao: novaDescricao
+    };
+    const headers = new HttpHeaders({
+      'X-Usuario-Logado': usuarioLogado
+    });
+
+    return this.http.patch<any>(`${this.apiUrl}/update/${id}`, dadosAtualizarFormaPagamento, { headers });
+  }
+  
+  inativarFormaPagamento(id: number, usuarioLogado: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'X-Usuario-Logado': usuarioLogado
+    });
+
+    // A rota aqui concatena o ID numérico e bate com o @PatchMapping do Java
+    return this.http.patch<any>(`${this.apiUrl}/delete/${id}`, {}, { headers });
   }
 
   cadastroFormaPagamento(descricao: string, usuarioLogado: string): Observable<any> {
@@ -31,19 +53,6 @@ export class AuthFormaPagamento {
       'X-Usuario-Logado': usuarioLogado
     });
 
-    return this.http.post<any>(`${this.apiUrl}/cadastro`, dadosCadastroFormaPagamento, { headers: headers });
-  }
-
-  // ---> NOVO MÉTODO DE ATUALIZAÇÃO AQUI <---
-  atualizarFormaPagamento(descricaoAntiga: string, novaDescricao: string, usuarioLogado: string): Observable<any> {
-    const dadosAtualizarFormaPagamento = {
-      descricao: novaDescricao
-    };
-    const headers = new HttpHeaders({
-      'X-Usuario-Logado': usuarioLogado
-    });
-
-    // Passamos a descricaoAntiga na URL (para o back-end encontrar) e a novaDescricao no Body (para ele atualizar)
-    return this.http.patch<any>(`${this.apiUrl}/update/${descricaoAntiga}`, dadosAtualizarFormaPagamento, { headers: headers });
+    return this.http.post<any>(`${this.apiUrl}/cadastro`, dadosCadastroFormaPagamento, { headers });
   }
 }
