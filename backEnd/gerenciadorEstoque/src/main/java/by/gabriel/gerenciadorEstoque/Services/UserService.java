@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import by.gabriel.gerenciadorEstoque.Api.DTO.Usuario.Consultas.UserSelectDTO;
 import by.gabriel.gerenciadorEstoque.Exception.Usuario.*;
+import by.gabriel.gerenciadorEstoque.Model.Usuario.UsuarioTelefone;
+import by.gabriel.gerenciadorEstoque.Repository.Usuario.UsuarioTelefoneRepository;
 import org.springframework.stereotype.Service;
 
 import by.gabriel.gerenciadorEstoque.Api.DTO.Usuario.UpdateUserDTO;
@@ -24,21 +26,36 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final MovimentacaoRepository movimentacaoRepository;
+    private final UsuarioTelefoneRepository usuarioTelefoneRepository;
 
-    public UserService(UserRepository userRepository, MovimentacaoRepository movimentacaoRepository) {
+    public UserService(UserRepository userRepository, MovimentacaoRepository movimentacaoRepository,UsuarioTelefoneRepository usuarioTelefoneRepository) {
         this.userRepository = userRepository;
         this.movimentacaoRepository = movimentacaoRepository;
+        this.usuarioTelefoneRepository = usuarioTelefoneRepository;
     }
 
     public List<UserSelectDTO> listAllUsers(){
 
-        List<UserSelectDTO> usuarios = userRepository.findByStatusCustom(UserStatus.ATIVO);
+        List<Usuario> usuarios = userRepository.findByStatusCustomEntity(UserStatus.ATIVO);
 
         if(usuarios.isEmpty()) {
             throw new NoUsersFoundInList("Não possui nenhum usuario cadastrado no sistema");
         }
 
-        return usuarios;
+        return usuarios.stream().map(u -> {
+            String telefonePrincipal = u.getTelefones().isEmpty()
+                    ? "NÃO INFORMADO"
+                    : u.getTelefones().get(0).getTelefone();
+
+            return new UserSelectDTO(
+                    u.getUserId(),
+                    u.getNome(),
+                    u.getEmail(),
+                    u.getUserCargo(),
+                    u.getUserStatus(),
+                    telefonePrincipal
+            );
+        }).toList();
     }
 
     public boolean logarUsuario(UserDTO dto) {
@@ -98,13 +115,20 @@ public class UserService {
                 dto.nome(),
                 dto.senha(),
                 dto.email(),
-                dto.telefone(),
                 dto.userCargo(),
                 UserStatus.ATIVO
         );
 
         Usuario usuarioSalvo = userRepository.save(novoUsuario);
-        System.out.println("USUARIO CADASTRADO COM SUCESSO");
+
+        usuarioSalvo = userRepository.findById(novoUsuario.getUserId()).orElseThrow(() -> new UserNotFoundException("Usuario não foi encontrado"));
+
+        UsuarioTelefone novoTelefone = new UsuarioTelefone(
+                dto.telefone(),
+                novoUsuario
+        );
+
+        usuarioTelefoneRepository.save(novoTelefone);
 
         // Gravando a movimentação na tabela genérica
         Movimentacao mov = new Movimentacao(
@@ -131,7 +155,6 @@ public class UserService {
 
         Usuario usuarioAlterado = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Usuario não encontrado"));
 
-        // Verificando se o Usuario que está logado tem o cargo necessario
         UserCargo cargo = userLogado.getUserCargo();
         if(cargo == null || (cargo != UserCargo.ADMINISTRADOR && cargo != UserCargo.DEV)) {
             throw new UserNotPermission("Usuario sem permissão");
@@ -157,9 +180,33 @@ public class UserService {
         }
 
         // TELEFONE
-        if (dto.telefone() != null && !dto.telefone().isBlank() && !dto.telefone().equals(usuarioAlterado.getTelefone())) {
-            usuarioAlterado.setTelefone(dto.telefone());
-            movimentacaoRepository.save(new Movimentacao(AcaoMovimentacao.ATUALIZACAO, TipoEntidade.USUARIO, usuarioAlterado.getUserId(), null, usuarioAlterado.getNome(), "TELEFONE", userLogado));
+        if (dto.telefone() != null) {
+
+            boolean exiteTelefone = usuarioTelefoneRepository.existsByUsuarioUserIdAndTelefone(usuarioAlterado.getUserId(), dto.telefone());
+
+            if (!exiteTelefone) {
+
+                // === A LÓGICA DE SUBSTITUIÇÃO ENTRA AQUI ===
+                if (!usuarioAlterado.getTelefones().isEmpty()) {
+                    // Se o usuário já tem um telefone cadastrado, pegamos ele (posição 0) e atualizamos
+                    UsuarioTelefone telefoneAtual = usuarioAlterado.getTelefones().get(0);
+                    telefoneAtual.setTelefone(dto.telefone());
+
+                    usuarioTelefoneRepository.save(telefoneAtual); // Faz UPDATE
+                } else {
+                    // Se ele não tinha nenhum telefone, criamos um novo
+                    UsuarioTelefone novoTelefone = new UsuarioTelefone();
+                    novoTelefone.setTelefone(dto.telefone());
+                    novoTelefone.setUsuario(usuarioAlterado);
+
+                    usuarioTelefoneRepository.save(novoTelefone); // Faz INSERT
+                }
+
+                movimentacaoRepository.save(new Movimentacao(AcaoMovimentacao.ATUALIZACAO, TipoEntidade.USUARIO, usuarioAlterado.getUserId(), null, usuarioAlterado.getNome(), "TELEFONE", userLogado));
+            }
+            else {
+                throw new TelefoneExistente("Este telefone já existe para este Usuário");
+            }
         }
 
         // CARGO (Enums são comparados com !=)

@@ -18,11 +18,12 @@ public interface RelatorioUsuarioRepository extends JpaRepository<Usuario, Long>
                 usr.id,
                 usr.email,
                 usr.nome,
-                usr.telefone,
+                t.telefone, 
                 usr.userCargo,
                 usr.userStatus
             )
             FROM Usuario usr
+            LEFT JOIN usr.telefones t 
             WHERE usr.userStatus = :status
             ORDER BY usr.nome ASC
             """)

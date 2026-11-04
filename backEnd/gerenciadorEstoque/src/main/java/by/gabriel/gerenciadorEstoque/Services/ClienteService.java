@@ -8,11 +8,14 @@ import by.gabriel.gerenciadorEstoque.Enum.Movimentacao.TipoEntidade;
 import by.gabriel.gerenciadorEstoque.Exception.Cliente.ClienteNaoEncontrado;
 import by.gabriel.gerenciadorEstoque.Exception.Cliente.EmailClienteJaExiste;
 import by.gabriel.gerenciadorEstoque.Exception.Cliente.NomeClienteNotNull;
+import by.gabriel.gerenciadorEstoque.Exception.Cliente.TelefoneNaoEncontrado;
 import by.gabriel.gerenciadorEstoque.Exception.Usuario.UserNotFoundException;
 import by.gabriel.gerenciadorEstoque.Model.Cliente.Cliente;
+import by.gabriel.gerenciadorEstoque.Model.Cliente.ClienteTelefone;
 import by.gabriel.gerenciadorEstoque.Model.Movimentacao.Movimentacao;
 import by.gabriel.gerenciadorEstoque.Model.Usuario.Usuario;
 import by.gabriel.gerenciadorEstoque.Repository.Cliente.ClienteRepository;
+import by.gabriel.gerenciadorEstoque.Repository.Cliente.ClienteTelefoneRepository;
 import by.gabriel.gerenciadorEstoque.Repository.Movimentacao.MovimentacaoRepository;
 import by.gabriel.gerenciadorEstoque.Repository.Usuario.UserRepository;
 import jakarta.transaction.Transactional;
@@ -26,21 +29,40 @@ public class ClienteService {
     private final ClienteRepository clienteRepository;
     private final MovimentacaoRepository movimentacaoRepository;
     private final UserRepository userRepository;
+    private final ClienteTelefoneRepository clienteTelefoneRepository;
 
-    public ClienteService(ClienteRepository clienteRepository, MovimentacaoRepository movimentacaoRepository, UserRepository userRepository) {
+    public ClienteService(ClienteRepository clienteRepository, MovimentacaoRepository movimentacaoRepository, UserRepository userRepository,ClienteTelefoneRepository clienteTelefoneRepository) {
         this.clienteRepository = clienteRepository;
         this.movimentacaoRepository = movimentacaoRepository;
         this.userRepository = userRepository;
+        this.clienteTelefoneRepository = clienteTelefoneRepository;
     }
 
     // --- LISTAGEM ---
+    // --- LISTAGEM ---
     public List<ClienteSelectDTO> listarClientesAtivos() {
-        return clienteRepository.findByStatusCustom(ClienteStatus.ATIVO);
+        List<Cliente> clientes = clienteRepository.findByStatusCustomEntity(ClienteStatus.ATIVO);
+
+        return clientes.stream().map(c -> {
+            String telefonePrincipal = c.getTelefones().isEmpty()
+                    ? "NÃO INFORMADO"
+                    : c.getTelefones().get(0).getTelefone();
+
+            return new ClienteSelectDTO(
+                    c.getId(),
+                    c.getNome(),
+                    c.getSobrenome(),
+                    c.getEmail(),
+                    telefonePrincipal,
+                    c.getStatus()
+            );
+        }).toList();
     }
 
     // --- CADASTRO ---
     @Transactional
     public Cliente cadastroCliente(ClienteDTO dto, String usuarioLogado) {
+
         Usuario userLogado = userRepository.findByNomeIgnoreCase(usuarioLogado)
                 .orElseThrow(() -> new RuntimeException("Usuário logado não encontrado"));
 
@@ -56,11 +78,20 @@ public class ClienteService {
                 dto.nome(),
                 dto.sobrenome(),
                 dto.email(),
-                dto.telefone(),
                 ClienteStatus.ATIVO
         );
 
         Cliente clienteSalvo = clienteRepository.save(novoCliente);
+
+        //VERIFICANDO SE O CLIENTE EXISTE ANTES DE SALVAR O TELEFONE
+        clienteRepository.findById(clienteSalvo.getId()).orElseThrow(() -> new ClienteNaoEncontrado("Cliente não encontrado com o id: " + novoCliente.getId()));
+
+        ClienteTelefone clienteTelefone = new ClienteTelefone(
+                dto.telefone(),
+                clienteSalvo
+        );
+
+        clienteTelefoneRepository.save(clienteTelefone);
 
         // Movimentação com UUID nulo e ID numérico preenchido
         movimentacaoRepository.save(new Movimentacao(
@@ -107,9 +138,33 @@ public class ClienteService {
             movimentacaoRepository.save(new Movimentacao(AcaoMovimentacao.ATUALIZACAO, TipoEntidade.CLIENTE, null, cliente.getId(), cliente.getNome(), "EMAIL", userLogado));
         }
 
-        if (dto.telefone() != null && !dto.telefone().equalsIgnoreCase(cliente.getTelefone())) {
-            cliente.setTelefone(dto.telefone());
-            movimentacaoRepository.save(new Movimentacao(AcaoMovimentacao.ATUALIZACAO, TipoEntidade.CLIENTE, null, cliente.getId(), cliente.getNome(), "TELEFONE", userLogado));
+        if (dto.telefone() != null) {
+
+            boolean telefoneJaExiste = clienteTelefoneRepository.existsByClienteIdAndTelefone(cliente.getId(), dto.telefone());
+
+            if (!telefoneJaExiste) {
+
+                // === LÓGICA DE SUBSTITUIÇÃO ===
+                if (!cliente.getTelefones().isEmpty()) {
+                    // Se o cliente já tem um telefone, pegamos o primeiro e atualizamos (UPDATE)
+                    ClienteTelefone telefoneAtual = cliente.getTelefones().get(0);
+                    telefoneAtual.setTelefone(dto.telefone());
+
+                    clienteTelefoneRepository.save(telefoneAtual);
+                } else {
+                    // Se o cliente não tinha nenhum telefone, criamos um novo (INSERT)
+                    ClienteTelefone novoTelefone = new ClienteTelefone();
+                    novoTelefone.setTelefone(dto.telefone());
+                    novoTelefone.setCliente(cliente); // Amarramos o telefone ao cliente
+
+                    clienteTelefoneRepository.save(novoTelefone);
+                }
+
+                movimentacaoRepository.save(new Movimentacao(AcaoMovimentacao.ATUALIZACAO, TipoEntidade.CLIENTE, null, cliente.getId(), cliente.getNome(), "TELEFONE", userLogado));
+            }
+            else {
+                throw new TelefoneNaoEncontrado("Este telefone já está cadastrado para este cliente."); // Aqui você pode considerar mudar o nome da exception futuramente para TelefoneJaCadastrado
+            }
         }
 
         return clienteRepository.save(cliente);

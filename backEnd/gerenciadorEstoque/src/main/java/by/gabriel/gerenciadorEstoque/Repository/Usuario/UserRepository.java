@@ -6,6 +6,7 @@ import java.util.Optional;
 
 
 import by.gabriel.gerenciadorEstoque.Api.DTO.Usuario.Consultas.UserSelectDTO;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,10 +24,8 @@ public interface UserRepository extends JpaRepository<Usuario, UUID>{
 
     Optional<Usuario> findByEmailIgnoreCase(String email);
 
-    @Query("SELECT new by.gabriel.gerenciadorEstoque.Api.DTO.Usuario.Consultas.UserSelectDTO(" +
-            "u.userId, u.nome, u.email, u.userCargo, u.userStatus, u.telefone) " +
-            "FROM Usuario u WHERE u.userStatus = :status " +
-            "ORDER BY u.nome ASC")
-    List<UserSelectDTO> findByStatusCustom(@Param("status") UserStatus status);
+    @EntityGraph(attributePaths = "telefones")
+    @Query("SELECT u FROM Usuario u WHERE u.userStatus = :status ORDER BY u.nome ASC")
+    List<Usuario> findByStatusCustomEntity(@Param("status") UserStatus status);
 
 }

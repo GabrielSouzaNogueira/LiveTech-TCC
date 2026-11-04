@@ -2,6 +2,7 @@ package by.gabriel.gerenciadorEstoque.Api.Headler.User;
 
 import java.time.Instant;
 
+import by.gabriel.gerenciadorEstoque.Exception.Usuario.*;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,16 +10,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import by.gabriel.gerenciadorEstoque.Api.DTO.Response.ResponseDTO;
-import by.gabriel.gerenciadorEstoque.Exception.Usuario.EmailAlreadyExistException;
-import by.gabriel.gerenciadorEstoque.Exception.Usuario.InvalidPasswordException;
-import by.gabriel.gerenciadorEstoque.Exception.Usuario.NoUsersFoundInList;
-import by.gabriel.gerenciadorEstoque.Exception.Usuario.UserAlreadyExistsException;
-import by.gabriel.gerenciadorEstoque.Exception.Usuario.UserInactiveException;
-import by.gabriel.gerenciadorEstoque.Exception.Usuario.UserLogadoNotNull;
-import by.gabriel.gerenciadorEstoque.Exception.Usuario.UserNameNotNullException;
-import by.gabriel.gerenciadorEstoque.Exception.Usuario.UserNotFoundException;
-import by.gabriel.gerenciadorEstoque.Exception.Usuario.UserNotPermission;
-import by.gabriel.gerenciadorEstoque.Exception.Usuario.UserPasswordNotNullException;
 
 @RestControllerAdvice
 @Order(1)
@@ -48,7 +39,7 @@ public class UserExceptionHandler {
     //EXCEÇÃO USUARIO NÃO ENCONTRADO
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ResponseDTO> handleUserNotFound(UserNotFoundException ex) {
-        
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
         .body(new ResponseDTO(false, ex.getMessage(), "USER_NOT_FOUND", Instant.now().toString()));
     }
@@ -82,14 +73,22 @@ public class UserExceptionHandler {
     public ResponseEntity<ResponseDTO> handleUserNotPermission(NoUsersFoundInList ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO(false, ex.getMessage(),"USERS_NOT_FOUND",Instant.now().toString()));
     }
-    
+
     @ExceptionHandler(UserLogadoNotNull.class)
     public ResponseEntity<ResponseDTO> UserLogadoNotNull(UserLogadoNotNull ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO(false, "Header do usuario logado não foi enviado","USERLOGADO_NOT_NULL",Instant.now().toString()));
     }
 
+    @ExceptionHandler(TelefoneNaoEncontrado.class)
+    public ResponseEntity<ResponseDTO> TelefoneNaoEncontrado(TelefoneNaoEncontrado ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseDTO(false, "Telefone não foi encontrado","TELEFONE_NAO_ENCONTRADO",Instant.now().toString()));
+    }
 
-    
+    @ExceptionHandler(TelefoneExistente.class)
+    public ResponseEntity<ResponseDTO> TelefoneExistente(TelefoneExistente ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO(false, "Telefone ja existente","TELEFONE_JA_EXISTENTE",Instant.now().toString()));
+    }
+
 
 }
 

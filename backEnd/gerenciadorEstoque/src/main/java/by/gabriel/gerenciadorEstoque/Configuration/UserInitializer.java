@@ -3,6 +3,7 @@ package by.gabriel.gerenciadorEstoque.Configuration;
 import by.gabriel.gerenciadorEstoque.Model.Usuario.Usuario;
 import by.gabriel.gerenciadorEstoque.Enum.Usuario.UserCargo;
 import by.gabriel.gerenciadorEstoque.Enum.Usuario.UserStatus;
+import by.gabriel.gerenciadorEstoque.Model.Usuario.UsuarioTelefone;
 import by.gabriel.gerenciadorEstoque.Repository.Usuario.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -26,12 +27,16 @@ public class UserInitializer {
                         "Gabriel",
                         "123",
                         "EmailTeste@email.com",
-                        null,
                         UserCargo.DEV,
                         UserStatus.ATIVO
                 );
 
                 usuarioRepository.save(adminPadrao);
+
+                UsuarioTelefone usuarioTelefonePadrão = new UsuarioTelefone(
+                        null,
+                        adminPadrao
+                );
 
                 System.out.println("✅ Usuário padrão criado com sucesso!");
                 System.out.println("🔑 Credenciais: Usuário [ Gabriel ] | Senha [ 123 ]");

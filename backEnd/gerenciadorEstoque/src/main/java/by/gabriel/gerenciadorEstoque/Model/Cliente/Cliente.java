@@ -2,7 +2,11 @@ package by.gabriel.gerenciadorEstoque.Model.Cliente;
 
 
 import by.gabriel.gerenciadorEstoque.Enum.Cliente.ClienteStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Cliente {
@@ -18,21 +22,21 @@ public class Cliente {
     @Column(nullable = true)
     private String email;
 
-    @Column(nullable = true)
-    private String telefone;
-
     @Enumerated(EnumType.STRING)
     private ClienteStatus status;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ClienteTelefone> telefones = new ArrayList<>();
 
     public Cliente() {
 
     }
 
-    public Cliente(String nome, String sobrenome, String email, String telefone, ClienteStatus status) {
+    public Cliente(String nome, String sobrenome, String email, ClienteStatus status) {
         this.nome = nome;
         this.sobrenome = sobrenome;
         this.email = email;
-        this.telefone = telefone;
         this.status = status;
     }
 
@@ -68,19 +72,15 @@ public class Cliente {
         this.email = email;
     }
 
-    public String getTelefone() {
-        return telefone;
-    }
-
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
-    }
-
     public ClienteStatus getStatus() {
         return status;
     }
 
     public void setStatus(ClienteStatus status) {
         this.status = status;
+    }
+
+    public List<ClienteTelefone> getTelefones() {
+        return telefones;
     }
 }

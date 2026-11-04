@@ -1,9 +1,7 @@
 package by.gabriel.gerenciadorEstoque.Api.Headler.Cliente;
 
 import by.gabriel.gerenciadorEstoque.Api.DTO.Response.ResponseDTO;
-import by.gabriel.gerenciadorEstoque.Exception.Cliente.ClienteNaoEncontrado;
-import by.gabriel.gerenciadorEstoque.Exception.Cliente.EmailClienteJaExiste;
-import by.gabriel.gerenciadorEstoque.Exception.Cliente.NomeClienteNotNull;
+import by.gabriel.gerenciadorEstoque.Exception.Cliente.*;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,16 +38,21 @@ public class ClienteExceptionHeader {
 
     }
 
-//    @ExceptionHandler(ClienteNaoEncontrado.class)
-//    public ResponseEntity<ResponseDTO> headerClienteNaoEncontrado(ClienteNaoEncontrado ex) {
-//
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                .body(new ResponseDTO(false, "Cliente não foi encontrado", "CLIENTE_NAO_ENCONTRADO", Instant.now().toString()));
-//
-//    }
+    @ExceptionHandler(TelefoneNaoEncontrado.class)
+    public ResponseEntity<ResponseDTO> headerTelefoneNãoEncontrado(TelefoneNaoEncontrado ex) {
 
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ResponseDTO(false, "Tefone não encontrado", "TELEFONE_NAO_ENCONTRADO", Instant.now().toString()));
 
+    }
 
+    @ExceptionHandler(TelefoneExistente.class)
+    public ResponseEntity<ResponseDTO> headerTelefoneExistente(TelefoneExistente ex) {
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ResponseDTO(false, "Tefone já existente para este usuário", "TELEFONE_JA_EXISTENTE", Instant.now().toString()));
+
+    }
 
 
 }

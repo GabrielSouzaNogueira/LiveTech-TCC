@@ -1,16 +1,14 @@
 package by.gabriel.gerenciadorEstoque.Model.Usuario;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import by.gabriel.gerenciadorEstoque.Enum.Usuario.UserCargo;
 import by.gabriel.gerenciadorEstoque.Enum.Usuario.UserStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 
 @Entity
 public class Usuario {
@@ -28,28 +26,28 @@ public class Usuario {
     @Column(nullable = true)
     private String email;
 
-    @Column(nullable = true)
-    private String telefone;
-
     @Enumerated(EnumType.STRING) // salva o enum como texto
     private UserCargo userCargo;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UsuarioTelefone> telefones = new ArrayList<>();
+
     @Enumerated(EnumType.STRING) // salva o enum como texto
     private UserStatus userStatus;
+
 
     public Usuario() {
     }
 
     // Construtor com todos os campos
-    public Usuario(String nome, String senha, String email, String telefone, UserCargo userCargo,UserStatus userStatus) {
+    public Usuario(String nome, String senha, String email, UserCargo userCargo,UserStatus userStatus) {
         this.nome = nome;
         setSenhaCriptografada(senha); //Senha já é criptografada no momento da criação do Usuario
 
         // Normaliza email: se vier vazio, vira null
         this.email = (email == null  || email.isBlank()) ? null : email;
 
-        // condição ? valorSeVerdadeiro : valorSeFalso
-        this.telefone = (telefone == null || telefone.isBlank()) ? null : telefone;
         this.userCargo = userCargo;
         this.userStatus = userStatus;
     }
@@ -78,6 +76,5 @@ public class Usuario {
     public void setUserCargo(UserCargo userCargo) { this.userCargo = userCargo; }
     public UserStatus getUserStatus() { return userStatus; }
     public void setUserStatus(UserStatus userStatus) { this.userStatus = userStatus; }
-    public String getTelefone() { return telefone; }
-    public void setTelefone(String telefone) { this.telefone = telefone; }
+    public List<UsuarioTelefone> getTelefones() {return telefones;}
 }
