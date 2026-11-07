@@ -8,7 +8,6 @@ import { Equipamento } from '../models/equipamento';
 })
 export class EquipamentoService {
   
-  // Rota base casando com o @RequestMapping("/equipamento") do Back-End
   private apiUrl = 'http://localhost:8080/equipamento'; 
 
   constructor(private http: HttpClient) {}
@@ -37,14 +36,15 @@ export class EquipamentoService {
     return this.http.post<Equipamento>(`${this.apiUrl}/cadastro`, equipamento, { headers: this.getHeaders() });
   }
 
-  // PUT /equipamento/atualizar/{id} -> ROTA ATUALIZADA AQUI!
+  // PUT /equipamento/atualizar/{id}
   atualizar(id: number, equipamento: Equipamento): Observable<Equipamento> {
     return this.http.put<Equipamento>(`${this.apiUrl}/atualizar/${id}`, equipamento, { headers: this.getHeaders() });
   }
 
-  // DELETE /equipamento/{id}
-  deletar(id: number): Observable<void> {
-    // Atenção: Se no seu Java o delete for @DeleteMapping("/deletar/{id}"), atualize aqui para `${this.apiUrl}/deletar/${id}` também.
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+  // PUT /equipamento/deletar/{id} -> AJUSTADO PARA SOFT DELETE (PUT)
+  // Retorna 'any' porque o seu back-end agora devolve um ResponseDTO e não mais void/vazio.
+  deletar(id: number): Observable<any> {
+    // Passamos 'null' no meio porque o PUT exige um body, mas o Java não pede nenhum @RequestBody
+    return this.http.put<any>(`${this.apiUrl}/deletar/${id}`, null, { headers: this.getHeaders() });
   }
 }
