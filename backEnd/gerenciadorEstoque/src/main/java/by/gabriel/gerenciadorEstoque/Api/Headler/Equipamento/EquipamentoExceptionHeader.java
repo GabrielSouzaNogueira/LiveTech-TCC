@@ -1,10 +1,7 @@
 package by.gabriel.gerenciadorEstoque.Api.Headler.Equipamento;
 
 import by.gabriel.gerenciadorEstoque.Api.DTO.Response.ResponseDTO;
-import by.gabriel.gerenciadorEstoque.Exception.Equipamento.EquipamentoNaoEncontrado;
-import by.gabriel.gerenciadorEstoque.Exception.Equipamento.ModeloNotNull;
-import by.gabriel.gerenciadorEstoque.Exception.Equipamento.NenhumEquipamentoEncontrado;
-import by.gabriel.gerenciadorEstoque.Exception.Equipamento.NumeroSerieNotNull;
+import by.gabriel.gerenciadorEstoque.Exception.Equipamento.*;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +55,29 @@ public class EquipamentoExceptionHeader {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO(
                 false,
                 "Nenhum Equipamento encontrado",
-                "NOT_NULL",
+                "NOT_FOUND",
+                Instant.now().toString()
+        ));
+    }
+
+    @ExceptionHandler(NumeroDeSerieJaExiste.class)
+    public ResponseEntity<ResponseDTO>handlerNumeroDeSerieJaExiste(NumeroDeSerieJaExiste ex){
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO(
+                false,
+                "Numero de serie já existe no sistema",
+                "NUMSERIE_IS_PRESENT",
+                Instant.now().toString()
+        ));
+    }
+
+    @ExceptionHandler(StatusInvalido.class)
+    public ResponseEntity<ResponseDTO>handlerStatusInvalido(StatusInvalido ex){
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO(
+                false,
+                "Status do Equipamento Invalido",
+                "STATUS_INVALID",
                 Instant.now().toString()
         ));
     }

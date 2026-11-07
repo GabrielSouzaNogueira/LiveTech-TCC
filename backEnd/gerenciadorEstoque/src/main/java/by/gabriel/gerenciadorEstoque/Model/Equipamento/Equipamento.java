@@ -13,7 +13,7 @@ public class Equipamento {
     @Column(name = "modelo", nullable = false)
     private String modelo;
 
-    @Column(name = "numeroSerie", nullable = false)
+    @Column(name = "numeroSerie", nullable = false, unique = true)
     private String numeroSerie;
 
     @Enumerated(EnumType.STRING)
@@ -51,5 +51,13 @@ public class Equipamento {
 
     public void setNumeroSerie(String numeroSerie) {
         this.numeroSerie = numeroSerie;
+    }
+
+    public EquipamentoStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EquipamentoStatus status) {
+        this.status = status;
     }
 }

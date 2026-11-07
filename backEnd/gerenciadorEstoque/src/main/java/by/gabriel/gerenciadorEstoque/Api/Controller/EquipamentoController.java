@@ -1,6 +1,7 @@
 package by.gabriel.gerenciadorEstoque.Api.Controller;
 
 import by.gabriel.gerenciadorEstoque.Api.DTO.Equipamento.EquipamentoDTO;
+import by.gabriel.gerenciadorEstoque.Api.DTO.Equipamento.UpdateEquipamentoDTO;
 import by.gabriel.gerenciadorEstoque.Model.Equipamento.Equipamento;
 import by.gabriel.gerenciadorEstoque.Services.EquipamentoService;
 import org.springframework.http.HttpStatus;
@@ -42,6 +43,14 @@ public class EquipamentoController {
         Equipamento equipamento = equipamentoService.cadastrar(dto, usuarioLogado);
         return ResponseEntity.status(HttpStatus.CREATED).body(equipamento);
 
+    }
+
+    @PutMapping("/atualizar/{id}")
+    public ResponseEntity<Equipamento> atualizar(@PathVariable Long id, @RequestBody UpdateEquipamentoDTO dto, @RequestHeader("X-Usuario-Logado") String usuarioLogado) {
+
+        Equipamento equipamentoAtualizado = equipamentoService.atualizar(id, dto, usuarioLogado);
+
+        return ResponseEntity.status(HttpStatus.OK).body(equipamentoAtualizado);
     }
 
 }

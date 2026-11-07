@@ -1,14 +1,15 @@
 package by.gabriel.gerenciadorEstoque.Services;
 
 import by.gabriel.gerenciadorEstoque.Api.DTO.Equipamento.EquipamentoDTO;
+import by.gabriel.gerenciadorEstoque.Api.DTO.Equipamento.UpdateEquipamentoDTO;
+import by.gabriel.gerenciadorEstoque.Api.Headler.Equipamento.EquipamentoExceptionHeader;
 import by.gabriel.gerenciadorEstoque.Enum.Equipamento.EquipamentoStatus;
 import by.gabriel.gerenciadorEstoque.Enum.Movimentacao.AcaoMovimentacao;
 import by.gabriel.gerenciadorEstoque.Enum.Movimentacao.TipoEntidade;
 import by.gabriel.gerenciadorEstoque.Enum.Usuario.UserCargo;
 import by.gabriel.gerenciadorEstoque.Enum.Usuario.UserStatus;
-import by.gabriel.gerenciadorEstoque.Exception.Equipamento.EquipamentoNaoEncontrado;
-import by.gabriel.gerenciadorEstoque.Exception.Equipamento.ModeloNotNull;
-import by.gabriel.gerenciadorEstoque.Exception.Equipamento.NumeroSerieNotNull;
+import by.gabriel.gerenciadorEstoque.Exception.Equipamento.*;
+import by.gabriel.gerenciadorEstoque.Exception.Produto.AccessDeniedException;
 import by.gabriel.gerenciadorEstoque.Exception.Usuario.UserNotFoundException;
 import by.gabriel.gerenciadorEstoque.Exception.Usuario.UserNotPermission;
 import by.gabriel.gerenciadorEstoque.Model.Equipamento.Equipamento;
@@ -69,6 +70,10 @@ public class EquipamentoService {
             throw new NumeroSerieNotNull("O numero de serie não pode estar vazio");
         }
 
+        if (equipamentoRepository.findByNumeroSerieIgnoreCase(dto.numeroSerie()).isPresent()) {
+            throw new NumeroDeSerieJaExiste("Numero de serie já existente no sistema");
+        }
+
         Equipamento equipamento = new Equipamento(
                 dto.modelo(),
                 dto.numeroSerie(),
@@ -93,4 +98,57 @@ public class EquipamentoService {
         return equipamento;
     }
 
+    @Transactional
+    public Equipamento atualizar(Long id, UpdateEquipamentoDTO dto, String usuarioLogado) {
+
+        Usuario usuario = userRepository.findByNomeIgnoreCase(usuarioLogado).orElseThrow(() -> new UserNotFoundException("Usuario não encontrado no sistema"));
+
+        if (!usuario.equals(UserCargo.GERENTE.toString()) || !usuario.equals(UserCargo.ADMINISTRADOR.toString()) || !usuario.equals(UserCargo.DEV)) {
+            throw new AccessDeniedException("Usuario sem permissão para realizar esta função");
+        }
+
+        Equipamento equipamento = equipamentoRepository.findById(id).orElseThrow(() -> new EquipamentoNaoEncontrado("Equipamento não encontrado no sistema"));
+
+        if (equipamento.getStatus() != EquipamentoStatus.ATIVO) {
+            throw new StatusInvalido("Status invalido do Equipamento");
+        }
+
+        if (dto.modelo() != null && !dto.modelo().isBlank()) {
+
+            equipamento.setModelo(dto.modelo());
+            equipamentoRepository.save(equipamento);
+
+            Movimentacao movimentacao = new Movimentacao(
+                    AcaoMovimentacao.ATUALIZACAO,
+                    TipoEntidade.EQUIPAMENTO,
+                    null,
+                    equipamento.getId(),
+                    equipamento.getModelo(),
+                    "MODELO",
+                    usuario
+            );
+
+            movimentacaoRepository.save(movimentacao);
+        }
+
+        if (dto.numeroSerie() != null && !dto.numeroSerie().isBlank()) {
+
+            equipamento.setNumeroSerie(dto.numeroSerie());
+            equipamentoRepository.save(equipamento);
+
+            Movimentacao movimentacao = new Movimentacao(
+                    AcaoMovimentacao.ATUALIZACAO,
+                    TipoEntidade.EQUIPAMENTO,
+                    null,
+                    equipamento.getId(),
+                    equipamento.getModelo(),
+                    "NUMSERIE",
+                    usuario
+            );
+
+            movimentacaoRepository.save(movimentacao);
+        }
+
+        return equipamento;
+    }
 }

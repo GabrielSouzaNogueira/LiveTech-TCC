@@ -10,11 +10,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EquipamentoRepository extends JpaRepository<Equipamento, Long> {
 
     @Query("SELECT e FROM Equipamento e WHERE e.status = :status ORDER BY e.modelo ASC")
     List<Equipamento> findByStatusCustomEntity(@Param("status") EquipamentoStatus status);
+
+    Optional<Equipamento> findByNumeroSerieIgnoreCase(String numSerie);
 
 }
