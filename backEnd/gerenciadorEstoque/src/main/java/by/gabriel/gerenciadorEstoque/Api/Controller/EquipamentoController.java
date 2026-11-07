@@ -2,12 +2,14 @@ package by.gabriel.gerenciadorEstoque.Api.Controller;
 
 import by.gabriel.gerenciadorEstoque.Api.DTO.Equipamento.EquipamentoDTO;
 import by.gabriel.gerenciadorEstoque.Api.DTO.Equipamento.UpdateEquipamentoDTO;
+import by.gabriel.gerenciadorEstoque.Api.DTO.Response.ResponseDTO;
 import by.gabriel.gerenciadorEstoque.Model.Equipamento.Equipamento;
 import by.gabriel.gerenciadorEstoque.Services.EquipamentoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -51,6 +53,27 @@ public class EquipamentoController {
         Equipamento equipamentoAtualizado = equipamentoService.atualizar(id, dto, usuarioLogado);
 
         return ResponseEntity.status(HttpStatus.OK).body(equipamentoAtualizado);
+    }
+
+    @PutMapping("/deletar/{id}")
+    public ResponseEntity<ResponseDTO> atualizar(@PathVariable Long id, @RequestHeader("X-Usuario-Logado") String usuarioLogado) {
+
+        Boolean equipamentoInativado = equipamentoService.deletar(id, usuarioLogado);
+
+        if (equipamentoInativado) {
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO(
+                    true,
+                    "Produto inativado com sucesso",
+                    Instant.now().toString()
+            ));
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO(
+                    false,
+                    "Algo deu errado na inativação do equipamento",
+                    Instant.now().toString()
+            ));
+        }
     }
 
 }

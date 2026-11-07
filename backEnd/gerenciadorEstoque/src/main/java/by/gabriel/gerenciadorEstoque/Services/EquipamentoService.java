@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EquipamentoService {
@@ -60,7 +61,8 @@ public class EquipamentoService {
     @Transactional
     public Equipamento cadastrar(EquipamentoDTO dto, String usuarioLogado) {
 
-        Usuario usuario = userRepository.findByNomeIgnoreCase(usuarioLogado).orElseThrow(() -> new UserNotFoundException("Usuario não foi encontrado"));
+        Usuario usuario = userRepository.findByNomeIgnoreCase(usuarioLogado)
+                .orElseThrow(() -> new UserNotFoundException("Usuario não foi encontrado"));
 
         if (dto.modelo() == null || dto.modelo().isBlank()) {
             throw new ModeloNotNull("O Modelo não pode estar vazio");
@@ -70,30 +72,41 @@ public class EquipamentoService {
             throw new NumeroSerieNotNull("O numero de serie não pode estar vazio");
         }
 
-        if (equipamentoRepository.findByNumeroSerieIgnoreCase(dto.numeroSerie()).isPresent()) {
-            throw new NumeroDeSerieJaExiste("Numero de serie já existente no sistema");
-        }
+        Optional<Equipamento> equipamentoExistente = equipamentoRepository.findByNumeroSerieIgnoreCase(dto.numeroSerie());
 
-        Equipamento equipamento = new Equipamento(
-                dto.modelo(),
-                dto.numeroSerie(),
-                EquipamentoStatus.ATIVO
-        );
+        Equipamento equipamento;
+        AcaoMovimentacao acaoMovimentacao;
+
+        if (equipamentoExistente.isPresent()) {
+            equipamento = equipamentoExistente.get();
+
+            if (equipamento.getStatus() != EquipamentoStatus.INATIVO) {
+                throw new NumeroDeSerieJaExiste("Numero de serie já existente no produto " + equipamento.getId());
+            }
+
+            equipamento.setModelo(dto.modelo());
+            equipamento.setStatus(EquipamentoStatus.ATIVO);
+
+            acaoMovimentacao = AcaoMovimentacao.ATUALIZACAO;
+
+        } else {
+            equipamento = new Equipamento(dto.modelo(), dto.numeroSerie(), EquipamentoStatus.ATIVO);
+            acaoMovimentacao = AcaoMovimentacao.CRIACAO;
+        }
 
         equipamentoRepository.save(equipamento);
 
         Movimentacao movimentacao = new Movimentacao(
-                AcaoMovimentacao.CRIACAO,
+                acaoMovimentacao,
                 TipoEntidade.EQUIPAMENTO,
                 null,
                 equipamento.getId(),
                 equipamento.getModelo(),
-                "NENHUM",
+                "NENHUM", // Como é um cadastro/reativação, afeta o registro como um todo
                 usuario
         );
 
         movimentacaoRepository.save(movimentacao);
-
 
         return equipamento;
     }
@@ -103,8 +116,11 @@ public class EquipamentoService {
 
         Usuario usuario = userRepository.findByNomeIgnoreCase(usuarioLogado).orElseThrow(() -> new UserNotFoundException("Usuario não encontrado no sistema"));
 
-        if (!usuario.equals(UserCargo.GERENTE.toString()) || !usuario.equals(UserCargo.ADMINISTRADOR.toString()) || !usuario.equals(UserCargo.DEV)) {
-            throw new AccessDeniedException("Usuario sem permissão para realizar esta função");
+        if (!usuario.getUserCargo().toString().equals("ADMINISTRADOR") &&
+                !usuario.getUserCargo().toString().equals("DEV") &&
+                !usuario.getUserCargo().toString().equals("GERENTE")) {
+
+            throw new AccessDeniedException("Usuario sem Permissão para realizar esta ação");
         }
 
         Equipamento equipamento = equipamentoRepository.findById(id).orElseThrow(() -> new EquipamentoNaoEncontrado("Equipamento não encontrado no sistema"));
@@ -150,5 +166,39 @@ public class EquipamentoService {
         }
 
         return equipamento;
+    }
+
+    @Transactional
+    public Boolean deletar(Long id, String usuarioLogado) {
+
+        Usuario usuario = userRepository.findByNomeIgnoreCase(usuarioLogado).orElseThrow(() -> new UserNotFoundException("Usuario não encontrado no sistema"));
+
+        if(!(usuario.getUserCargo().toString().equals("ADMINISTRADOR")) && !(usuario.getUserCargo().toString().equals("DEV"))) {
+            throw new AccessDeniedException("Usuario sem Permissão para realizar esta ação");
+        }
+
+        Equipamento equipamento = equipamentoRepository.findById(id).orElseThrow(() -> new EquipamentoNaoEncontrado("Equipamento não encontrado no sistema"));
+
+        if (equipamento.getStatus() == EquipamentoStatus.INATIVO) {
+            throw new StatusInvalido("O equipamento já está inativo no sistema!");
+        }
+
+        equipamento.setStatus(EquipamentoStatus.INATIVO);
+        equipamentoRepository.save(equipamento);
+
+        Movimentacao movimentacao = new Movimentacao(
+                AcaoMovimentacao.EXCLUSAO,
+                TipoEntidade.EQUIPAMENTO,
+                null,
+                equipamento.getId(),
+                equipamento.getModelo(),
+                "NENHUM",
+                usuario
+        );
+
+        movimentacaoRepository.save(movimentacao);
+
+        return true;
+
     }
 }

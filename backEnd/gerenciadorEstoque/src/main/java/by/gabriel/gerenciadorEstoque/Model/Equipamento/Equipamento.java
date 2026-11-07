@@ -13,7 +13,7 @@ public class Equipamento {
     @Column(name = "modelo", nullable = false)
     private String modelo;
 
-    @Column(name = "numeroSerie", nullable = false, unique = true)
+    @Column(name = "numeroSerie", nullable = false)
     private String numeroSerie;
 
     @Enumerated(EnumType.STRING)

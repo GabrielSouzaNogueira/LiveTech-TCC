@@ -33,7 +33,7 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UsuarioTelefone> telefones = new ArrayList<>();
 
-    @Enumerated(EnumType.STRING) // salva o enum como texto
+    @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
 
