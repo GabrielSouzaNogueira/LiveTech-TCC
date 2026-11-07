@@ -4,12 +4,14 @@ import by.gabriel.gerenciadorEstoque.Api.DTO.OS.OsDTO;
 import by.gabriel.gerenciadorEstoque.Api.DTO.OS.consultas.OsListDTO;
 import by.gabriel.gerenciadorEstoque.Enum.OS.OsStatus;
 import by.gabriel.gerenciadorEstoque.Exception.Cliente.ClienteNaoEncontrado;
+import by.gabriel.gerenciadorEstoque.Exception.Equipamento.EquipamentoNaoEncontrado;
 import by.gabriel.gerenciadorEstoque.Exception.Os.OsNaoEncontradoException;
 import by.gabriel.gerenciadorEstoque.Exception.Os.OsStatusInvalido;
 import by.gabriel.gerenciadorEstoque.Exception.Produto.ProdNotFoundException;
 import by.gabriel.gerenciadorEstoque.Exception.Servico.ServicoNaoEncontradoException;
 import by.gabriel.gerenciadorEstoque.Exception.Usuario.UserNameNotNullException;
 import by.gabriel.gerenciadorEstoque.Model.Cliente.Cliente;
+import by.gabriel.gerenciadorEstoque.Model.Equipamento.Equipamento;
 import by.gabriel.gerenciadorEstoque.Model.OS.ItensOsProduto;
 import by.gabriel.gerenciadorEstoque.Model.OS.ItensOsServico;
 import by.gabriel.gerenciadorEstoque.Model.OS.OrdemServico;
@@ -17,6 +19,7 @@ import by.gabriel.gerenciadorEstoque.Model.Produto.Produto;
 import by.gabriel.gerenciadorEstoque.Model.Servicos.Servicos;
 import by.gabriel.gerenciadorEstoque.Model.Usuario.Usuario;
 import by.gabriel.gerenciadorEstoque.Repository.Cliente.ClienteRepository;
+import by.gabriel.gerenciadorEstoque.Repository.Equipamento.EquipamentoRepository;
 import by.gabriel.gerenciadorEstoque.Repository.OS.OrdemServicoRepository;
 import by.gabriel.gerenciadorEstoque.Repository.Produto.ProdutoRepository;
 import by.gabriel.gerenciadorEstoque.Repository.Servicos.ServicosRepository;
@@ -36,15 +39,17 @@ public class OsService {
     private final UserRepository usuarioRepository;
     private final ProdutoRepository produtoRepository;
     private final ServicosRepository servicosRepository;
+    private final EquipamentoRepository equipamentoRepository;
 
     public OsService(OrdemServicoRepository osRepository, ClienteRepository clienteRepository,
                      UserRepository usuarioRepository, ProdutoRepository produtoRepository,
-                     ServicosRepository servicosRepository) {
+                     ServicosRepository servicosRepository,EquipamentoRepository equipamentoRepository) {
         this.osRepository = osRepository;
         this.clienteRepository = clienteRepository;
         this.usuarioRepository = usuarioRepository;
         this.produtoRepository = produtoRepository;
         this.servicosRepository = servicosRepository;
+        this.equipamentoRepository = equipamentoRepository;
     }
 
     // --- CRIAÇÃO ---
@@ -56,14 +61,20 @@ public class OsService {
         Usuario usuario = usuarioRepository.findByNomeIgnoreCase(usuarioLogado)
                 .orElseThrow(() -> new UserNameNotNullException("Usuario Logado não encontrado"));
 
+        Equipamento equipamento = equipamentoRepository.findById(dto.equipamentoId())
+                .orElseThrow(() -> new EquipamentoNaoEncontrado("Equipamento não encontrado"));
+
         OrdemServico os = new OrdemServico();
         os.setCliente(cliente);
         os.setUsuario(usuario);
-        os.setDescricaoEquipamento(dto.equipamento());
+
+        // CORREÇÃO AQUI: setEquipamento em vez de setDescricaoEquipamento
+        os.setEquipamento(equipamento);
+
         os.setObservacoes(dto.defeitoRelatado());
         os.setDataAbertura(LocalDateTime.now());
         os.setDataPrevisao(dto.dataPrevisao());
-        os.setStatus(OsStatus.ABERTA); // Ajustado para ABERTA
+        os.setStatus(OsStatus.ABERTA);
 
         BigDecimal descontoFinal = dto.desconto() != null ? dto.desconto() : BigDecimal.ZERO;
         os.setDesconto(descontoFinal);
@@ -116,7 +127,7 @@ public class OsService {
 
     // --- LISTAGEM E BUSCA ---
     public List<OsListDTO> listarTodas() {
-        return osRepository.filtrarOS(null, null, null, null);
+        return osRepository.filtrarOS(null, null, null, null, null, null);
     }
 
     public OrdemServico buscarPorId(Long id) {
@@ -139,9 +150,14 @@ public class OsService {
             os.setCliente(novoCliente);
         }
 
-        if (dto.equipamento() != null) {
-            os.setDescricaoEquipamento(dto.equipamento());
+        if (dto.equipamentoId() != null) {
+            Equipamento equipamento = equipamentoRepository.findById(dto.equipamentoId())
+                    .orElseThrow(() -> new EquipamentoNaoEncontrado("Equipamento não encontrado com este ID ou Inativado"));
+
+            // CORREÇÃO AQUI: setEquipamento em vez de setDescricaoEquipamento
+            os.setEquipamento(equipamento);
         }
+
         if (dto.defeitoRelatado() != null) {
             os.setObservacoes(dto.defeitoRelatado());
         }
@@ -196,10 +212,12 @@ public class OsService {
             os.setValorTotalServicos(totalServicos);
         }
 
-        BigDecimal totalGeral = os.getValorTotalProdutos()
-                .add(os.getValorTotalServicos())
-                .subtract(os.getDesconto());
+        // Adicionado um pequeno tratamento para evitar NullPointerException caso uma das listas venha vazia no Update
+        BigDecimal totalProd = os.getValorTotalProdutos() != null ? os.getValorTotalProdutos() : BigDecimal.ZERO;
+        BigDecimal totalServ = os.getValorTotalServicos() != null ? os.getValorTotalServicos() : BigDecimal.ZERO;
+        BigDecimal desc = os.getDesconto() != null ? os.getDesconto() : BigDecimal.ZERO;
 
+        BigDecimal totalGeral = totalProd.add(totalServ).subtract(desc);
         os.setValorTotalGeral(totalGeral);
 
         return osRepository.save(os);

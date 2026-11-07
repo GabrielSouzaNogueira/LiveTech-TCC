@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { 
   OsRequestDTO, OsListDTO, 
-  ClienteResumoDTO, ProdutoResumoDTO, ServicoResumoDTO 
+  ClienteResumoDTO, ProdutoResumoDTO, ServicoResumoDTO, EquipamentoResumoDTO 
 } from '../models/os-dto'; 
 
 @Injectable({
@@ -16,10 +16,10 @@ export class AuthOS {
   private urlClientes = 'http://localhost:8080/cliente/listAll'; 
   private urlProdutos = 'http://localhost:8080/produto/listProd';
   private urlServicos = 'http://localhost:8080/servicos/listAll';
+  private urlEquipamentos = 'http://localhost:8080/equipamento';
 
   constructor(private http: HttpClient) {}
 
-  // --- CRUD da OS ---
   criarOS(dto: OsRequestDTO, usuarioLogado: string): Observable<OsListDTO> {
     const headers = new HttpHeaders({ 'X-Usuario-Logado': usuarioLogado });
     return this.http.post<OsListDTO>(`${this.apiUrl}/criar`, dto, { headers });
@@ -36,6 +36,7 @@ export class AuthOS {
   }
 
   listarTodas(): Observable<OsListDTO[]> {
+    // Removemos o '/listar' do final, chamando apenas a rota raiz
     return this.http.get<OsListDTO[]>(this.apiUrl);
   }
 
@@ -43,7 +44,6 @@ export class AuthOS {
     return this.http.delete(`${this.apiUrl}/deletar/${id}`);
   }
 
-  // --- Buscas para Selects ---
   listarClientes(): Observable<ClienteResumoDTO[]> {
     return this.http.get<ClienteResumoDTO[]>(this.urlClientes);
   }
@@ -54,5 +54,11 @@ export class AuthOS {
 
   listarServicos(): Observable<ServicoResumoDTO[]> {
     return this.http.get<ServicoResumoDTO[]>(this.urlServicos);
+  }
+
+  // NOVO: Busca de equipamentos para o Modal
+  pesquisarEquipamentosModal(termo: string): Observable<EquipamentoResumoDTO[]> {
+    const headers = new HttpHeaders({ 'X-Usuario-Logado': localStorage.getItem('usuarioLogado') || 'Admin' });
+    return this.http.get<EquipamentoResumoDTO[]>(`${this.urlEquipamentos}/buscar-modal?termo=${termo}`, { headers });
   }
 }

@@ -1,7 +1,11 @@
 package by.gabriel.gerenciadorEstoque.Model.Equipamento;
 
 import by.gabriel.gerenciadorEstoque.Enum.Equipamento.EquipamentoStatus;
+import by.gabriel.gerenciadorEstoque.Model.OS.OrdemServico;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 public class Equipamento {
@@ -18,6 +22,10 @@ public class Equipamento {
 
     @Enumerated(EnumType.STRING)
     private EquipamentoStatus status;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "equipamento")
+    private List<OrdemServico> historicoOS;
 
     public Equipamento() {
 

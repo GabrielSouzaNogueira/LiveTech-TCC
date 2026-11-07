@@ -74,7 +74,7 @@ public class OsController {
         return new OsResponseDTO(
                 os.getId(),
                 os.getCliente().getNome(),
-                os.getDescricaoEquipamento(),
+                os.getEquipamento(),
                 os.getObservacoes(),
                 os.getValorTotalGeral(),
                 os.getStatus(),

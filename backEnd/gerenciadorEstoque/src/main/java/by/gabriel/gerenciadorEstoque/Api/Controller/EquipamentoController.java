@@ -1,6 +1,7 @@
 package by.gabriel.gerenciadorEstoque.Api.Controller;
 
 import by.gabriel.gerenciadorEstoque.Api.DTO.Equipamento.EquipamentoDTO;
+import by.gabriel.gerenciadorEstoque.Api.DTO.Equipamento.EquipamentoResumoDTO;
 import by.gabriel.gerenciadorEstoque.Api.DTO.Equipamento.UpdateEquipamentoDTO;
 import by.gabriel.gerenciadorEstoque.Api.DTO.Response.ResponseDTO;
 import by.gabriel.gerenciadorEstoque.Model.Equipamento.Equipamento;
@@ -76,4 +77,12 @@ public class EquipamentoController {
         }
     }
 
+    @GetMapping("/buscar-modal")
+    public ResponseEntity<List<EquipamentoResumoDTO>> buscarParaModal(
+            @RequestParam(value = "termo", required = false, defaultValue = "") String termo,
+            @RequestHeader("X-Usuario-Logado") String usuarioLogado) {
+
+        List<EquipamentoResumoDTO> equipamentos = equipamentoService.buscarParaModal(termo, usuarioLogado);
+        return ResponseEntity.status(HttpStatus.OK).body(equipamentos);
+    }
 }

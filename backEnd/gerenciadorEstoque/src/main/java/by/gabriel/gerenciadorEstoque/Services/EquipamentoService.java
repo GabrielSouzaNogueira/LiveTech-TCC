@@ -1,6 +1,7 @@
 package by.gabriel.gerenciadorEstoque.Services;
 
 import by.gabriel.gerenciadorEstoque.Api.DTO.Equipamento.EquipamentoDTO;
+import by.gabriel.gerenciadorEstoque.Api.DTO.Equipamento.EquipamentoResumoDTO;
 import by.gabriel.gerenciadorEstoque.Api.DTO.Equipamento.UpdateEquipamentoDTO;
 import by.gabriel.gerenciadorEstoque.Api.Headler.Equipamento.EquipamentoExceptionHeader;
 import by.gabriel.gerenciadorEstoque.Enum.Equipamento.EquipamentoStatus;
@@ -84,13 +85,13 @@ public class EquipamentoService {
                 throw new NumeroDeSerieJaExiste("Numero de serie já existente no produto " + equipamento.getId());
             }
 
-            equipamento.setModelo(dto.modelo());
+            equipamento.setModelo(dto.modelo().toUpperCase());
             equipamento.setStatus(EquipamentoStatus.ATIVO);
 
             acaoMovimentacao = AcaoMovimentacao.ATUALIZACAO;
 
         } else {
-            equipamento = new Equipamento(dto.modelo(), dto.numeroSerie(), EquipamentoStatus.ATIVO);
+            equipamento = new Equipamento(dto.modelo(), dto.numeroSerie().toUpperCase(), EquipamentoStatus.ATIVO);
             acaoMovimentacao = AcaoMovimentacao.CRIACAO;
         }
 
@@ -101,8 +102,8 @@ public class EquipamentoService {
                 TipoEntidade.EQUIPAMENTO,
                 null,
                 equipamento.getId(),
-                equipamento.getModelo(),
-                "NENHUM", // Como é um cadastro/reativação, afeta o registro como um todo
+                equipamento.getModelo().toUpperCase(),
+                "NENHUM",
                 usuario
         );
 
@@ -200,5 +201,19 @@ public class EquipamentoService {
 
         return true;
 
+    }
+
+    @Transactional
+    public List<EquipamentoResumoDTO> buscarParaModal(String termo, String usuarioLogado) {
+
+        Usuario usuario = userRepository.findByNomeIgnoreCase(usuarioLogado)
+                .orElseThrow(() -> new UserNotFoundException("Usuario não encontrado no sistema"));
+
+        // Se o termo for vazio, traz TODOS. Se tiver texto, filtra!
+        if (termo == null || termo.trim().isEmpty()) {
+            return equipamentoRepository.buscarTodosParaModal();
+        }
+
+        return equipamentoRepository.buscarParaModal(termo);
     }
 }

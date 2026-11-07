@@ -7,7 +7,9 @@ import java.time.LocalDateTime;
 public record OsListDTO(
         Long id,
         String nomeCliente,
-        String descricaoEquipamento,
+        Long equipamentoId,
+        String equipamentoModelo,
+        String equipamentoNumeroSerie,
         BigDecimal valorTotalGeral,
         OsStatus status,
         LocalDateTime dataAbertura,

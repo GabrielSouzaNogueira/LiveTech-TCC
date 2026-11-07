@@ -1,61 +1,100 @@
-<div class="container mt-4">
-  <h2>Gestão de Equipamentos</h2>
+<div class="page-container">
+  <header class="page-header">
+    <div class="header-titles">
+      <h1>Gestão de Equipamentos</h1>
+      <p>Cadastre e gerencie o patrimônio ativo do sistema</p>
+    </div>
+  </header>
 
-  <!-- Formulário -->
-  <div class="card p-3 mb-4">
-    <form [formGroup]="equipamentoForm" (ngSubmit)="salvar()">
-      <div class="row">
-        
-        <div class="col-md-4">
-          <label>Modelo</label>
-          <input type="text" class="form-control" formControlName="modelo" placeholder="Ex: Dell Inspiron">
-        </div>
-        
-        <div class="col-md-4">
-          <label>Número de Série</label>
-          <input type="text" class="form-control" formControlName="numeroSerie" placeholder="Ex: SN-123456">
+  <div class="content-grid">
+    <!-- CARD DO FORMULÁRIO -->
+    <section class="card form-card">
+      <div class="card-header">
+        <h2>{{ editandoId ? 'Editando Equipamento' : 'Novo Equipamento' }}</h2>
+        <span class="badge" *ngIf="editandoId">ID: #{{ editandoId }}</span>
+      </div>
+
+      <form [formGroup]="equipamentoForm" (ngSubmit)="salvar()" class="form-layout">
+        <div class="input-group">
+          <label for="modelo">Modelo do Equipamento</label>
+          <input 
+            type="text" 
+            id="modelo" 
+            formControlName="modelo" 
+            placeholder="Ex: Notebook Dell Inspiron 15"
+            [class.input-error]="equipamentoForm.get('modelo')?.invalid && equipamentoForm.get('modelo')?.touched"
+          >
         </div>
 
-        <div class="col-md-1 d-flex align-items-end">
-          <button type="submit" class="btn btn-primary w-100" [disabled]="equipamentoForm.invalid">
-            {{ editandoId ? 'Atualizar' : 'Salvar' }}
+        <div class="input-group">
+          <label for="numeroSerie">Número de Série (S/N)</label>
+          <input 
+            type="text" 
+            id="numeroSerie" 
+            formControlName="numeroSerie" 
+            placeholder="Ex: SN-987654321"
+            [class.input-error]="equipamentoForm.get('numeroSerie')?.invalid && equipamentoForm.get('numeroSerie')?.touched"
+          >
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="equipamentoForm.invalid">
+            <span class="icon">{{ editandoId ? '💾' : '➕' }}</span>
+            {{ editandoId ? 'Atualizar Equipamento' : 'Cadastrar Equipamento' }}
+          </button>
+          
+          <button type="button" class="btn btn-secondary" *ngIf="editandoId" (click)="cancelarEdicao()">
+            ❌ Cancelar
           </button>
         </div>
-        
-      </div>
-      
-      <button *ngIf="editandoId" type="button" class="btn btn-secondary mt-2" (click)="cancelarEdicao()">
-        Cancelar Edição
-      </button>
-    </form>
-  </div>
+      </form>
+    </section>
 
-  <!-- Tabela de Listagem -->
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Modelo</th>
-        <th>Nº Série</th>
-        <th>Status</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let eq of equipamentos">
-        <td>{{ eq.id }}</td>
-        <td>{{ eq.modelo }}</td>
-        <td>{{ eq.numeroSerie }}</td>
-        <td>
-          <span class="badge" [ngClass]="{'bg-success': eq.status === 'ATIVO', 'bg-danger': eq.status === 'INATIVO', 'bg-warning': eq.status === 'MANUTENCAO'}">
-            {{ eq.status }}
-          </span>
-        </td>
-        <td>
-          <button class="btn btn-sm btn-info me-2" (click)="editar(eq)">Editar</button>
-          <button class="btn btn-sm btn-danger" (click)="deletar(eq.id)">Deletar</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+    <!-- CARD DA TABELA -->
+    <section class="card table-card">
+      <div class="card-header">
+        <h2>Equipamentos Ativos</h2>
+        <div class="total-badge">{{ equipamentos.length }} registros</div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Modelo</th>
+              <th>Número de Série</th>
+              <th class="text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let eq of equipamentos" [class.row-editing]="eq.id === editandoId">
+              <td class="font-mono text-gray">#{{ eq.id }}</td>
+              <td class="font-bold">{{ eq.modelo }}</td>
+              <td class="font-mono">{{ eq.numeroSerie }}</td>
+              <td class="td-actions">
+                <button class="btn-icon edit" (click)="editar(eq)" title="Editar">
+                  ✏️
+                </button>
+                <button class="btn-icon delete" (click)="deletar(eq.id)" title="Inativar">
+                  🗑️
+                </button>
+              </td>
+            </tr>
+            
+            <!-- Estado Vazio -->
+            <tr *ngIf="equipamentos.length === 0">
+              <td colspan="4" class="empty-state">
+                <div class="empty-content">
+                  <span class="empty-icon">📭</span>
+                  <h3>Nenhum equipamento cadastrado</h3>
+                  <p>Preencha o formulário ao lado para adicionar o primeiro.</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
 </div>

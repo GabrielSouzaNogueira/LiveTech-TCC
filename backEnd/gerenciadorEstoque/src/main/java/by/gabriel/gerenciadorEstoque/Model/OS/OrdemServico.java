@@ -2,7 +2,9 @@ package by.gabriel.gerenciadorEstoque.Model.OS;
 
 import by.gabriel.gerenciadorEstoque.Enum.OS.OsStatus;
 import by.gabriel.gerenciadorEstoque.Model.Cliente.Cliente;
+import by.gabriel.gerenciadorEstoque.Model.Equipamento.Equipamento;
 import by.gabriel.gerenciadorEstoque.Model.Usuario.Usuario;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,7 +26,10 @@ public class OrdemServico {
     @JoinColumn(name = "user_id", nullable = false)
     private Usuario usuario;
 
-    private String descricaoEquipamento;
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "equipamento_id", nullable = false)
+    private Equipamento equipamento;
 
     private String observacoes;
 
@@ -76,12 +81,12 @@ public class OrdemServico {
         this.usuario = usuario;
     }
 
-    public String getDescricaoEquipamento() {
-        return descricaoEquipamento;
+    public Equipamento getEquipamento() {
+        return equipamento;
     }
 
-    public void setDescricaoEquipamento(String descricaoEquipamento) {
-        this.descricaoEquipamento = descricaoEquipamento;
+    public void setEquipamento(Equipamento equipamento) {
+        this.equipamento = equipamento;
     }
 
     public String getObservacoes() {
