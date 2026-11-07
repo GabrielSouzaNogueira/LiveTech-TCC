@@ -6,5 +6,8 @@ public enum TipoEntidade {
     USUARIO,
     CLIENTE,
     SERVICO,
-    FORMA_PAGAMENTO
+    FORMA_PAGAMENTO,
+    EQUIPAMENTO,
+    OS,
+    PEDIDO
 }

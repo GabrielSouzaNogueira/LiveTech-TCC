@@ -23,9 +23,10 @@ public class Equipamento {
 
     }
 
-    public Equipamento(String modelo, String numeroSerie) {
+    public Equipamento(String modelo, String numeroSerie, EquipamentoStatus status) {
         this.modelo = modelo;
         this.numeroSerie = numeroSerie;
+        this.status = status;
     }
 
     public Long getId() {
