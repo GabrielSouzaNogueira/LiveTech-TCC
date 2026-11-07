@@ -9,6 +9,8 @@
     <h2 class="titulo-sistema" *ngIf="!estaRecolhida">Estoque & Vendas</h2>
   </div>
 
+  <!-- ... topo do sidebar (não muda) ... -->
+
   <!-- NAVEGAÇÃO: Links das páginas -->
   <nav class="sidebar-nav">
     <ul>
@@ -50,6 +52,15 @@
           <span class="texto-link" *ngIf="!estaRecolhida">Cadastro de Produtos</span>
         </a>
        </li>
+
+       <!-- NOVA ROTA DE EQUIPAMENTOS AQUI -->
+       <li>
+        <a routerLink="/equipamento" routerLinkActive="link-ativo" class="nav-item">
+          <span class="icone">💻</span>
+          <span class="texto-link" *ngIf="!estaRecolhida">Equipamentos</span>
+        </a>
+       </li>
+
        <li>
         <a routerLink="/movimentacao" routerLinkActive="link-ativo" class="nav-item">
           <span class="icone">📈</span> 
@@ -78,6 +89,8 @@
        </li>
     </ul>
   </nav>
+
+<!-- ... rodapé (não muda) ... -->
 
   <!-- RODAPÉ: Botão de Sair fixado na última barra -->
   <div class="sidebar-footer">

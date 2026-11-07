@@ -1,0 +1,61 @@
+<div class="container mt-4">
+  <h2>Gestão de Equipamentos</h2>
+
+  <!-- Formulário -->
+  <div class="card p-3 mb-4">
+    <form [formGroup]="equipamentoForm" (ngSubmit)="salvar()">
+      <div class="row">
+        
+        <div class="col-md-4">
+          <label>Modelo</label>
+          <input type="text" class="form-control" formControlName="modelo" placeholder="Ex: Dell Inspiron">
+        </div>
+        
+        <div class="col-md-4">
+          <label>Número de Série</label>
+          <input type="text" class="form-control" formControlName="numeroSerie" placeholder="Ex: SN-123456">
+        </div>
+
+        <div class="col-md-1 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-100" [disabled]="equipamentoForm.invalid">
+            {{ editandoId ? 'Atualizar' : 'Salvar' }}
+          </button>
+        </div>
+        
+      </div>
+      
+      <button *ngIf="editandoId" type="button" class="btn btn-secondary mt-2" (click)="cancelarEdicao()">
+        Cancelar Edição
+      </button>
+    </form>
+  </div>
+
+  <!-- Tabela de Listagem -->
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Modelo</th>
+        <th>Nº Série</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let eq of equipamentos">
+        <td>{{ eq.id }}</td>
+        <td>{{ eq.modelo }}</td>
+        <td>{{ eq.numeroSerie }}</td>
+        <td>
+          <span class="badge" [ngClass]="{'bg-success': eq.status === 'ATIVO', 'bg-danger': eq.status === 'INATIVO', 'bg-warning': eq.status === 'MANUTENCAO'}">
+            {{ eq.status }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-sm btn-info me-2" (click)="editar(eq)">Editar</button>
+          <button class="btn btn-sm btn-danger" (click)="deletar(eq.id)">Deletar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
