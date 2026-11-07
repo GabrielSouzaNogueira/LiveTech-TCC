@@ -42,6 +42,7 @@ public class SecurityConfig {
 
                     .requestMatchers("/relatorio/produto/**").permitAll()
 
+                    .requestMatchers("/equipamento/**").permitAll()
                 .anyRequest().authenticated()
             );
 

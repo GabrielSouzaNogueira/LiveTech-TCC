@@ -15,19 +15,31 @@ import by.gabriel.gerenciadorEstoque.Model.Equipamento.Equipamento;
 import by.gabriel.gerenciadorEstoque.Model.Movimentacao.Movimentacao;
 import by.gabriel.gerenciadorEstoque.Model.Usuario.Usuario;
 import by.gabriel.gerenciadorEstoque.Repository.Equipamento.EquipamentoRepository;
+import by.gabriel.gerenciadorEstoque.Repository.Movimentacao.MovimentacaoRepository;
 import by.gabriel.gerenciadorEstoque.Repository.Usuario.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.List;
 
 @Service
 public class EquipamentoService {
 
     private final EquipamentoRepository equipamentoRepository;
     private final UserRepository userRepository;
+    private final MovimentacaoRepository movimentacaoRepository;
 
-    public EquipamentoService(EquipamentoRepository equipamentoRepository, UserRepository userRepository) {
+    public EquipamentoService(EquipamentoRepository equipamentoRepository, UserRepository userRepository, MovimentacaoRepository movimentacaoRepository) {
         this.equipamentoRepository = equipamentoRepository;
         this.userRepository = userRepository;
+        this.movimentacaoRepository = movimentacaoRepository;
+    }
+
+    @Transactional
+    public List<Equipamento> listarEquipamento() {
+
+        return equipamentoRepository.findByStatusCustomEntity(EquipamentoStatus.ATIVO);
     }
 
     @Transactional
@@ -48,10 +60,6 @@ public class EquipamentoService {
     public Equipamento cadastrar(EquipamentoDTO dto, String usuarioLogado) {
 
         Usuario usuario = userRepository.findByNomeIgnoreCase(usuarioLogado).orElseThrow(() -> new UserNotFoundException("Usuario não foi encontrado"));
-
-        if (!usuario.equals(UserStatus.ATIVO.toString())){
-            throw new UserNotPermission("Este usuario não está ativo!");
-        }
 
         if (dto.modelo() == null || dto.modelo().isBlank()) {
             throw new ModeloNotNull("O Modelo não pode estar vazio");
@@ -74,10 +82,13 @@ public class EquipamentoService {
                 TipoEntidade.EQUIPAMENTO,
                 null,
                 equipamento.getId(),
-                usuarioLogado,
+                equipamento.getModelo(),
                 "NENHUM",
                 usuario
         );
+
+        movimentacaoRepository.save(movimentacao);
+
 
         return equipamento;
     }

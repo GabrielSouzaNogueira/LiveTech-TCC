@@ -3,6 +3,7 @@ package by.gabriel.gerenciadorEstoque.Api.Headler.Equipamento;
 import by.gabriel.gerenciadorEstoque.Api.DTO.Response.ResponseDTO;
 import by.gabriel.gerenciadorEstoque.Exception.Equipamento.EquipamentoNaoEncontrado;
 import by.gabriel.gerenciadorEstoque.Exception.Equipamento.ModeloNotNull;
+import by.gabriel.gerenciadorEstoque.Exception.Equipamento.NenhumEquipamentoEncontrado;
 import by.gabriel.gerenciadorEstoque.Exception.Equipamento.NumeroSerieNotNull;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -46,6 +47,17 @@ public class EquipamentoExceptionHeader {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO(
                 false,
                 "Numero de serie não pode ser NULL ou Vazio",
+                "NOT_NULL",
+                Instant.now().toString()
+        ));
+    }
+
+    @ExceptionHandler(NenhumEquipamentoEncontrado.class)
+    public ResponseEntity<ResponseDTO>handlerNenhumEquipamentoEncontrado(NenhumEquipamentoEncontrado ex){
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO(
+                false,
+                "Nenhum Equipamento encontrado",
                 "NOT_NULL",
                 Instant.now().toString()
         ));
