@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgxMaskDirective } from 'ngx-mask';
 import { AuthCadastroCliente } from '../../services/auth-cadastro-cliente';
-import { Route, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthNotificacaoService } from '../../services/auth-notificacao';
 import { HttpErrorResponse } from '@angular/common/http';
 import { GerenciadorCliente } from "../gerenciador-cliente/gerenciador-cliente";
@@ -43,9 +43,16 @@ export class CadastroCliente {
 
     const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
 
-    this.authCadastroClienteService.cadastroCliente(this.nomeDigitado, this.sobrenomeDigitado, this.emailDigitado, this.telefoneDigitado, usuarioAtual).subscribe({
+    this.authCadastroClienteService.cadastroCliente(
+      this.nomeDigitado,
+      this.sobrenomeDigitado,
+      this.emailDigitado,
+      this.telefoneDigitado,
+      usuarioAtual
+    ).subscribe({
         next: (resposta) => {
           this.carregando = false;
+          this.limparCampos();
           this.cdr.detectChanges();
           this.AuthNotificacaoService.sucesso(resposta?.mensagem || 'Cadastro realizado com sucesso');
         },
@@ -55,6 +62,13 @@ export class CadastroCliente {
           const mensagem = this.AuthNotificacaoService.extrairMensagemErro(erro, 'Cadastro não foi possível');
           this.AuthNotificacaoService.erro(mensagem);
         }
-    })
+    });
+  }
+
+  limparCampos(): void {
+    this.nomeDigitado = '';
+    this.sobrenomeDigitado = '';
+    this.emailDigitado = '';
+    this.telefoneDigitado = '';
   }
 }

@@ -29,12 +29,26 @@
         </div>
         <div class="card-body form-grid">
           
-          <div class="input-group">
+          <div class="input-group autocomplete-wrapper">
             <label>Cliente *</label>
-            <select [(ngModel)]="novaOs.clienteId" name="clienteId" required>
-              <option value="0" disabled>Selecione o Cliente</option>
-              <option *ngFor="let c of clientesLista" [value]="c.id">{{ c.nome }} {{ c.sobrenome }}</option>
-            </select>
+            <input type="text"
+                   [(ngModel)]="termoBuscaCliente"
+                   name="buscaCliente"
+                   (focus)="mostrarDropdownClientes = true"
+                   (blur)="fecharDropdownClientes()"
+                   (ngModelChange)="onDigitarCliente()"
+                   placeholder="Digite o nome do cliente..."
+                   autocomplete="off"
+                   required>
+
+            <ul class="autocomplete-list" *ngIf="mostrarDropdownClientes">
+              <li *ngFor="let c of clientesFiltrados" (mousedown)="selecionarCliente(c)">
+                {{ c.nome }} {{ c.sobrenome }}
+              </li>
+              <li class="autocomplete-empty" *ngIf="clientesFiltrados.length === 0">
+                Nenhum cliente encontrado
+              </li>
+            </ul>
           </div>
           
           <div class="input-group">
@@ -74,8 +88,8 @@
             <h3>Produtos/Peças</h3>
             <div class="search-input-wrapper mb-3">
               <select [(ngModel)]="produtoSelecionadoId" name="prodId">
-                  <option value="0" disabled>Selecione o Produto</option>
-                  <option *ngFor="let p of produtosLista" [value]="p.prodId">{{ p.nome }} ({{ p.precoVenda | currency:'BRL' }})</option>
+                <option value="0" disabled>Selecione o Produto</option>
+                <option *ngFor="let p of produtosLista" [value]="p.prodId">{{ p.nome }} ({{ p.precoVenda | currency:'BRL' }})</option>
               </select>
               <input type="number" [(ngModel)]="produtoQtd" name="prodQtd" min="1" style="max-width: 80px;">
               <button type="button" class="btn btn-secondary" (click)="adicionarProduto()">➕</button>
@@ -99,11 +113,10 @@
             <div class="search-input-wrapper mb-3">
               <select [(ngModel)]="servicoSelecionadoId" name="servId">
                 <option value="0" disabled>Selecione o Serviço</option>
-                <!-- MUDOU AQUI NO FINAL PARA s.precoServico -->
                 <option *ngFor="let s of servicosLista" [value]="s.servicosId">
                   {{ s.descServico }} ({{ s.precoServico | currency:'BRL' }})
                 </option>
-            </select>
+              </select>
               <input type="number" [(ngModel)]="servicoQtd" name="servQtd" min="1" style="max-width: 80px;">
               <button type="button" class="btn btn-secondary" (click)="adicionarServico()">➕</button>
             </div>
@@ -157,7 +170,6 @@
         <h2>Ordens Cadastradas</h2>
         <div class="total-badge">{{ listaOS.length }} registros</div>
       </div>
-      <!-- Tabela sem card-body padding para preencher 100% da largura do card -->
       <div class="table-responsive">
         <table class="modern-table">
           <thead>
@@ -215,7 +227,6 @@
       <div class="modal-body">
         
         <div class="search-box">
-          <!-- Input com ngModelChange para busca em tempo real -->
           <input type="text" 
                  [(ngModel)]="termoBuscaEquipamento" 
                  (ngModelChange)="buscarEquipamentoModal()" 

@@ -122,3 +122,21 @@
   color: #64748b;
   line-height: 1.4;
 }
+
+.atalhos-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+  .atalhos-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .atalhos-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}

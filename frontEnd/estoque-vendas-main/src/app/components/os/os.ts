@@ -30,6 +30,10 @@ export class OsComponent implements OnInit {
   equipamentosPesquisa: EquipamentoResumoDTO[] = [];
   equipamentoSelecionadoNome: string = '';
 
+  // Variáveis do Autocomplete de Cliente
+  termoBuscaCliente: string = '';
+  mostrarDropdownClientes: boolean = false;
+
   editandoId: number | null = null;
   novaOs: OsRequestDTO = this.resetarFormulario();
 
@@ -59,17 +63,18 @@ export class OsComponent implements OnInit {
   resetarFormulario(): OsRequestDTO {
     this.editandoId = null;
     this.equipamentoSelecionadoNome = '';
+    this.termoBuscaCliente = '';
+    this.mostrarDropdownClientes = false;
     return {
       clienteId: 0, equipamentoId: 0, defeitoRelatado: '', desconto: 0,
       dataPrevisao: '', itensProduto: [], itensServico: []
     };
   }
 
-  // --- LÓGICA DO MODAL ---
-abrirModalEquipamento() {
+  // --- LÓGICA DO MODAL DE EQUIPAMENTO ---
+  abrirModalEquipamento() {
     this.mostrarModalEquipamento = true;
     this.termoBuscaEquipamento = '';
-
     this.buscarEquipamentoModal(); 
   }
 
@@ -77,7 +82,7 @@ abrirModalEquipamento() {
     this.mostrarModalEquipamento = false;
   }
 
- buscarEquipamentoModal() {
+  buscarEquipamentoModal() {
     this.osService.pesquisarEquipamentosModal(this.termoBuscaEquipamento).subscribe(res => {
       this.equipamentosPesquisa = res;
     });
@@ -88,7 +93,30 @@ abrirModalEquipamento() {
     this.equipamentoSelecionadoNome = `${eq.modelo} (SN: ${eq.numeroSerie})`;
     this.fecharModalEquipamento();
   }
-  // ----------------------
+
+  // --- LÓGICA DO AUTOCOMPLETE DE CLIENTE ---
+  get clientesFiltrados(): ClienteResumoDTO[] {
+    const termo = this.termoBuscaCliente.trim().toLowerCase();
+    if (!termo) return this.clientesLista;
+    return this.clientesLista.filter(c =>
+      `${c.nome} ${c.sobrenome || ''}`.toLowerCase().includes(termo)
+    );
+  }
+
+  onDigitarCliente() {
+    this.mostrarDropdownClientes = true;
+    this.novaOs.clienteId = 0;
+  }
+
+  selecionarCliente(cliente: ClienteResumoDTO) {
+    this.novaOs.clienteId = cliente.id;
+    this.termoBuscaCliente = `${cliente.nome} ${cliente.sobrenome || ''}`.trim();
+    this.mostrarDropdownClientes = false;
+  }
+
+  fecharDropdownClientes() {
+    this.mostrarDropdownClientes = false;
+  }
 
   cancelarEdicao() {
     this.novaOs = this.resetarFormulario();
@@ -112,6 +140,7 @@ abrirModalEquipamento() {
   getNomeProduto(id: number): string { 
     return this.produtosLista.find(p => p.prodId === id || (p as any).id === id)?.nome || `Produto #${id}`; 
   }
+
   getNomeServico(id: number): string { 
     return this.servicosLista.find(s => s.servicosId === id)?.descServico || `Serviço #${id}`; 
   }
@@ -171,6 +200,7 @@ abrirModalEquipamento() {
     this.editandoId = os.id;
     const cliente = this.clientesLista.find(c => c.nome + ' ' + c.sobrenome === os.nomeCliente || c.nome === os.nomeCliente);
     
+    this.termoBuscaCliente = cliente ? `${cliente.nome} ${cliente.sobrenome || ''}`.trim() : os.nomeCliente;
     this.equipamentoSelecionadoNome = `${os.equipamentoModelo} (SN: ${os.equipamentoNumeroSerie})`;
     
     this.novaOs = {
@@ -189,7 +219,6 @@ abrirModalEquipamento() {
       this.osService.finalizarOS(id, this.usuarioLogado).subscribe({
         next: () => {
           alert('OS Finalizada com sucesso!');
-          // Recarrega a lista de OS do banco de dados para atualizar o status na tela
           this.carregarOS();
         },
         error: () => alert('Erro ao finalizar a OS.')
@@ -214,7 +243,6 @@ abrirModalEquipamento() {
       const obs = os.observacoes ? os.observacoes : 'Nenhuma observação registrada.';
       const valorTotal = os.valorTotalGeral ? os.valorTotalGeral.toFixed(2).replace('.', ',') : '0,00';
 
-      // Tratando a exibição do equipamento com os novos campos de Modelo e Série
       const equipamentoPrint = os.equipamentoModelo 
         ? `${os.equipamentoModelo} (SN: ${os.equipamentoNumeroSerie})` 
         : 'Equipamento não especificado';
@@ -297,32 +325,25 @@ abrirModalEquipamento() {
   }
 
   // --- LÓGICA DE CÁLCULO DE TOTAIS ---
-  
-  // Puxa o PREÇO DO PRODUTO (Certifique-se que o DTO tem 'precoVenda')
   getPrecoProduto(id: number): number {
     const prod = this.produtosLista.find(p => p.prodId === id || (p as any).id === id);
     return prod?.precoVenda || 0;
   }
 
-  // Puxa o VALOR DO SERVIÇO
   getValorServico(id: number): number {
     const serv = this.servicosLista.find(s => s.servicosId === id || (s as any).id === id);
-    // Se o seu backend devolve com outro nome (ex: preco), troque aqui!
-    return serv?.precoServico || 0; // <-- MUDOU AQUI
+    return serv?.precoServico || 0;
   }
 
   get subtotalOS(): number {
-    // Calcula o total apenas dos produtos
     const totalProdutos = this.novaOs.itensProduto.reduce((acc, item) => {
       return acc + (this.getPrecoProduto(item.produtoId) * item.quantidade);
     }, 0);
 
-    // Calcula o total apenas dos serviços
     const totalServicos = this.novaOs.itensServico.reduce((acc, item) => {
       return acc + (this.getValorServico(item.servicoId) * item.quantidade);
     }, 0);
 
-    // Soma as duas categorias
     return totalProdutos + totalServicos;
   }
 

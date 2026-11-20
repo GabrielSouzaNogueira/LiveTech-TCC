@@ -45,10 +45,19 @@ export class CadastroProduto {
     const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
 
     this.cadastroProdutoService
-      .cadastroProduto(this.nomeDigitado, this.marcaDigitada, this.codBarraDigitada, this.quantidadeDigitada, this.precoCustoDigitado, this.precoVendaDigitado, usuarioAtual)
+      .cadastroProduto(
+        this.nomeDigitado,
+        this.marcaDigitada,
+        this.codBarraDigitada,
+        this.quantidadeDigitada,
+        this.precoCustoDigitado,
+        this.precoVendaDigitado,
+        usuarioAtual
+      )
       .subscribe({
         next: (resposta) => {
           this.carregando = false;
+          this.limparCampos();
           this.cdr.detectChanges();
           this.AuthNotificacaoService.sucesso(resposta?.mensagem || 'Cadastro realizado com sucesso');
         },
@@ -59,5 +68,14 @@ export class CadastroProduto {
           this.AuthNotificacaoService.erro(mensagem);
         }
       });
+  }
+
+  limparCampos(): void {
+    this.nomeDigitado = '';
+    this.marcaDigitada = '';
+    this.codBarraDigitada = '';
+    this.quantidadeDigitada = 0;
+    this.precoCustoDigitado = 0;
+    this.precoVendaDigitado = 0;
   }
 }

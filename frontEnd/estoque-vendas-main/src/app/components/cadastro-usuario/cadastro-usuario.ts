@@ -46,14 +46,20 @@ export class CadastroUsuario {
     const usuarioAtual = localStorage.getItem('usuarioLogado') || 'Sistema';
 
     this.cadastroUsuarioService
-      .cadastroUsuario(this.nomeDigitado, this.senhaDigitada, this.emailDigitado, this.telefoneDigitado, this.cargoDigitado, usuarioAtual)
+      .cadastroUsuario(
+        this.nomeDigitado,
+        this.senhaDigitada,
+        this.emailDigitado,
+        this.telefoneDigitado,
+        this.cargoDigitado,
+        usuarioAtual
+      )
       .subscribe({
         next: (resposta) => {
           this.carregando = false;
+          this.limparCampos();
           this.cdr.detectChanges();
           this.AuthNotificacaoService.sucesso(resposta?.mensagem || 'Cadastro realizado com sucesso');
-          this.limparCampos();
-        
         },
         error: (erro: HttpErrorResponse) => {
           this.carregando = false;
@@ -64,13 +70,11 @@ export class CadastroUsuario {
       });
   }
   
-    limparCampos(): void {
-      this.nomeDigitado = '';
-      this.senhaDigitada = '';
-      this.emailDigitado = '';
-      this.telefoneDigitado = '';
-      this.cargoDigitado = '';
-    }
-
+  limparCampos(): void {
+    this.nomeDigitado = '';
+    this.senhaDigitada = '';
+    this.emailDigitado = '';
+    this.telefoneDigitado = '';
+    this.cargoDigitado = '';
+  }
 }
-
