@@ -39,7 +39,6 @@ public class ClienteService {
     }
 
     // --- LISTAGEM ---
-    // --- LISTAGEM ---
     public List<ClienteSelectDTO> listarClientesAtivos() {
         List<Cliente> clientes = clienteRepository.findByStatusCustomEntity(ClienteStatus.ATIVO);
 
@@ -163,7 +162,7 @@ public class ClienteService {
                 movimentacaoRepository.save(new Movimentacao(AcaoMovimentacao.ATUALIZACAO, TipoEntidade.CLIENTE, null, cliente.getId(), cliente.getNome(), "TELEFONE", userLogado));
             }
             else {
-                throw new TelefoneNaoEncontrado("Este telefone já está cadastrado para este cliente."); // Aqui você pode considerar mudar o nome da exception futuramente para TelefoneJaCadastrado
+                return clienteRepository.save(cliente);
             }
         }
 
