@@ -158,14 +158,19 @@ public class PedidoService {
             PagPedido pagVenda = new PagPedido();
             pagVenda.setPedido(venda);
             pagVenda.setFormaPagto(formapagto);
+
+            if (pagDto.valorPago().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new TotalPagoMenorQueValorDaVenda("Algum valor informado está zerado na forma de pagamento");
+            }
+
+            if (pagDto.valorPago().compareTo(venda.getValorTotal()) > 0)  {
+                throw  new TotalPagoMenorQueValorDaVenda("Valor pago está maior que o valor total do pedido");
+            }
+
             pagVenda.setValorPago(pagDto.valorPago());
 
             listaPagamentos.add(pagVenda);
             totalPago = totalPago.add(pagDto.valorPago());
-        }
-
-        if (totalPago.compareTo(venda.getValorTotal()) < 0) {
-            throw new TotalPagoMenorQueValorDaVenda("O valor total pago é menor que o valor total do pedido.");
         }
 
         venda.setStatus(PedidoStatus.FINALIZADA);
