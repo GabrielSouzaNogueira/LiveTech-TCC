@@ -19,13 +19,19 @@
         <input type="date" id="dataFim" [(ngModel)]="dataFim" class="form-control" />
       </div>
 
-      <!-- NOVO: Filtro de Módulo (TipoEntidade) -->
+      <!-- Filtro de Módulo (TipoEntidade) -->
       <div class="form-group">
         <label for="filtroTipo">Módulo</label>
         <select id="filtroTipo" [(ngModel)]="filtroTipo" class="form-control">
           <option value="">Todos</option>
           <option value="PRODUTO">Produto</option>
           <option value="USUARIO">Usuário</option>
+          <option value="CLIENTE">Cliente</option>
+          <option value="SERVICO">Serviço</option>
+          <option value="FORMA_PAGAMENTO">Forma de Pagamento</option>
+          <option value="EQUIPAMENTO">Equipamento</option>
+          <option value="OS">Ordem de Serviço (OS)</option>
+          <option value="PEDIDO">Pedido</option>
         </select>
       </div>
 
@@ -40,10 +46,10 @@
         </select>
       </div>
 
-      <!-- Filtro de Registro Afetado (Antes era Usuário Afetado) -->
+      <!-- Filtro de Registro Afetado -->
       <div class="form-group">
         <label for="filtroRegistro">Registro Afetado</label>
-        <input type="text" id="filtroRegistro" [(ngModel)]="filtroRegistro" placeholder="Nome do produto ou usuário" class="form-control" />
+        <input type="text" id="filtroRegistro" [(ngModel)]="filtroRegistro" placeholder="Nome do registro afetado" class="form-control" />
       </div>
 
       <!-- Filtro de Responsável -->
@@ -60,6 +66,11 @@
         </button>
         <button class="btn btn-secondary" (click)="limparFiltro()" [disabled]="carregando">
           Limpar
+        </button>
+        <button class="btn btn-secondary" 
+                (click)="imprimirMovimentacoes()" 
+                [disabled]="carregando || movimentacoesExibidas.length === 0">
+          🖨️ Imprimir
         </button>
       </div>
       
@@ -92,10 +103,7 @@
             <th>#</th>
             <th>Módulo</th> 
             <th>Responsável</th>
-            
-            <!-- COLUNA SEMPRE VISÍVEL: Retiramos o *ngIf daqui -->
             <th>ID Registro</th> 
-            
             <th>Registro Afetado</th>
             <th>Ação</th>
             <th>Campo Afetado</th>
@@ -106,26 +114,24 @@
           <tr *ngFor="let mov of movimentacoesExibidas">
             <td>{{ mov.movId }}</td>
             
-            <!-- Módulo -->
-            <td><span class="badge cargo-badge">{{ mov.tipoEntidade }}</span></td>
+            <!-- Módulo formatado -->
+            <td><span class="badge cargo-badge">{{ formatarModulo(mov.tipoEntidade) }}</span></td>
             
             <!-- Responsável -->
             <td><strong>{{ mov.responsavel }}</strong></td>
             
-            <!-- CÉLULA SEMPRE VISÍVEL: O conteúdo dentro dela se adapta à entidade -->
+            <!-- ID Registro -->
             <td>
-              <!-- Se NÃO for USUARIO (Ex: Produto), mostra o ID numérico normal -->
               <span *ngIf="mov.tipoEntidade !== 'USUARIO'" class="fw-bold" style="color: #555;">
                 {{ mov.registroAfetadoId || 'N/A' }}
               </span>
 
-              <!-- Se FOR USUARIO, mostra os 8 primeiros caracteres e esconde o resto no Tooltip -->
               <span *ngIf="mov.tipoEntidade === 'USUARIO'" class="text-muted" [title]="'UUID Completo: ' + mov.registroAfetadoId" style="cursor: help;">
                 {{ mov.registroAfetadoId | slice:0:8 }}...
               </span>
             </td>
 
-            <!-- COLUNA REGISTRO AFETADO -->
+            <!-- Registro Afetado -->
             <td class="destaque">
               {{ mov.nomeRegistroAfetado }}
             </td>
@@ -144,5 +150,5 @@
         </tbody>
       </table>
     </div>
-</div>
+  </div>
 </div>
